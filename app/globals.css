@@ -1,0 +1,474 @@
+@import "tailwindcss";
+
+/*
+  Tokens do Daily Coffee. As cores vêm da referência visual: creme, marrom-café e um destaque canela.
+  Para outro cliente, troque só os valores; os nomes são usados nos componentes.
+  Contrastes conferidos: tinta/fundo 15:1, tinta-suave/fundo 5,6:1, claro/destaque 4,8:1.
+*/
+@theme {
+  --color-fundo: #f7f2ec;
+  --color-reserva: #e9e0d5;
+  --color-linha: #d8ccbe;
+  --color-tinta: #2b1e17;
+  --color-tinta-suave: #6e5d51;
+  --color-escuro: #2a1d16;
+  --color-destaque: #8f5c33;
+  --color-claro: #f6eee4;
+
+  /* Raio zero em tudo: a linguagem do site é de retângulos nítidos. */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --radius-2xl: 0;
+  --radius-3xl: 0;
+  --radius-4xl: 0;
+
+  --ease-saida: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-gaveta: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* --font-display e --font-text são criadas pelo next/font em app/fonts.ts. */
+@theme inline {
+  --font-sans: var(--font-text), sans-serif;
+}
+
+/*
+  Camadas (z-index), do fundo para a frente:
+  30 barra do WhatsApp no celular | 40 cabeçalho | 45 overlay do menu | 46 gaveta do menu
+  | 47 botão do menu (acima da gaveta, vira o X) | 50 link "Pular para o conteúdo"
+*/
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-radius: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 3.5rem;
+    font-synthesis: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background: var(--color-fundo);
+    color: var(--color-tinta);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    text-underline-offset: 0.25em;
+    text-decoration-thickness: 1px;
+  }
+
+  ::selection {
+    background: var(--color-destaque);
+    color: var(--color-claro);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-tinta);
+    outline-offset: 3px;
+  }
+
+  /* Sobre fundo escuro (hero e promoção) o contorno de foco precisa ser claro. */
+  .sobre-escuro :focus-visible {
+    outline-color: var(--color-claro);
+  }
+}
+
+/* Barra de rolagem do desktop: marrom, bem fina e discreta. No celular continua a do sistema. */
+@media (min-width: 48rem) and (hover: hover) and (pointer: fine) {
+  html::-webkit-scrollbar {
+    width: 6px;
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background: rgb(143 92 51 / 0.5);
+    border-radius: 3px;
+  }
+
+  html::-webkit-scrollbar-thumb:hover {
+    background: rgb(143 92 51 / 0.8);
+  }
+
+  /* Firefox e outros que não usam o ::-webkit-scrollbar. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: rgb(143 92 51 / 0.5) transparent;
+    }
+  }
+}
+/* Voz dos títulos: Brownland (ou o fallback). Só em caixa alta e em tamanho grande. */
+@utility titulo {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  text-transform: uppercase;
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+}
+
+/* Título de seção mais leve: a mesma Anton, mas em caixa normal e com entrelinha folgada. O tamanho
+   fica por conta de quem usa (menor que o das seções grandes). */
+@utility titulo-suave {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  line-height: 1.1;
+  letter-spacing: 0.015em;
+}
+
+/* Linhas pequenas espaçadas: fonte de texto, caixa alta, semi-bold. */
+@utility rotulo {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  line-height: 1.5;
+}
+
+@layer components {
+  .botao {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    min-height: 3.25rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: transform 160ms var(--ease-saida);
+  }
+
+  /* O ícone nunca encolhe quando o rótulo aperta o botão. */
+  .botao svg {
+    flex-shrink: 0;
+  }
+
+  /* Hover: uma camada por cima do fundo do botão que só muda de opacidade. */
+  .botao::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--sobreposicao);
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+
+  .botao:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .botao:hover::after {
+      opacity: 1;
+    }
+  }
+
+  .botao-destaque {
+    --sobreposicao: rgb(42 29 22 / 0.28);
+    background: var(--color-destaque);
+    color: var(--color-claro);
+  }
+
+  /* Botão principal do hero: a cor vem das variáveis --cta-fundo e --cta-texto da seção #inicio, que
+     o carrossel troca junto com a foto. */
+  .botao-cta-hero {
+    --sobreposicao: rgb(42 29 22 / 0.28);
+    background: var(--cta-fundo, var(--color-destaque));
+    color: var(--cta-texto, var(--color-claro));
+    border: 1px solid transparent;
+    transition:
+      transform 160ms var(--ease-saida),
+      background-color 1400ms ease;
+  }
+
+  /* Botão só de borda, usado sobre a foto do hero. */
+  .botao-contorno {
+    --sobreposicao: rgb(246 238 228 / 0.14);
+    border: 1.5px solid rgb(246 238 228 / 0.8);
+    color: var(--color-claro);
+  }
+
+  /* Sublinhado que cresce da esquerda no hover (links do menu). */
+  .link-linha {
+    position: relative;
+  }
+
+  .link-linha::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: -0.3rem;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 240ms var(--ease-saida);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .link-linha:hover::after {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Fotos dos queridinhos crescem um pouco no hover, só com mouse. */
+  .foto-produto img {
+    transition: transform 280ms var(--ease-saida);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .queridinho:hover .foto-produto img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* Menu do celular: gaveta que entra da direita, sobre um overlay. Fecha mais rápido do que abre. */
+  .gaveta {
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+      transform 260ms var(--ease-gaveta),
+      visibility 0s linear 260ms;
+  }
+
+  .gaveta[data-aberto="true"] {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform 380ms var(--ease-gaveta),
+      visibility 0s;
+  }
+
+  .gaveta-overlay {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 260ms ease,
+      visibility 0s linear 260ms;
+  }
+
+  .gaveta-overlay[data-aberto="true"] {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 320ms ease,
+      visibility 0s;
+  }
+
+  /* Os links da gaveta entram em cascata curta depois que ela começa a abrir. */
+  .gaveta-item {
+    opacity: 0;
+    transform: translateX(12px);
+    transition:
+      opacity 160ms ease,
+      transform 160ms var(--ease-saida);
+  }
+
+  .gaveta[data-aberto="true"] .gaveta-item {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 320ms ease calc(var(--i, 0) * 50ms + 120ms),
+      transform 420ms var(--ease-saida) calc(var(--i, 0) * 50ms + 120ms);
+  }
+
+  /* Ícone do menu: três barras que viram um X. */
+  .hamburguer-barras {
+    position: relative;
+    display: block;
+    width: 1.25rem;
+    height: 1rem;
+  }
+
+  .hamburguer-barras > span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transition:
+      transform 320ms var(--ease-gaveta),
+      opacity 160ms ease;
+  }
+
+  .hamburguer-barras > span:nth-child(1) {
+    top: 0;
+  }
+
+  .hamburguer-barras > span:nth-child(2) {
+    top: calc(50% - 1px);
+  }
+
+  .hamburguer-barras > span:nth-child(3) {
+    bottom: 0;
+  }
+
+  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+
+  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  /* Barra fixa do WhatsApp no celular: sobe da base depois que o hero sai da tela. */
+  .barra-whatsapp {
+    transform: translateY(100%);
+    visibility: hidden;
+    transition:
+      transform 200ms var(--ease-saida),
+      visibility 0s linear 200ms;
+  }
+
+  .barra-whatsapp[data-visivel="true"] {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 260ms var(--ease-saida),
+      visibility 0s;
+  }
+}
+
+/* Sombra suave só nos textos do hero: com a camada escura mais leve, as fotos claras
+   (caramelo, morango) ainda mantêm o contraste do texto pequeno. */
+.hero-texto > p,
+.hero-texto > h1 {
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.4);
+}
+
+/* Entrada do hero: CSS puro, para o título não depender do JavaScript para aparecer. */
+@keyframes hero-foto {
+  from {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes hero-sobe {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-foto {
+    animation: hero-foto 1000ms var(--ease-saida) both;
+  }
+
+  .hero-entra {
+    animation: hero-sobe 640ms var(--ease-saida) both;
+    animation-delay: calc(120ms + var(--ordem, 0) * 70ms);
+  }
+}
+
+/* Movimento reduzido: sem deslocamento nem escala, só aparecer. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .hero-entra {
+    animation: aparece 300ms ease both;
+  }
+
+  /* Revelação das seções (Motion): fica só o fade. !important vence o estilo que o Motion aplica. */
+  [data-revelar] {
+    transform: none !important;
+  }
+
+  .botao:active {
+    transform: none;
+  }
+
+  .foto-produto img,
+  .queridinho:hover .foto-produto img {
+    transform: none;
+  }
+
+  /* Gaveta: sem deslocamento, só aparece e some. */
+  .gaveta,
+  .gaveta[data-aberto="true"] {
+    transform: none;
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      visibility 0s linear 200ms;
+  }
+
+  .gaveta[data-aberto="true"] {
+    opacity: 1;
+    transition:
+      opacity 200ms ease,
+      visibility 0s;
+  }
+
+  .gaveta-item,
+  .gaveta[data-aberto="true"] .gaveta-item {
+    transform: none;
+    transition-delay: 0s;
+  }
+
+  .hamburguer-barras > span {
+    transition-duration: 0.01ms;
+  }
+
+  .barra-whatsapp {
+    transform: none;
+    opacity: 0;
+    transition:
+      opacity 200ms ease,
+      visibility 0s linear 200ms;
+  }
+
+  .barra-whatsapp[data-visivel="true"] {
+    opacity: 1;
+    transition:
+      opacity 200ms ease,
+      visibility 0s;
+  }
+}
