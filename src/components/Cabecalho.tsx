@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { navegacao, rotulos } from "@/data/textos";
 import { linkWhatsAppCafe } from "@/lib/links";
 import { site } from "@/site.config";
@@ -23,7 +29,9 @@ export function Cabecalho() {
     const sentinela = sentinelaRef.current;
     if (!sentinela) return;
 
-    const observador = new IntersectionObserver(([entrada]) => setPassouDoTopo(!entrada.isIntersecting));
+    const observador = new IntersectionObserver(([entrada]) =>
+      setPassouDoTopo(!entrada.isIntersecting),
+    );
     observador.observe(sentinela);
     return () => observador.disconnect();
   }, []);
@@ -31,7 +39,9 @@ export function Cabecalho() {
   useEffect(() => {
     if (!menuAberto) return;
 
-    const linksDaGaveta = Array.from(gavetaRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? []);
+    const linksDaGaveta = Array.from(
+      gavetaRef.current?.querySelectorAll<HTMLElement>("a[href]") ?? [],
+    );
     linksDaGaveta[0]?.focus();
     document.body.style.overflow = "hidden";
 
@@ -43,7 +53,9 @@ export function Cabecalho() {
       }
       if (evento.key !== "Tab") return;
 
-      const ciclo = [botaoMenuRef.current, ...linksDaGaveta].filter((el): el is HTMLElement => el !== null);
+      const ciclo = [botaoMenuRef.current, ...linksDaGaveta].filter(
+        (el): el is HTMLElement => el !== null,
+      );
       const indice = ciclo.indexOf(document.activeElement as HTMLElement);
       if (indice === -1) {
         evento.preventDefault();
@@ -78,7 +90,11 @@ export function Cabecalho() {
 
   return (
     <>
-      <div ref={sentinelaRef} aria-hidden="true" className="pointer-events-none absolute top-0 left-0 h-8 w-px" />
+      <div
+        ref={sentinelaRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 h-8 w-px"
+      />
 
       {/* Transparente com texto claro sobre o hero; creme com texto escuro depois de rolar. */}
       <header
@@ -130,7 +146,10 @@ export function Cabecalho() {
               <ul className="flex items-center gap-7">
                 {navegacao.map((link) => (
                   <li key={link.href}>
-                    <a href={link.href} className="link-linha text-[0.8125rem] font-semibold">
+                    <a
+                      href={link.href}
+                      className="link-linha text-[0.8125rem] font-semibold"
+                    >
                       {link.rotulo}
                     </a>
                   </li>
@@ -186,8 +205,16 @@ export function Cabecalho() {
         <nav aria-label="Menu do celular">
           <ul>
             {navegacao.map((link, indice) => (
-              <li key={link.href} className="gaveta-item" style={{ "--i": indice } as CSSProperties}>
-                <a href={link.href} onClick={() => setMenuAberto(false)} className="block py-3 text-lg font-semibold">
+              <li
+                key={link.href}
+                className="gaveta-item"
+                style={{ "--i": indice } as CSSProperties}
+              >
+                <a
+                  href={link.href}
+                  onClick={() => setMenuAberto(false)}
+                  className="block py-3 text-lg font-semibold"
+                >
                   {link.rotulo}
                 </a>
               </li>

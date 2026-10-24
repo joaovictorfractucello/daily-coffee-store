@@ -7,11 +7,18 @@ import { imagens } from "@/lib/imagens";
 // Embaixo, 3 itens em linha, cada um com um ícone, separados por uma linha fina (sem caixas).
 export function QuemSomos() {
   return (
-    <section id="quem-somos" aria-labelledby="quem-somos-titulo" className="px-4 pb-20 sm:px-6 md:pb-28 lg:px-10">
+    <section
+      id="quem-somos"
+      aria-labelledby="quem-somos-titulo"
+      className="px-4 pb-20 sm:px-6 md:pb-28 lg:px-10"
+    >
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 md:grid-cols-12 md:items-center md:gap-x-12">
           <Revelar className="md:col-span-5">
-            <h2 id="quem-somos-titulo" className="titulo-suave text-[2rem] md:text-[2.5rem]">
+            <h2
+              id="quem-somos-titulo"
+              className="titulo-suave text-[2rem] md:text-[2.5rem]"
+            >
               {quemSomos.titulo}
             </h2>
             <div className="mt-5 flex max-w-[44ch] flex-col gap-4 text-[1.0625rem] text-tinta-suave">
@@ -38,7 +45,9 @@ export function QuemSomos() {
                 />
                 <div>
                   <h3 className="font-bold">{fato.titulo}</h3>
-                  <p className="mt-1 text-[0.9375rem] leading-snug text-tinta-suave">{fato.texto}</p>
+                  <p className="mt-1 text-[0.9375rem] leading-snug text-tinta-suave">
+                    {fato.texto}
+                  </p>
                 </div>
               </li>
             ))}

@@ -43,7 +43,8 @@ export const queridinhosTextos = {
 export const promocao = {
   // Cada item é uma linha do título.
   titulo: ["Cappuccino", "com pão de queijo"],
-  descricao: "O par favorito da casa: cappuccino cremoso e pão de queijo quentinho, juntos por",
+  descricao:
+    "O par favorito da casa: cappuccino cremoso e pão de queijo quentinho, juntos por",
   // Em reais. EXEMPLO (café fictício): troque pelo preço real do combo.
   preco: 22,
   botao: "Pedir o combo",
@@ -63,9 +64,21 @@ export const quemSomos = {
   ],
   // Os 3 itens em linha embaixo do texto (ocupam o lugar da antiga faixa escura).
   fatos: [
-    { titulo: "Café coado na hora", texto: "Cada xícara é feita no momento do pedido.", icone: "iconeCafe" },
-    { titulo: "Aberto todos os dias", texto: "Da manhã ao fim da tarde, sem pressa.", icone: "iconeDias" },
-    { titulo: "Pão de queijo saindo do forno", texto: "Fornadas pequenas ao longo do dia.", icone: "iconePao" },
+    {
+      titulo: "Café coado na hora",
+      texto: "Cada xícara é feita no momento do pedido.",
+      icone: "iconeCafe",
+    },
+    {
+      titulo: "Aberto todos os dias",
+      texto: "Da manhã ao fim da tarde, sem pressa.",
+      icone: "iconeDias",
+    },
+    {
+      titulo: "Pão de queijo saindo do forno",
+      texto: "Fornadas pequenas ao longo do dia.",
+      icone: "iconePao",
+    },
   ] as const,
 };
 
@@ -80,7 +93,8 @@ export const visitar = {
 };
 
 export const rodape = {
-  descricao: "Café coado na hora, pão de queijo quentinho e mesa para ficar com calma.",
+  descricao:
+    "Café coado na hora, pão de queijo quentinho e mesa para ficar com calma.",
   tituloNavegacao: "Navegação",
   tituloHorario: "Horário",
   tituloContato: "Contato",

@@ -6,7 +6,8 @@ import type { ReactNode } from "react";
 
 // O "m" é a versão mínima do componente; os recursos de animação chegam depois, sem
 // bloquear a primeira carga da página.
-const carregarRecursos = () => import("@/lib/recursos-motion").then((modulo) => modulo.default);
+const carregarRecursos = () =>
+  import("@/lib/recursos-motion").then((modulo) => modulo.default);
 
 type RevelarProps = {
   children: ReactNode;

@@ -3,7 +3,12 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-type Slide = { src: string; alt: string; sizes: string; cta: { fundo: string; texto: string } };
+type Slide = {
+  src: string;
+  alt: string;
+  sizes: string;
+  cta: { fundo: string; texto: string };
+};
 
 const INTERVALO_MS = 5000;
 
@@ -32,14 +37,18 @@ export function HeroFotos({ slides }: { slides: Slide[] }) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const id = window.setInterval(() => {
-      if (!document.hidden && heroNaTela.current) setAtivo((atual) => (atual + 1) % slides.length);
+      if (!document.hidden && heroNaTela.current)
+        setAtivo((atual) => (atual + 1) % slides.length);
     }, INTERVALO_MS);
     return () => window.clearInterval(id);
   }, [slides.length]);
 
   useEffect(() => {
     const { fundo, texto } = slides[ativo].cta;
-    for (const alvo of [document.getElementById("inicio"), document.querySelector("header")]) {
+    for (const alvo of [
+      document.getElementById("inicio"),
+      document.querySelector("header"),
+    ]) {
       alvo?.style.setProperty("--cta-fundo", fundo);
       alvo?.style.setProperty("--cta-texto", texto);
     }

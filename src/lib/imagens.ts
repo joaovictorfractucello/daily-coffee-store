@@ -11,7 +11,8 @@ export type Imagem = {
   sizes: string;
 };
 
-const sizesQueridinho = "(min-width: 1280px) 380px, (min-width: 768px) 30vw, 92vw";
+const sizesQueridinho =
+  "(min-width: 1280px) 380px, (min-width: 768px) 30vw, 92vw";
 
 export const imagens = {
   cappuccinoCremoso: {

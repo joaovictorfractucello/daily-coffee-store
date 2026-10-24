@@ -14,7 +14,12 @@ function Mapa() {
   return (
     <div className="relative aspect-[4/3] overflow-hidden bg-reserva md:aspect-auto md:h-full md:min-h-[22rem]">
       <MapaGoogle src={urlMapa} titulo={visitar.tituloMapa} />
-      <a href={linkComoChegar} target="_blank" rel="noopener noreferrer" className="absolute inset-0">
+      <a
+        href={linkComoChegar}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute inset-0"
+      >
         <span className="sr-only">
           {visitar.abrirMapa} {visitar.abreMapa}
         </span>
@@ -27,10 +32,17 @@ export function Visitar() {
   const { endereco } = site;
 
   return (
-    <section id="visitar" aria-labelledby="visitar-titulo" className="scroll-mt-12 px-4 pb-20 sm:px-6 md:scroll-mt-16 md:pb-28 lg:px-10">
+    <section
+      id="visitar"
+      aria-labelledby="visitar-titulo"
+      className="scroll-mt-12 px-4 pb-20 sm:px-6 md:scroll-mt-16 md:pb-28 lg:px-10"
+    >
       <div className="mx-auto max-w-7xl">
         <Revelar>
-          <h2 id="visitar-titulo" className="titulo-suave text-[2rem] md:text-[2.5rem]">
+          <h2
+            id="visitar-titulo"
+            className="titulo-suave text-[2rem] md:text-[2.5rem]"
+          >
             {visitar.titulo}
           </h2>
         </Revelar>
@@ -54,7 +66,8 @@ export function Visitar() {
                     <Fragment key={horario.rotulo}>
                       <dt>{horario.rotulo}</dt>
                       <dd className="tabular-nums">
-                        {formatarHora(horario.abre)} às {formatarHora(horario.fecha)}
+                        {formatarHora(horario.abre)} às{" "}
+                        {formatarHora(horario.fecha)}
                       </dd>
                     </Fragment>
                   ))}

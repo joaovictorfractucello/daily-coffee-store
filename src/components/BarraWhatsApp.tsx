@@ -13,19 +13,26 @@ export function BarraWhatsApp() {
   useEffect(() => {
     const alvos = document.querySelectorAll("[data-cta-whatsapp]");
     const naTela = new Set<Element>();
-    const observador = new IntersectionObserver((entradas) => {
-      for (const entrada of entradas) {
-        if (entrada.isIntersecting) naTela.add(entrada.target);
-        else naTela.delete(entrada.target);
-      }
-      setVisivel(naTela.size === 0);
-    }, { rootMargin: "-56px 0px 0px 0px" }); // ignora a faixa coberta pelo cabeçalho fixo
+    const observador = new IntersectionObserver(
+      (entradas) => {
+        for (const entrada of entradas) {
+          if (entrada.isIntersecting) naTela.add(entrada.target);
+          else naTela.delete(entrada.target);
+        }
+        setVisivel(naTela.size === 0);
+      },
+      { rootMargin: "-56px 0px 0px 0px" },
+    ); // ignora a faixa coberta pelo cabeçalho fixo
     alvos.forEach((alvo) => observador.observe(alvo));
     return () => observador.disconnect();
   }, []);
 
   return (
-    <div data-visivel={visivel} inert={!visivel} className="barra-whatsapp fixed inset-x-0 bottom-0 z-30 md:hidden">
+    <div
+      data-visivel={visivel}
+      inert={!visivel}
+      className="barra-whatsapp fixed inset-x-0 bottom-0 z-30 md:hidden"
+    >
       <a
         href={linkWhatsAppCafe}
         target="_blank"
