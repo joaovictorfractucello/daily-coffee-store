@@ -17,7 +17,9 @@ function montarDadosEstruturados() {
     url: site.url,
     telephone: `+${site.whatsapp.numero.replace(/\D/g, "")}`,
     menu: new URL(linkCardapio, site.url).toString(),
-    ...(existeEmPublic(fotoHero.arquivo) && { image: new URL(fotoHero.arquivo, site.url).toString() }),
+    ...(existeEmPublic(fotoHero.arquivo) && {
+      image: new URL(fotoHero.arquivo, site.url).toString(),
+    }),
     address: {
       "@type": "PostalAddress",
       streetAddress: `${site.endereco.rua}, ${site.endereco.bairro}`,
@@ -37,6 +39,14 @@ function montarDadosEstruturados() {
 
 export function DadosEstruturados() {
   // Escapa "<" para um texto dos dados nunca conseguir fechar a tag <script>.
-  const json = JSON.stringify(montarDadosEstruturados()).replace(/</g, "\\u003c");
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
+  const json = JSON.stringify(montarDadosEstruturados()).replace(
+    /</g,
+    "\\u003c",
+  );
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: json }}
+    />
+  );
 }

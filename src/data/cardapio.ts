@@ -33,7 +33,8 @@ export const queridinhos: Queridinho[] = [
   },
   {
     nome: "Croissant de manteiga",
-    descricao: "Massa folhada na manteiga, crocante por fora e macia por dentro.",
+    descricao:
+      "Massa folhada na manteiga, crocante por fora e macia por dentro.",
     preco: 16,
     imagem: "croissantDeManteiga",
   },

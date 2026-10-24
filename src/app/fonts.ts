@@ -19,7 +19,7 @@ export const fonteTitulo = Anton({
 });
 
 // export const fonteTitulo = localFont({
-//   src: "../public/fonts/Brownland.otf",
+//   src: "../../public/fonts/Brownland.otf",
 //   display: "swap",
 //   variable: "--font-display",
 // });

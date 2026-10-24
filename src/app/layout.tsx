@@ -29,7 +29,14 @@ export async function generateMetadata(): Promise<Metadata> {
       description: seo.descricao,
       // Sem a foto do hero, nenhuma imagem de compartilhamento é declarada.
       images: temFotoHero
-        ? [{ url: fotoHero.arquivo, width: fotoHero.largura, height: fotoHero.altura, alt: fotoHero.alt }]
+        ? [
+            {
+              url: fotoHero.arquivo,
+              width: fotoHero.largura,
+              height: fotoHero.altura,
+              alt: fotoHero.alt,
+            },
+          ]
         : undefined,
     },
     twitter: { card: temFotoHero ? "summary_large_image" : "summary" },
@@ -43,7 +50,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${fonteTitulo.variable} ${fonteTexto.variable}`}>
+    <html
+      lang="pt-BR"
+      className={`${fonteTitulo.variable} ${fonteTexto.variable}`}
+    >
       <body>
         <a
           href="#conteudo"
@@ -58,7 +68,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <DadosEstruturados />
         {/* Sem JavaScript, o conteúdo que seria revelado ao rolar aparece direto. */}
         <noscript>
-          <style>{"[data-revelar]{opacity:1!important;transform:none!important}"}</style>
+          <style>
+            {"[data-revelar]{opacity:1!important;transform:none!important}"}
+          </style>
         </noscript>
       </body>
     </html>

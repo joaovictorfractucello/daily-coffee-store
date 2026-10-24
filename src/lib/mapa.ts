@@ -4,8 +4,12 @@ import { site } from "@/site.config";
 // Só aceita o embed do Google Maps (qualquer outro valor no .env, como outro site ou "javascript:",
 // é ignorado em vez de virar um iframe).
 function ehEmbedDoGoogle(url: URL) {
-  if (url.protocol !== "https:" || url.hostname !== "www.google.com") return false;
-  return url.pathname.startsWith("/maps/embed") || (url.pathname === "/maps" && url.searchParams.get("output") === "embed");
+  if (url.protocol !== "https:" || url.hostname !== "www.google.com")
+    return false;
+  return (
+    url.pathname.startsWith("/maps/embed") ||
+    (url.pathname === "/maps" && url.searchParams.get("output") === "embed")
+  );
 }
 
 function urlSegura(url: string): string | null {

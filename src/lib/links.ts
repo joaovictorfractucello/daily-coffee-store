@@ -6,9 +6,15 @@ export function linkWhatsApp(numero: string, mensagem: string) {
   return `https://wa.me/${soDigitos}?text=${encodeURIComponent(mensagem)}`;
 }
 
-export const linkWhatsAppCafe = linkWhatsApp(site.whatsapp.numero, site.whatsapp.mensagem);
+export const linkWhatsAppCafe = linkWhatsApp(
+  site.whatsapp.numero,
+  site.whatsapp.mensagem,
+);
 
-export const linkWhatsAppCombo = linkWhatsApp(site.whatsapp.numero, site.whatsapp.mensagemCombo);
+export const linkWhatsAppCombo = linkWhatsApp(
+  site.whatsapp.numero,
+  site.whatsapp.mensagemCombo,
+);
 
 export const linkCardapio = site.cardapioPdfUrl;
 

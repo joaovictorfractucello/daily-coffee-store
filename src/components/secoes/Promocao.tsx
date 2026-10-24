@@ -43,7 +43,11 @@ export function Promocao() {
                 ))}
               </h2>
               <p className="mt-4 max-w-[34ch] text-[1.0625rem] md:text-lg md:[text-shadow:0_1px_12px_rgb(0_0_0/0.4)]">
-                {promocao.descricao} <strong className="font-bold">{formatarPreco(promocao.preco)}</strong>.
+                {promocao.descricao}{" "}
+                <strong className="font-bold">
+                  {formatarPreco(promocao.preco)}
+                </strong>
+                .
               </p>
               <a
                 href={linkWhatsAppCombo}

@@ -23,7 +23,9 @@ export function Foto({
   proporcaoPropria = false,
   qualidade = 75,
 }: FotoProps) {
-  const proporcao = proporcaoPropria ? undefined : { aspectRatio: `${imagem.largura} / ${imagem.altura}` };
+  const proporcao = proporcaoPropria
+    ? undefined
+    : { aspectRatio: `${imagem.largura} / ${imagem.altura}` };
 
   if (existeEmPublic(imagem.arquivo)) {
     return (
@@ -41,7 +43,11 @@ export function Foto({
   }
 
   return (
-    <div aria-hidden="true" className={`relative grid place-items-center bg-reserva ${className}`} style={proporcao}>
+    <div
+      aria-hidden="true"
+      className={`relative grid place-items-center bg-reserva ${className}`}
+      style={proporcao}
+    >
       {process.env.NODE_ENV !== "production" && (
         <span className="px-4 text-center text-xs font-semibold text-tinta-suave">
           {imagem.arquivo.replace("/images/", "")}
