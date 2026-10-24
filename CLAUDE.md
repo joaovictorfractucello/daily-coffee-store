@@ -30,13 +30,14 @@ npx prisma db seed     # popular o banco com dados de exemplo
 Fluxo: `route.ts → middleware → controller → service → repository`
  
 - `route.ts`: só liga o método HTTP ao controller.
-- **Controller**: lê a requisição, valida com Zod, chama o service, converte erros em status HTTP.
+- **Controller**: lê a requisição, valida com Zod e chama o service. Sem try/catch: erros sobem até o `withErrorHandler`.
 - **Service**: regras de negócio. Não conhece HTTP (nada de `Request`, `Response` ou status).
 - **Repository**: único lugar que usa o Prisma.
-- Erros do domínio estendem `AppError` (`src/server/errors/`).
+- Erros do domínio estendem `AppError` (`message`, `code`, `kind`), sem status HTTP. O `withErrorHandler` (`src/server/errors/error-handler.ts`) converte `kind` em status.
 - Serviços externos (e-mail, pagamento) ficam atrás de interfaces.
 - Tudo em `src/server/` importa `server-only`.
 - Não usar Server Actions para operações de dados: a API é REST (Route Handlers), testável no Postman.
+
 ## Convenções
  
 - Código (variáveis, funções, arquivos) em **inglês**; textos da interface em **português**.
@@ -65,8 +66,11 @@ Toda regra de negócio nova vem acompanhada de teste unitário.
 - Nunca commitar direto em `main` ou `develop`.
 - **Os commits são feitos por mim.** Não execute `git commit`, `git push`, merge ou abertura de PR.
 - Ao terminar uma parte do trabalho, sugira a mensagem de commit (Conventional Commits) e quais arquivos entram nele. Se houver mudanças de assuntos diferentes, sugira separá-las em commits distintos.
+
 ## Como trabalhar comigo
  
+- Respostas **precisas, didáticas e resumidas**: vá direto ao ponto, explique em linguagem simples e use exemplos curtos quando ajudarem.
+- **Resumir não é omitir.** Riscos, efeitos colaterais, o que pode quebrar, alternativas relevantes e pontos em que você não tem certeza devem sempre aparecer, mesmo que em uma linha.
 - Eu tomo as decisões. Antes de mudanças grandes, apresente um plano curto e espere aprovação.
 - Se uma ideia minha tiver problema (segurança, arquitetura, complexidade), diga claramente e explique o motivo.
 - Prefira a solução simples. Cite a alternativa complexa só se fizer sentido, dizendo quando valeria a pena.
