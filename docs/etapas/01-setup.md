@@ -33,29 +33,29 @@ Ter o `daily-coffee-store` rodando localmente, em staging (`develop`) e em produ
 ## Tarefas
  
 ### 0. Repositório (commit inicial direto na `main`)
-- [ ] Copiar a landing **sem** `.git`, `node_modules` e `.next`
-- [ ] Alterar `name` no `package.json` para `daily-coffee-store`
-- [ ] Criar o repositório no GitHub e as branches `main` e `develop`
-- [ ] Proteger `main` e `develop`: merge só via PR com CI aprovado (o CI passa a ser obrigatório quando existir, na tarefa 5)
-- [ ] Adicionar `CLAUDE.md`, `docs/SPEC.md` e `docs/data-model.md`
+- [x] Copiar a landing **sem** `.git`, `node_modules` e `.next`
+- [x] Alterar `name` no `package.json` para `daily-coffee-store`
+- [x] Criar o repositório no GitHub e as branches `main` e `develop`
+- [ ] ~~Proteger `main` e `develop`: merge só via PR com CI aprovado (o CI passa a ser obrigatório quando existir, na tarefa 5)~~ — **desligada por decisão** (projeto solo); reavaliar na tarefa 5
+- [x] Adicionar `CLAUDE.md`, `docs/SPEC.md` e `docs/data-model.md`
 ### 1. `feature/setup-tooling`
-- [ ] TypeScript em modo `strict` e alias `@/` → `src/`
-- [ ] Script `typecheck` (`tsc --noEmit`)
-- [ ] Prettier + `prettier-plugin-tailwindcss` (ordena as classes do Tailwind), integrado ao ESLint
-- [ ] Scripts `format` e `format:check`
-- [ ] Fixar a versão do Node: `.nvmrc` + campo `engines` no `package.json`
+- [x] TypeScript em modo `strict` e alias `@/` → `src/`
+- [x] Script `typecheck` (`tsc --noEmit`)
+- [x] Prettier + `prettier-plugin-tailwindcss` (ordena as classes do Tailwind), integrado ao ESLint
+- [x] Scripts `format` e `format:check`
+- [x] Fixar a versão do Node: `.nvmrc` + campo `engines` no `package.json`
 ### 1b. `feature/setup-english`
 Traduzir para inglês os identificadores herdados da landing (componentes, funções, variáveis, arquivos e chaves de configuração), seguindo a convenção do CLAUDE.md.
-- [ ] Apenas renomear: **nenhuma mudança de visual ou comportamento**
-- [ ] Textos exibidos ao usuário continuam em português (ex.: a chave `address` guarda "Rua Capitão Macedo, 450")
-- [ ] `formatarPreco` vira a base do `formatPrice` da tarefa 4: verificar se recebe reais ou centavos e alinhar à regra de centavos na tarefa 4 (sem mudar comportamento nesta branch)
-- [ ] Conferência visual: a página fica idêntica antes e depois
+- [x] Apenas renomear: **nenhuma mudança de visual ou comportamento**
+- [x] Textos exibidos ao usuário continuam em português (ex.: a chave `address` guarda "Rua Capitão Macedo, 450")
+- [x] `formatarPreco` vira a base do `formatPrice` da tarefa 4: verificar se recebe reais ou centavos e alinhar à regra de centavos na tarefa 4 (sem mudar comportamento nesta branch) → recebe **reais**; a conversão para centavos fica na tarefa 4
+- [x] Conferência visual: a página fica idêntica antes e depois (HTML e CSS do build comparados antes e depois: equivalentes)
 ### 2. `feature/setup-structure`
-- [ ] Criar `src/server/` com `controllers/`, `services/`, `repositories/`, `middlewares/`, `validators/`, `errors/`, `lib/`
-- [ ] Instalar `server-only`
-- [ ] Classe base `AppError` com `message`, `code` (ex.: `PRODUCT_NOT_FOUND`) e `kind` (`NOT_FOUND`, `CONFLICT`, `VALIDATION`, `UNAUTHORIZED`, `FORBIDDEN`), **sem status HTTP**: o domínio não conhece HTTP
-- [ ] `src/server/errors/error-handler.ts`: wrapper `withErrorHandler(handler)` com o mapa `kind → status` tipado (`Record<ErrorKind, number>`); erros desconhecidos viram 500 sem detalhes internos
-- [ ] `src/env.ts`: validação das variáveis de ambiente com Zod; o projeto falha ao iniciar se faltar alguma
+- [x] Criar `src/server/` com `controllers/`, `services/`, `repositories/`, `middlewares/`, `validators/`, `errors/`, `lib/` → só `errors/` agora; as outras pastas nascem com o primeiro arquivo (decisão: sem pasta vazia)
+- [x] Instalar `server-only`
+- [x] Classe base `AppError` com `message`, `code` (ex.: `PRODUCT_NOT_FOUND`) e `kind` (`NOT_FOUND`, `CONFLICT`, `VALIDATION`, `UNAUTHORIZED`, `FORBIDDEN`), **sem status HTTP**: o domínio não conhece HTTP
+- [x] `src/server/errors/error-handler.ts`: wrapper `withErrorHandler(handler)` com o mapa `kind → status` tipado (`Record<ErrorKind, number>`); erros desconhecidos viram 500 sem detalhes internos
+- [x] `src/env.ts`: validação das variáveis de ambiente com Zod; o projeto falha ao iniciar se faltar alguma → importado no `next.config.ts`, falha no `dev` e no `build`; as URLs do banco entram na tarefa 3
 ### 3. `feature/setup-database`
 - [ ] Criar o projeto no Neon com os branches `main` (produção) e `dev` (staging e local)
 - [ ] Instalar e configurar o Prisma **conforme a documentação da versão atual** (versões recentes mudaram a configuração)
