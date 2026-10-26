@@ -41,6 +41,7 @@ Fluxo: `route.ts → middleware → controller → service → repository`
 ## Convenções
  
 - Código (variáveis, funções, arquivos) em **inglês**; textos da interface em **português**.
+- **URLs públicas em português**: rotas das páginas (`/cardapio`, `/carrinho`), âncoras (`#queridinhos`, `#quem-somos`) e arquivos servidos de `public/` (`/cardapio.pdf`). O nome do componente ou da variável que as usa continua em inglês.
 - Dinheiro sempre em **centavos (inteiro)**, com sufixo `InCents`. Formatar em reais só na interface.
 - Listas fixas de valores são **enums do Prisma**. Rótulos de tela ficam em mapas no código.
 - Ícones: somente **Phosphor**. Ao adicionar componentes do shadcn, trocar os ícones do lucide.
