@@ -3,17 +3,17 @@
 /*
   Tokens do Daily Coffee. As cores vêm da referência visual: creme, marrom-café e um destaque canela.
   Para outro cliente, troque só os valores; os nomes são usados nos componentes.
-  Contrastes conferidos: tinta/fundo 15:1, tinta-suave/fundo 5,6:1, claro/destaque 4,8:1.
+  Contrastes conferidos: ink/background 15:1, ink-soft/background 5,6:1, light/accent 4,8:1.
 */
 @theme {
-  --color-fundo: #f7f2ec;
-  --color-reserva: #e9e0d5;
-  --color-linha: #d8ccbe;
-  --color-tinta: #2b1e17;
-  --color-tinta-suave: #6e5d51;
-  --color-escuro: #2a1d16;
-  --color-destaque: #8f5c33;
-  --color-claro: #f6eee4;
+  --color-background: #f7f2ec;
+  --color-muted: #e9e0d5;
+  --color-line: #d8ccbe;
+  --color-ink: #2b1e17;
+  --color-ink-soft: #6e5d51;
+  --color-dark: #2a1d16;
+  --color-accent: #8f5c33;
+  --color-light: #f6eee4;
 
   /* Raio zero em tudo: a linguagem do site é de retângulos nítidos. */
   --radius-xs: 0;
@@ -25,8 +25,8 @@
   --radius-3xl: 0;
   --radius-4xl: 0;
 
-  --ease-saida: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-gaveta: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-snappy: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 /* --font-display e --font-text são criadas pelo next/font em app/fonts.ts. */
@@ -36,8 +36,8 @@
 
 /*
   Camadas (z-index), do fundo para a frente:
-  30 barra do WhatsApp no celular | 40 cabeçalho | 45 overlay do menu | 46 gaveta do menu
-  | 47 botão do menu (acima da gaveta, vira o X) | 50 link "Pular para o conteúdo"
+  30 barra do WhatsApp no celular | 40 cabeçalho | 45 overlay do menu | 46 drawer do menu
+  | 47 botão do menu (acima da drawer, vira o X) | 50 link "Pular para o conteúdo"
 */
 
 @layer base {
@@ -55,8 +55,8 @@
   }
 
   body {
-    background: var(--color-fundo);
-    color: var(--color-tinta);
+    background: var(--color-background);
+    color: var(--color-ink);
     font-size: 1.0625rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -79,18 +79,18 @@
   }
 
   ::selection {
-    background: var(--color-destaque);
-    color: var(--color-claro);
+    background: var(--color-accent);
+    color: var(--color-light);
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-tinta);
+    outline: 2px solid var(--color-ink);
     outline-offset: 3px;
   }
 
   /* Sobre fundo escuro (hero e promoção) o contorno de foco precisa ser claro. */
-  .sobre-escuro :focus-visible {
-    outline-color: var(--color-claro);
+  .on-dark :focus-visible {
+    outline-color: var(--color-light);
   }
 }
 
@@ -123,7 +123,7 @@
   }
 }
 /* Voz dos títulos: Brownland (ou o fallback). Só em caixa alta e em tamanho grande. */
-@utility titulo {
+@utility heading {
   font-family: var(--font-display), sans-serif;
   font-weight: 400;
   font-synthesis: none;
@@ -134,7 +134,7 @@
 
 /* Título de seção mais leve: a mesma Anton, mas em caixa normal e com entrelinha folgada. O tamanho
    fica por conta de quem usa (menor que o das seções grandes). */
-@utility titulo-suave {
+@utility heading-soft {
   font-family: var(--font-display), sans-serif;
   font-weight: 400;
   font-synthesis: none;
@@ -143,7 +143,7 @@
 }
 
 /* Linhas pequenas espaçadas: fonte de texto, caixa alta, semi-bold. */
-@utility rotulo {
+@utility eyebrow {
   font-family: var(--font-sans);
   font-weight: 600;
   text-transform: uppercase;
@@ -152,7 +152,7 @@
 }
 
 @layer components {
-  .botao {
+  .button {
     position: relative;
     isolation: isolate;
     display: inline-flex;
@@ -167,67 +167,67 @@
     line-height: 1.2;
     white-space: nowrap;
     text-decoration: none;
-    transition: transform 160ms var(--ease-saida);
+    transition: transform 160ms var(--ease-snappy);
   }
 
   /* O ícone nunca encolhe quando o rótulo aperta o botão. */
-  .botao svg {
+  .button svg {
     flex-shrink: 0;
   }
 
   /* Hover: uma camada por cima do fundo do botão que só muda de opacidade. */
-  .botao::after {
+  .button::after {
     content: "";
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: var(--sobreposicao);
+    background: var(--overlay);
     border-radius: inherit;
     opacity: 0;
     transition: opacity 200ms ease;
   }
 
-  .botao:active {
+  .button:active {
     transform: scale(0.97);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .botao:hover::after {
+    .button:hover::after {
       opacity: 1;
     }
   }
 
-  .botao-destaque {
-    --sobreposicao: rgb(42 29 22 / 0.28);
-    background: var(--color-destaque);
-    color: var(--color-claro);
+  .button-accent {
+    --overlay: rgb(42 29 22 / 0.28);
+    background: var(--color-accent);
+    color: var(--color-light);
   }
 
-  /* Botão principal do hero: a cor vem das variáveis --cta-fundo e --cta-texto da seção #inicio, que
+  /* Botão principal do hero: a cor vem das variáveis --cta-background e --cta-text da seção #inicio, que
      o carrossel troca junto com a foto. */
-  .botao-cta-hero {
-    --sobreposicao: rgb(42 29 22 / 0.28);
-    background: var(--cta-fundo, var(--color-destaque));
-    color: var(--cta-texto, var(--color-claro));
+  .button-hero-cta {
+    --overlay: rgb(42 29 22 / 0.28);
+    background: var(--cta-background, var(--color-accent));
+    color: var(--cta-text, var(--color-light));
     border: 1px solid transparent;
     transition:
-      transform 160ms var(--ease-saida),
+      transform 160ms var(--ease-snappy),
       background-color 1400ms ease;
   }
 
   /* Botão só de borda, usado sobre a foto do hero. */
-  .botao-contorno {
-    --sobreposicao: rgb(246 238 228 / 0.14);
+  .button-outline {
+    --overlay: rgb(246 238 228 / 0.14);
     border: 1.5px solid rgb(246 238 228 / 0.8);
-    color: var(--color-claro);
+    color: var(--color-light);
   }
 
   /* Sublinhado que cresce da esquerda no hover (links do menu). */
-  .link-linha {
+  .link-underline {
     position: relative;
   }
 
-  .link-linha::after {
+  .link-underline::after {
     content: "";
     position: absolute;
     inset-inline: 0;
@@ -236,44 +236,44 @@
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 240ms var(--ease-saida);
+    transition: transform 240ms var(--ease-snappy);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .link-linha:hover::after {
+    .link-underline:hover::after {
       transform: scaleX(1);
     }
   }
 
   /* Fotos dos queridinhos crescem um pouco no hover, só com mouse. */
-  .foto-produto img {
-    transition: transform 280ms var(--ease-saida);
+  .product-photo img {
+    transition: transform 280ms var(--ease-snappy);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .queridinho:hover .foto-produto img {
+    .favorite:hover .product-photo img {
       transform: scale(1.03);
     }
   }
 
-  /* Menu do celular: gaveta que entra da direita, sobre um overlay. Fecha mais rápido do que abre. */
-  .gaveta {
+  /* Menu do celular: drawer que entra da direita, sobre um overlay. Fecha mais rápido do que abre. */
+  .drawer {
     transform: translateX(100%);
     visibility: hidden;
     transition:
-      transform 260ms var(--ease-gaveta),
+      transform 260ms var(--ease-drawer),
       visibility 0s linear 260ms;
   }
 
-  .gaveta[data-aberto="true"] {
+  .drawer[data-open="true"] {
     transform: translateX(0);
     visibility: visible;
     transition:
-      transform 380ms var(--ease-gaveta),
+      transform 380ms var(--ease-drawer),
       visibility 0s;
   }
 
-  .gaveta-overlay {
+  .drawer-overlay {
     opacity: 0;
     visibility: hidden;
     transition:
@@ -281,7 +281,7 @@
       visibility 0s linear 260ms;
   }
 
-  .gaveta-overlay[data-aberto="true"] {
+  .drawer-overlay[data-open="true"] {
     opacity: 1;
     visibility: visible;
     transition:
@@ -289,120 +289,120 @@
       visibility 0s;
   }
 
-  /* Os links da gaveta entram em cascata curta depois que ela começa a abrir. */
-  .gaveta-item {
+  /* Os links da drawer entram em cascata curta depois que ela começa a abrir. */
+  .drawer-item {
     opacity: 0;
     transform: translateX(12px);
     transition:
       opacity 160ms ease,
-      transform 160ms var(--ease-saida);
+      transform 160ms var(--ease-snappy);
   }
 
-  .gaveta[data-aberto="true"] .gaveta-item {
+  .drawer[data-open="true"] .drawer-item {
     opacity: 1;
     transform: none;
     transition:
       opacity 320ms ease calc(var(--i, 0) * 50ms + 120ms),
-      transform 420ms var(--ease-saida) calc(var(--i, 0) * 50ms + 120ms);
+      transform 420ms var(--ease-snappy) calc(var(--i, 0) * 50ms + 120ms);
   }
 
   /* Ícone do menu: três barras que viram um X. */
-  .hamburguer-barras {
+  .hamburger-bars {
     position: relative;
     display: block;
     width: 1.25rem;
     height: 1rem;
   }
 
-  .hamburguer-barras > span {
+  .hamburger-bars > span {
     position: absolute;
     left: 0;
     width: 100%;
     height: 2px;
     background: currentColor;
     transition:
-      transform 320ms var(--ease-gaveta),
+      transform 320ms var(--ease-drawer),
       opacity 160ms ease;
   }
 
-  .hamburguer-barras > span:nth-child(1) {
+  .hamburger-bars > span:nth-child(1) {
     top: 0;
   }
 
-  .hamburguer-barras > span:nth-child(2) {
+  .hamburger-bars > span:nth-child(2) {
     top: calc(50% - 1px);
   }
 
-  .hamburguer-barras > span:nth-child(3) {
+  .hamburger-bars > span:nth-child(3) {
     bottom: 0;
   }
 
-  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(1) {
+  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
   }
 
-  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(2) {
+  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(2) {
     opacity: 0;
     transform: scaleX(0.2);
   }
 
-  .hamburguer[data-aberto="true"] .hamburguer-barras > span:nth-child(3) {
+  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
   }
 
   /* Barra fixa do WhatsApp no celular: sobe da base depois que o hero sai da tela. */
-  .barra-whatsapp {
+  .whatsapp-bar {
     transform: translateY(100%);
     visibility: hidden;
     transition:
-      transform 200ms var(--ease-saida),
+      transform 200ms var(--ease-snappy),
       visibility 0s linear 200ms;
   }
 
-  .barra-whatsapp[data-visivel="true"] {
+  .whatsapp-bar[data-visible="true"] {
     transform: none;
     visibility: visible;
     transition:
-      transform 260ms var(--ease-saida),
+      transform 260ms var(--ease-snappy),
       visibility 0s;
   }
 }
 
 /* Sombra suave só nos textos do hero: com a camada escura mais leve, as fotos claras
    (caramelo, morango) ainda mantêm o contraste do texto pequeno. */
-.hero-texto > p,
-.hero-texto > h1 {
+.hero-text > p,
+.hero-text > h1 {
   text-shadow: 0 1px 14px rgb(0 0 0 / 0.4);
 }
 
 /* Entrada do hero: CSS puro, para o título não depender do JavaScript para aparecer. */
-@keyframes hero-foto {
+@keyframes hero-photo {
   from {
     transform: scale(1.03);
   }
 }
 
-@keyframes hero-sobe {
+@keyframes hero-rise {
   from {
     opacity: 0;
     transform: translateY(12px);
   }
 }
 
-@keyframes aparece {
+@keyframes fade-in {
   from {
     opacity: 0;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero-foto {
-    animation: hero-foto 1000ms var(--ease-saida) both;
+  .hero-photo {
+    animation: hero-photo 1000ms var(--ease-snappy) both;
   }
 
-  .hero-entra {
-    animation: hero-sobe 640ms var(--ease-saida) both;
-    animation-delay: calc(120ms + var(--ordem, 0) * 70ms);
+  .hero-enter {
+    animation: hero-rise 640ms var(--ease-snappy) both;
+    animation-delay: calc(120ms + var(--order, 0) * 70ms);
   }
 }
 
@@ -412,27 +412,27 @@
     scroll-behavior: auto;
   }
 
-  .hero-entra {
-    animation: aparece 300ms ease both;
+  .hero-enter {
+    animation: fade-in 300ms ease both;
   }
 
   /* Revelação das seções (Motion): fica só o fade. !important vence o estilo que o Motion aplica. */
-  [data-revelar] {
+  [data-reveal] {
     transform: none !important;
   }
 
-  .botao:active {
+  .button:active {
     transform: none;
   }
 
-  .foto-produto img,
-  .queridinho:hover .foto-produto img {
+  .product-photo img,
+  .favorite:hover .product-photo img {
     transform: none;
   }
 
-  /* Gaveta: sem deslocamento, só aparece e some. */
-  .gaveta,
-  .gaveta[data-aberto="true"] {
+  /* Gaveta: sem deslocamento, só fade-in e some. */
+  .drawer,
+  .drawer[data-open="true"] {
     transform: none;
     opacity: 0;
     transition:
@@ -440,24 +440,24 @@
       visibility 0s linear 200ms;
   }
 
-  .gaveta[data-aberto="true"] {
+  .drawer[data-open="true"] {
     opacity: 1;
     transition:
       opacity 200ms ease,
       visibility 0s;
   }
 
-  .gaveta-item,
-  .gaveta[data-aberto="true"] .gaveta-item {
+  .drawer-item,
+  .drawer[data-open="true"] .drawer-item {
     transform: none;
     transition-delay: 0s;
   }
 
-  .hamburguer-barras > span {
+  .hamburger-bars > span {
     transition-duration: 0.01ms;
   }
 
-  .barra-whatsapp {
+  .whatsapp-bar {
     transform: none;
     opacity: 0;
     transition:
@@ -465,7 +465,7 @@
       visibility 0s linear 200ms;
   }
 
-  .barra-whatsapp[data-visivel="true"] {
+  .whatsapp-bar[data-visible="true"] {
     opacity: 1;
     transition:
       opacity 200ms ease,

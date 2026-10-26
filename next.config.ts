@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   // Sem isso o Next bloqueia o JavaScript de desenvolvimento e a página fica sem menu e sem animações.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
   // No Next 16 só a qualidade 75 é permitida por padrão: qualquer outro valor é trocado por ela.
-  // A 90 é usada na faixa promocional (prop `qualidade` do componente Foto).
+  // A 90 é usada na faixa promocional (prop `quality` do componente Photo).
   images: {
     qualities: [75, 90],
     // O Next guarda a imagem otimizada por 4h, identificada pelo endereço e não pelo conteúdo: se

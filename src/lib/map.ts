@@ -1,9 +1,9 @@
-import { buscaDoMapa } from "@/lib/endereco";
+import { mapSearchQuery } from "@/lib/address";
 import { site } from "@/site.config";
 
 // Só aceita o embed do Google Maps (qualquer outro valor no .env, como outro site ou "javascript:",
 // é ignorado em vez de virar um iframe).
-function ehEmbedDoGoogle(url: URL) {
+function isGoogleEmbed(url: URL) {
   if (url.protocol !== "https:" || url.hostname !== "www.google.com")
     return false;
   return (
@@ -12,18 +12,18 @@ function ehEmbedDoGoogle(url: URL) {
   );
 }
 
-function urlSegura(url: string): string | null {
+function safeUrl(url: string): string | null {
   if (!url) return null;
   try {
-    const endereco = new URL(url);
-    return ehEmbedDoGoogle(endereco) ? endereco.toString() : null;
+    const parsedUrl = new URL(url);
+    return isGoogleEmbed(parsedUrl) ? parsedUrl.toString() : null;
   } catch {
     return null;
   }
 }
 
 // Mapa do Google do próprio endereço, sem precisar de chave nem de .env.
-const mapaDoEndereco = `https://www.google.com/maps?q=${encodeURIComponent(buscaDoMapa)}&z=16&output=embed`;
+const addressMapUrl = `https://www.google.com/maps?q=${encodeURIComponent(mapSearchQuery)}&z=16&output=embed`;
 
-// Se NEXT_PUBLIC_MAPA_EMBED_URL estiver preenchida e for válida, ela vence (útil para um pino exato).
-export const urlMapa = urlSegura(site.mapaEmbedUrl) ?? mapaDoEndereco;
+// Se NEXT_PUBLIC_MAP_EMBED_URL estiver preenchida e for válida, ela vence (útil para um pino exato).
+export const mapUrl = safeUrl(site.mapEmbedUrl) ?? addressMapUrl;
