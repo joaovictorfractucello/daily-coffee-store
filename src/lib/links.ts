@@ -1,24 +1,24 @@
-import { buscaDoMapa } from "@/lib/endereco";
+import { mapSearchQuery } from "@/lib/address";
 import { site } from "@/site.config";
 
-export function linkWhatsApp(numero: string, mensagem: string) {
-  const soDigitos = numero.replace(/\D/g, "");
-  return `https://wa.me/${soDigitos}?text=${encodeURIComponent(mensagem)}`;
+export function buildWhatsAppLink(phone: string, message: string) {
+  const digitsOnly = phone.replace(/\D/g, "");
+  return `https://wa.me/${digitsOnly}?text=${encodeURIComponent(message)}`;
 }
 
-export const linkWhatsAppCafe = linkWhatsApp(
-  site.whatsapp.numero,
-  site.whatsapp.mensagem,
+export const whatsAppLink = buildWhatsAppLink(
+  site.whatsapp.phone,
+  site.whatsapp.message,
 );
 
-export const linkWhatsAppCombo = linkWhatsApp(
-  site.whatsapp.numero,
-  site.whatsapp.mensagemCombo,
+export const comboWhatsAppLink = buildWhatsAppLink(
+  site.whatsapp.phone,
+  site.whatsapp.comboMessage,
 );
 
-export const linkCardapio = site.cardapioPdfUrl;
+export const menuLink = site.menuPdfUrl;
 
-export const linkInstagram = `https://www.instagram.com/${site.instagram.usuario}/`;
+export const instagramLink = `https://www.instagram.com/${site.instagram.username}/`;
 
 // Abre o Google Maps já com o endereço (busca), pronto para traçar a rota.
-export const linkComoChegar = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(buscaDoMapa)}`;
+export const directionsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapSearchQuery)}`;

@@ -1,19 +1,19 @@
-import { CtaFinal } from "@/components/secoes/CtaFinal";
-import { Hero } from "@/components/secoes/Hero";
-import { QuemSomos } from "@/components/secoes/QuemSomos";
-import { Promocao } from "@/components/secoes/Promocao";
-import { Queridinhos } from "@/components/secoes/Queridinhos";
-import { Visitar } from "@/components/secoes/Visitar";
+import { FinalCta } from "@/components/sections/FinalCta";
+import { Hero } from "@/components/sections/Hero";
+import { AboutUs } from "@/components/sections/AboutUs";
+import { Promotion } from "@/components/sections/Promotion";
+import { Favorites } from "@/components/sections/Favorites";
+import { Visit } from "@/components/sections/Visit";
 
 export default function Home() {
   return (
     <>
       <Hero />
-      <Queridinhos />
-      <Promocao />
-      <QuemSomos />
-      <Visitar />
-      <CtaFinal />
+      <Favorites />
+      <Promotion />
+      <AboutUs />
+      <Visit />
+      <FinalCta />
     </>
   );
 }

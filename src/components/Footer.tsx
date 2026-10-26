@@ -1,28 +1,28 @@
 import { InstagramLogo, MapPin, WhatsappLogo } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
-import { navegacao, rodape, rotulos } from "@/data/textos";
-import { formatarHora, formatarTelefone } from "@/lib/formatar";
-import { linkInstagram, linkWhatsAppCafe } from "@/lib/links";
+import { navigation, footer, labels } from "@/data/copy";
+import { formatTime, formatPhone } from "@/lib/format";
+import { instagramLink, whatsAppLink } from "@/lib/links";
 import { site } from "@/site.config";
 
-const classeTitulo = "text-sm font-bold";
-const classeLink =
-  "block py-1.5 text-sm text-tinta-suave transition-colors duration-200 hover:text-tinta";
-const classeIcone = "mt-0.5 shrink-0 text-destaque";
+const titleClass = "text-sm font-bold";
+const linkClass =
+  "block py-1.5 text-sm text-ink-soft transition-colors duration-200 hover:text-ink";
+const iconClass = "mt-0.5 shrink-0 text-accent";
 
 // Rodapé claro e compacto, na mesma largura do cabeçalho. A marca tem o mesmo tamanho da do cabeçalho.
-export function Rodape() {
-  const { endereco } = site;
+export function Footer() {
+  const { address } = site;
 
   return (
     // No celular, o espaço extra embaixo evita que a barra fixa do WhatsApp cubra o rodapé.
-    <footer className="border-t border-linha px-4 pb-24 sm:px-6 md:pb-0 lg:px-10">
+    <footer className="border-t border-line px-4 pb-24 sm:px-6 md:pb-0 lg:px-10">
       <div className="mx-auto max-w-7xl py-10 md:py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr_1.4fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">
             <a
               href="#inicio"
-              aria-label={`${site.nome}, ${rotulos.voltarAoInicio}`}
+              aria-label={`${site.name}, ${labels.backToTop}`}
               className="inline-flex items-center gap-2"
             >
               <Image
@@ -44,18 +44,18 @@ export function Rodape() {
                 />
               </span>
             </a>
-            <p className="mt-4 max-w-[30ch] text-sm text-tinta-suave">
-              {rodape.descricao}
+            <p className="mt-4 max-w-[30ch] text-sm text-ink-soft">
+              {footer.description}
             </p>
           </div>
 
           <nav aria-label="Rodapé">
-            <h2 className={classeTitulo}>{rodape.tituloNavegacao}</h2>
+            <h2 className={titleClass}>{footer.navigationTitle}</h2>
             <ul className="mt-2">
-              {navegacao.map((link) => (
+              {navigation.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className={classeLink}>
-                    {link.rotulo}
+                  <a href={link.href} className={linkClass}>
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -63,14 +63,13 @@ export function Rodape() {
           </nav>
 
           <div>
-            <h2 className={classeTitulo}>{rodape.tituloHorario}</h2>
-            <dl className="mt-2 text-sm text-tinta-suave">
-              {site.horarios.map((horario) => (
-                <div key={horario.rotulo} className="py-1.5">
-                  <dt>{horario.rotulo}</dt>
+            <h2 className={titleClass}>{footer.hoursTitle}</h2>
+            <dl className="mt-2 text-sm text-ink-soft">
+              {site.openingHours.map((hours) => (
+                <div key={hours.label} className="py-1.5">
+                  <dt>{hours.label}</dt>
                   <dd className="tabular-nums">
-                    {formatarHora(horario.abre)} às{" "}
-                    {formatarHora(horario.fecha)}
+                    {formatTime(hours.opensAt)} às {formatTime(hours.closesAt)}
                   </dd>
                 </div>
               ))}
@@ -78,53 +77,49 @@ export function Rodape() {
           </div>
 
           <div className="col-span-2 md:col-span-1">
-            <h2 className={classeTitulo}>{rodape.tituloContato}</h2>
+            <h2 className={titleClass}>{footer.contactTitle}</h2>
             <ul className="mt-2">
               <li>
                 <a
-                  href={linkWhatsAppCafe}
+                  href={whatsAppLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${classeLink} flex items-start gap-2.5`}
+                  className={`${linkClass} flex items-start gap-2.5`}
                 >
                   <WhatsappLogo
                     aria-hidden="true"
                     size={18}
-                    className={classeIcone}
+                    className={iconClass}
                   />
                   <span className="tabular-nums">
-                    {formatarTelefone(site.whatsapp.numero)}
+                    {formatPhone(site.whatsapp.phone)}
                   </span>
-                  <span className="sr-only"> {rotulos.abreWhatsApp}</span>
+                  <span className="sr-only"> {labels.opensWhatsApp}</span>
                 </a>
               </li>
               <li>
                 <a
-                  href={linkInstagram}
+                  href={instagramLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${classeLink} flex items-start gap-2.5`}
+                  className={`${linkClass} flex items-start gap-2.5`}
                 >
                   <InstagramLogo
                     aria-hidden="true"
                     size={18}
-                    className={classeIcone}
+                    className={iconClass}
                   />
-                  @{site.instagram.usuario}
-                  <span className="sr-only"> {rotulos.abreInstagram}</span>
+                  @{site.instagram.username}
+                  <span className="sr-only"> {labels.opensInstagram}</span>
                 </a>
               </li>
               <li>
-                <address className="flex items-start gap-2.5 py-1.5 text-sm text-tinta-suave not-italic">
-                  <MapPin
-                    aria-hidden="true"
-                    size={18}
-                    className={classeIcone}
-                  />
+                <address className="flex items-start gap-2.5 py-1.5 text-sm text-ink-soft not-italic">
+                  <MapPin aria-hidden="true" size={18} className={iconClass} />
                   <span>
-                    {endereco.rua}
+                    {address.street}
                     <br />
-                    {endereco.bairro}, {endereco.cidade}, {endereco.estado}
+                    {address.neighborhood}, {address.city}, {address.state}
                   </span>
                 </address>
               </li>
@@ -132,9 +127,9 @@ export function Rodape() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-linha pt-5 text-xs text-tinta-suave">
+        <div className="mt-8 border-t border-line pt-5 text-xs text-ink-soft">
           <p>
-            © {site.nome}. {rodape.direitos}
+            © {site.name}. {footer.rights}
           </p>
         </div>
       </div>
