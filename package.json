@@ -44,5 +44,10 @@
   },
   "engines": {
     "node": ">=24"
+  },
+  "allowScripts": {
+    "prisma@7.10.1": true,
+    "@prisma/engines@7.10.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }
