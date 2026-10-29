@@ -244,7 +244,20 @@ Roda em todo PR para `develop` e `main`: install (`npm ci`), lint, `format:check
 - sem force-push e sem exclusão da branch.
  
 ### Deploy
-Feito automaticamente pela integração Git da Vercel.
+Feito automaticamente pela integração Git da Vercel. Quem publica é o merge; o CI decide se ele pode acontecer.
+
+| Momento | O que acontece |
+|---|---|
+| PR `feature/*` → `develop` | CI + **preview** do PR (banco Neon `dev`, `noindex`) |
+| Merge na `develop` | **staging** em `daily-coffee-store-staging.vercel.app` (banco Neon `dev`, `noindex`) |
+| Merge na `main` | **produção** em `daily-coffee-store.vercel.app` (banco Neon `production`) |
+
+- O build roda `prisma migrate deploy` antes do `next build` (`vercel.json`).
+- `VERCEL_ENV=production` é o que libera a indexação: só a produção tem `robots.txt` permitindo o site (e bloqueando `/api/`) e fica sem `noindex`. Staging e previews bloqueiam tudo. Staging e previews são públicos (sem login da Vercel), sem dados reais.
+- O `canonical` e o `og:url` apontam sempre para o domínio de produção.
+- Rollback: pelo painel da Vercel (Deployments → deploy anterior → Promote), e a correção entra por PR.
+- Risco conhecido: PRs de feature também geram preview e rodam as migrations no Neon `dev` compartilhado. Quando dois PRs tiverem migrations diferentes, trocar para rodar o migrate só na produção e na `develop`.
+- Plano Hobby da Vercel é só para uso não comercial: migrar para o Pro antes de vender de verdade.
  
 ---
  
@@ -342,8 +355,8 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
  
 ## 14. Ajustes herdados da landing
  
-- A meta description cita "Rua das Acácias, 128", mas a página mostra "Rua Capitão Macedo, 450". Unificar.
-- `canonical` e `og:url` apontam para `example.com`. Corrigir para a URL real.
+- ~~A meta description cita "Rua das Acácias, 128", mas a página mostra "Rua Capitão Macedo, 450". Unificar.~~ Resolvido na Etapa 1: a descrição usa `site.address`.
+- ~~`canonical` e `og:url` apontam para `example.com`. Corrigir para a URL real.~~ Resolvido na Etapa 1: `site.url` é `https://daily-coffee-store.vercel.app`.
 ---
  
 ## 15. Pendências (a discutir)

@@ -53,8 +53,7 @@ export type SiteConfig = {
 
 export const site: SiteConfig = {
   name: "Daily Coffee",
-  // EXEMPLO: example.com é um domínio reservado para exemplos. Troque pelo domínio do cliente.
-  url: "https://www.example.com",
+  url: "https://daily-coffee-store.vercel.app",
   // EXEMPLO: endereço fictício. A rua é real (para o mapa do Google mostrar a região certa), mas o número
   // 450 foi inventado. Num cliente real, troque por todo o endereço do café.
   address: {

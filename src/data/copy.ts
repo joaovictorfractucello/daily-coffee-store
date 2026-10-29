@@ -1,5 +1,7 @@
 // Todos os textos da página. Para mudar uma frase, mexa só aqui.
 
+import { site } from "@/site.config";
+
 // Um rótulo por intenção: o pedido geral é sempre "Pedir no WhatsApp" (cabeçalho, hero, menu e barra
 // fixa), o cardápio é sempre "Ver cardápio". A promoção e a faixa final têm rótulo próprio
 // (veja `promotion.button` e `finalCta.button`) porque a intenção delas é outra.
@@ -24,8 +26,7 @@ export const navigation = [
 
 export const seo = {
   title: "Daily Coffee | Cafeteria em São Paulo",
-  description:
-    "Café coado na hora, pão de queijo saindo do forno e mesa para ficar com calma. Na Rua das Acácias, 128, Vila Mariana, São Paulo.",
+  description: `Café coado na hora, pão de queijo saindo do forno e mesa para ficar com calma. Na ${site.address.street}, ${site.address.neighborhood}, ${site.address.city}.`,
 };
 
 export const hero = {
