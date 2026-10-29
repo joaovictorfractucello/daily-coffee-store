@@ -36,7 +36,7 @@ Ter o `daily-coffee-store` rodando localmente, em staging (`develop`) e em produ
 - [x] Copiar a landing **sem** `.git`, `node_modules` e `.next`
 - [x] Alterar `name` no `package.json` para `daily-coffee-store`
 - [x] Criar o repositório no GitHub e as branches `main` e `develop`
-- [ ] Proteger `main` e `develop`: merge só via PR com CI aprovado → desligada temporariamente por decisão (projeto solo); religada na tarefa 5, com o CI como check obrigatório
+- [x] Proteger `main` e `develop`: merge só via PR com CI aprovado → ligada na tarefa 5 (padrão de mercado: PR obrigatório, check `CI`, branch atualizada, conversas resolvidas, vale para admins, sem force-push, 0 aprovações)
 - [x] Adicionar `CLAUDE.md`, `docs/SPEC.md` e `docs/data-model.md`
 ### 1. `feature/setup-tooling`
 - [x] TypeScript em modo `strict` e alias `@/` → `src/`
@@ -74,7 +74,7 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 ### 5. `feature/setup-ci`
 - [x] Workflow do GitHub Actions em PRs para `develop` e `main`: install → lint → format:check → typecheck → test → build → `.github/workflows/ci.yml`, job `CI` (Node do `.nvmrc`, cancela execução anterior do mesmo PR)
 - [x] Definir como o build roda no CI sem as variáveis reais (ex.: valores fictícios só para o build) → `DATABASE_URL` e `DIRECT_URL` fictícias no nível do job (`example.com`); o `env.ts` valida o formato, e o build não consulta o banco
-- [ ] Tornar o CI obrigatório na proteção das branches → regra aplicada depois do primeiro CI verde (o GitHub precisa conhecer o nome do check)
+- [x] Tornar o CI obrigatório na proteção das branches → check `CI` exigido em `main` e `develop`
 - [x] Aprovar os scripts de instalação (`allowScripts` no `package.json`): `prisma`, `@prisma/engines` e `unrs-resolver`, que o npm 12 passa a bloquear por padrão
 ### 6. `feature/setup-deploy`
 - [ ] Criar o projeto na Vercel ligado ao repositório (`daily-coffee-store`)
@@ -129,7 +129,7 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 - [ ] Lint, format:check, typecheck, test e build passam localmente
 - [ ] Remover uma variável do `.env` faz o projeto falhar com mensagem clara
 - [ ] O PR gera preview na Vercel
-- [ ] **Um PR com teste quebrado é bloqueado** (quebrar de propósito, confirmar e reverter)
+- [x] **Um PR com teste quebrado é bloqueado** (quebrar de propósito, confirmar e reverter) → provado no PR #7 (CI falhou, `mergeStateStatus: BLOCKED`, merge recusado; fechado sem merge)
 - [ ] Staging usa o Neon `dev` e produção usa o Neon `main`
 - [ ] `/api/health` responde `ok` em staging e produção
 - [ ] `/robots.txt` em produção bloqueia `/api/`; staging não é indexável
