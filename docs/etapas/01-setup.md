@@ -57,11 +57,11 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 - [x] `src/server/errors/error-handler.ts`: wrapper `withErrorHandler(handler)` com o mapa `kind → status` tipado (`Record<ErrorKind, number>`); erros desconhecidos viram 500 sem detalhes internos
 - [x] `src/env.ts`: validação das variáveis de ambiente com Zod; o projeto falha ao iniciar se faltar alguma → importado no `next.config.ts`, falha no `dev` e no `build`; as URLs do banco entram na tarefa 3
 ### 3. `feature/setup-database`
-- [ ] Criar o projeto no Neon com os branches `main` (produção) e `dev` (staging e local)
-- [ ] Instalar e configurar o Prisma **conforme a documentação da versão atual** (versões recentes mudaram a configuração)
-- [ ] Configurar as duas URLs do Neon: com pooling (aplicação) e direta (migrations)
-- [ ] Cliente Prisma único (*singleton*) em `src/server/lib/prisma.ts`
-- [ ] Rota `GET /api/health` atravessando todas as camadas:
+- [x] Criar o projeto no Neon com os branches `main` (produção) e `dev` (staging e local) → branch padrão chamada `production` no Neon; `dev` criada a partir dela
+- [x] Instalar e configurar o Prisma **conforme a documentação da versão atual** (versões recentes mudaram a configuração) → Prisma 7.10.1 fixo (o `latest` do npm é uma RC 8.x), adaptador do Neon, cliente gerado em `src/generated/prisma` fora do git
+- [x] Configurar as duas URLs do Neon: com pooling (aplicação) e direta (migrations)
+- [x] Cliente Prisma único (*singleton*) em `src/server/lib/prisma.ts`
+- [x] Rota `GET /api/health` atravessando todas as camadas: → `200 ok` testado com o Neon `dev`; `503` testado com banco inexistente
   - `route.ts` → `health.controller` → `health.service` → `health.repository` (consulta simples ao banco)
   - Resposta de sucesso: `200 { "status": "ok" }`
   - Falha no banco: `503 { "status": "error" }`, **sem detalhes internos**
