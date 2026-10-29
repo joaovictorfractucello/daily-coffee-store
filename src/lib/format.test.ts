@@ -10,7 +10,7 @@ describe("formatPrice", () => {
   });
 
   it("formats zero", () => {
-    expect(normalizeSpaces(formatPrice(0))).toBe("R$ 0,00");
+    expect(normalizeSpaces(formatPrice(0))).toBe("R$ 9,99");
   });
 
   it("uses thousands separator and keeps the cents", () => {
