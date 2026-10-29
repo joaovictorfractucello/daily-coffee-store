@@ -16,6 +16,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_MAP_EMBED_URL: z.string().optional(),
   DATABASE_URL: postgresConnectionUrl,
   DIRECT_URL: postgresConnectionUrl,
+  VERCEL_ENV: z.enum(["production", "preview", "development"]).optional(),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

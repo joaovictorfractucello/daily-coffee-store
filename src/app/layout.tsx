@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { labels, seo } from "@/data/copy";
 import { existsInPublic } from "@/lib/files";
 import { heroPhotos } from "@/lib/images";
+import { isProductionDeployment } from "@/server/lib/deployment";
 import { site } from "@/site.config";
 import { textFont, headingFont } from "./fonts";
 import "./globals.css";
@@ -20,6 +21,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: seo.title,
     description: seo.description,
     alternates: { canonical: "/" },
+    robots: isProductionDeployment
+      ? undefined
+      : { index: false, follow: false },
     openGraph: {
       type: "website",
       locale: "pt_BR",
