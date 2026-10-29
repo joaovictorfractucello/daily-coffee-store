@@ -6,8 +6,7 @@ export type Favorite = {
   name: string;
   // Até 12 palavras.
   description: string;
-  // Em reais.
-  price: number;
+  priceInCents: number;
   image: ImageKey;
 };
 
@@ -17,32 +16,32 @@ export const favorites: Favorite[] = [
     name: "Cappuccino cremoso",
     description:
       "Espresso, leite vaporizado e espuma densa. Canela, se quiser.",
-    price: 14,
+    priceInCents: 1400,
     image: "creamyCappuccino",
   },
   {
     name: "Frappé de chocolate",
     description: "Chocolate batido com gelo, chantilly e calda por cima.",
-    price: 18,
+    priceInCents: 1800,
     image: "chocolateFrappe",
   },
   {
     name: "Pão de queijo quentinho",
     description: "Assado em fornadas pequenas ao longo do dia.",
-    price: 13,
+    priceInCents: 1300,
     image: "cheeseBread",
   },
   {
     name: "Croissant de manteiga",
     description:
       "Massa folhada na manteiga, crocante por fora e macia por dentro.",
-    price: 16,
+    priceInCents: 1600,
     image: "butterCroissant",
   },
   {
     name: "Bolo de cenoura com chocolate",
     description: "Fatia alta com cobertura de chocolate que escorre.",
-    price: 15,
+    priceInCents: 1500,
     image: "carrotCake",
   },
 ];

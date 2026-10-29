@@ -45,8 +45,8 @@ export const promotion = {
   title: ["Cappuccino", "com pão de queijo"],
   description:
     "O par favorito da casa: cappuccino cremoso e pão de queijo quentinho, juntos por",
-  // Em reais. EXEMPLO (café fictício): troque pelo preço real do combo.
-  price: 22,
+  // EXEMPLO (café fictício): troque pelo preço real do combo.
+  priceInCents: 2200,
   button: "Pedir o combo",
 };
 

@@ -5,9 +5,9 @@ const priceFormatter = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 2,
 });
 
-// 14 -> "R$ 14,00"
-export function formatPrice(priceInReais: number) {
-  return priceFormatter.format(priceInReais);
+// 1400 -> "R$ 14,00"
+export function formatPrice(priceInCents: number) {
+  return priceFormatter.format(priceInCents / 100);
 }
 
 // "5511999999999" -> "(11) 99999-9999". Aceita número com ou sem o DDI 55.
