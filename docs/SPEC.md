@@ -234,10 +234,14 @@ develop   → PR para main    → produção
 ```
  
 ### CI (GitHub Actions)
-Roda em todo PR: lint, typecheck e testes.
+Roda em todo PR para `develop` e `main`: install (`npm ci`), lint, `format:check`, typecheck, testes e build, nesta ordem. O build usa `DATABASE_URL` e `DIRECT_URL` fictícias, definidas no workflow. O job se chama `CI`.
  
 ### Proteção de branch
-`main` e `develop` só aceitam merge com CI aprovado.
+`main` e `develop` (padrão de mercado, valendo também para administradores):
+- merge só via PR, sem exigir aprovação de revisor enquanto o projeto tem um único desenvolvedor (o GitHub não permite aprovar o próprio PR);
+- o check `CI` precisa passar, e a branch precisa estar atualizada com a base;
+- comentários do PR resolvidos antes do merge;
+- sem force-push e sem exclusão da branch.
  
 ### Deploy
 Feito automaticamente pela integração Git da Vercel.

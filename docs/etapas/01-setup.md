@@ -36,7 +36,7 @@ Ter o `daily-coffee-store` rodando localmente, em staging (`develop`) e em produ
 - [x] Copiar a landing **sem** `.git`, `node_modules` e `.next`
 - [x] Alterar `name` no `package.json` para `daily-coffee-store`
 - [x] Criar o repositório no GitHub e as branches `main` e `develop`
-- [ ] ~~Proteger `main` e `develop`: merge só via PR com CI aprovado (o CI passa a ser obrigatório quando existir, na tarefa 5)~~ — **desligada por decisão** (projeto solo); reavaliar na tarefa 5
+- [ ] Proteger `main` e `develop`: merge só via PR com CI aprovado → desligada temporariamente por decisão (projeto solo); religada na tarefa 5, com o CI como check obrigatório
 - [x] Adicionar `CLAUDE.md`, `docs/SPEC.md` e `docs/data-model.md`
 ### 1. `feature/setup-tooling`
 - [x] TypeScript em modo `strict` e alias `@/` → `src/`
@@ -72,9 +72,10 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 - [x] Teste do `health.service` com o repository simulado (*mock*)
 - [x] Testes extras (fora do plano): `withErrorHandler` (AppError por kind, erro desconhecido sem vazar detalhe, erro interno do Next repassado)
 ### 5. `feature/setup-ci`
-- [ ] Workflow do GitHub Actions em PRs para `develop` e `main`: install → lint → format:check → typecheck → test → build
-- [ ] Definir como o build roda no CI sem as variáveis reais (ex.: valores fictícios só para o build)
-- [ ] Tornar o CI obrigatório na proteção das branches
+- [x] Workflow do GitHub Actions em PRs para `develop` e `main`: install → lint → format:check → typecheck → test → build → `.github/workflows/ci.yml`, job `CI` (Node do `.nvmrc`, cancela execução anterior do mesmo PR)
+- [x] Definir como o build roda no CI sem as variáveis reais (ex.: valores fictícios só para o build) → `DATABASE_URL` e `DIRECT_URL` fictícias no nível do job (`example.com`); o `env.ts` valida o formato, e o build não consulta o banco
+- [ ] Tornar o CI obrigatório na proteção das branches → regra aplicada depois do primeiro CI verde (o GitHub precisa conhecer o nome do check)
+- [x] Aprovar os scripts de instalação (`allowScripts` no `package.json`): `prisma`, `@prisma/engines` e `unrs-resolver`, que o npm 12 passa a bloquear por padrão
 ### 6. `feature/setup-deploy`
 - [ ] Criar o projeto na Vercel ligado ao repositório (`daily-coffee-store`)
 - [ ] Variáveis de ambiente: Production → Neon `main`; Preview → Neon `dev`
