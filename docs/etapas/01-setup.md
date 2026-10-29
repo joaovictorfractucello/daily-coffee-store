@@ -77,13 +77,13 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 - [x] Tornar o CI obrigatório na proteção das branches → check `CI` exigido em `main` e `develop`
 - [x] Aprovar os scripts de instalação (`allowScripts` no `package.json`): `prisma`, `@prisma/engines` e `unrs-resolver`, que o npm 12 passa a bloquear por padrão
 ### 6. `feature/setup-deploy`
-- [ ] Criar o projeto na Vercel ligado ao repositório (`daily-coffee-store`)
-- [ ] Variáveis de ambiente: Production → Neon `main`; Preview → Neon `dev`
-- [ ] Build com `prisma migrate deploy` antes do `next build`
-- [ ] URL fixa para a branch `develop` (staging)
-- [ ] Corrigir metadados herdados da landing: endereço único (Rua Capitão Macedo, 450) e `canonical`/`og:url` com o domínio novo
-- [ ] `robots.txt` (via `app/robots.ts`) bloqueando `/api/` para buscadores
-- [ ] Bloquear a indexação de staging (`noindex`), para o Google não indexar a URL da `develop` como uma cópia do site
+- [x] Criar o projeto na Vercel ligado ao repositório (`daily-coffee-store`) → plano Hobby, preset Next.js, Node 24.x, região das funções `iad1` (mesma do Neon, us-east-1)
+- [x] Variáveis de ambiente: Production → Neon `main`; Preview → Neon `dev` → `DATABASE_URL` e `DIRECT_URL` em cada ambiente da Vercel (valores só no painel)
+- [x] Build com `prisma migrate deploy` antes do `next build` → `vercel.json`; `migrate deploy` sem a pasta `migrations` termina com código 0 (testado no Neon `dev`)
+- [x] URL fixa para a branch `develop` (staging) → `daily-coffee-store-staging.vercel.app` ligado à branch `develop`; previews e staging sem login da Vercel (decisão: público, com `noindex`)
+- [x] Corrigir metadados herdados da landing: endereço único (Rua Capitão Macedo, 450) e `canonical`/`og:url` com o domínio novo → descrição do SEO usa `site.address`; `site.url` = `https://daily-coffee-store.vercel.app`
+- [x] `robots.txt` (via `app/robots.ts`) bloqueando `/api/` para buscadores → `src/app/robots.ts` (teste em `robots.test.ts`)
+- [x] Bloquear a indexação de staging (`noindex`), para o Google não indexar a URL da `develop` como uma cópia do site → `VERCEL_ENV !== production` gera `noindex` e `Disallow: /`
 ### 7. `feature/setup-docs`
 - [ ] `README.md` inicial: sobre o projeto, stack, como rodar localmente
 - [ ] `.env.example` com todas as variáveis (sem valores reais)
