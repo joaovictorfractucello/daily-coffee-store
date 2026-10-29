@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_rethrow as rethrowNextInternalError } from "next/navigation";
 import { AppError, type ErrorKind } from "./app-error";
 
 const statusByKind: Record<ErrorKind, number> = {
@@ -9,15 +10,14 @@ const statusByKind: Record<ErrorKind, number> = {
   FORBIDDEN: 403,
 };
 
-function toErrorResponse(error: unknown): Response {
-  if (error instanceof AppError) {
-    return Response.json(
-      { error: { code: error.code, message: error.message } },
-      { status: statusByKind[error.kind] },
-    );
-  }
+function respondWithAppError(error: AppError): Response {
+  return Response.json(
+    { error: { code: error.code, message: error.message } },
+    { status: statusByKind[error.kind] },
+  );
+}
 
-  // Erro inesperado: o detalhe fica só no log do servidor, o cliente recebe uma resposta genérica.
+function logAndRespondWithGenericError(error: unknown): Response {
   console.error(error);
   return Response.json(
     { error: { code: "INTERNAL_ERROR", message: "Erro interno." } },
@@ -25,8 +25,6 @@ function toErrorResponse(error: unknown): Response {
   );
 }
 
-// Envolve o handler do route.ts. Controllers não precisam de try/catch: qualquer erro lançado
-// por eles (ou pelos services) vira a resposta HTTP certa aqui.
 export function withErrorHandler<Req extends Request, Context>(
   handler: (request: Req, context: Context) => Promise<Response>,
 ) {
@@ -34,7 +32,10 @@ export function withErrorHandler<Req extends Request, Context>(
     try {
       return await handler(request, context);
     } catch (error) {
-      return toErrorResponse(error);
+      rethrowNextInternalError(error);
+      return error instanceof AppError
+        ? respondWithAppError(error)
+        : logAndRespondWithGenericError(error);
     }
   };
 }
