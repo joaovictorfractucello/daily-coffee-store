@@ -66,10 +66,11 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
   - Resposta de sucesso: `200 { "status": "ok" }`
   - Falha no banco: `503 { "status": "error" }`, **sem detalhes internos**
 ### 4. `feature/setup-tests`
-- [ ] Instalar e configurar o Vitest (com o alias `@/`)
-- [ ] Scripts `test` e `test:watch`
-- [ ] `formatPrice` em `src/lib/` (centavos → texto em reais) + testes, reaproveitando a função herdada da landing (sem duplicar) e ajustando os pontos que a usam
-- [ ] Teste do `health.service` com o repository simulado (*mock*)
+- [x] Instalar e configurar o Vitest (com o alias `@/`) → Vitest 5.0.5 (config em `vitest.config.mts`) + alias de `server-only` para um módulo vazio; `@types/node` subiu para 24 porque o Vitest 5 exige 22 ou superior
+- [x] Scripts `test` e `test:watch`
+- [x] `formatPrice` em `src/lib/` (centavos → texto em reais) + testes, reaproveitando a função herdada da landing (sem duplicar) e ajustando os pontos que a usam → preço de `price` (reais) para `priceInCents` em `menu.ts` e `copy.ts`; preços exibidos conferidos no HTML do build
+- [x] Teste do `health.service` com o repository simulado (*mock*)
+- [x] Testes extras (fora do plano): `withErrorHandler` (AppError por kind, erro desconhecido sem vazar detalhe, erro interno do Next repassado)
 ### 5. `feature/setup-ci`
 - [ ] Workflow do GitHub Actions em PRs para `develop` e `main`: install → lint → format:check → typecheck → test → build
 - [ ] Definir como o build roda no CI sem as variáveis reais (ex.: valores fictícios só para o build)

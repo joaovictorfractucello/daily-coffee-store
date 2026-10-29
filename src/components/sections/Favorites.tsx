@@ -76,7 +76,7 @@ export function Favorites() {
                   {item.name}
                 </h3>
                 <p className="mt-0.5 font-semibold tabular-nums">
-                  {formatPrice(item.price)}
+                  {formatPrice(item.priceInCents)}
                 </p>
                 <p className="mt-2 text-[0.9375rem] leading-snug text-ink-soft">
                   {item.description}

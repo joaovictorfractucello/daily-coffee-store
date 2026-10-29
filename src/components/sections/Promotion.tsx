@@ -45,7 +45,7 @@ export function Promotion() {
               <p className="mt-4 max-w-[34ch] text-[1.0625rem] md:text-lg md:[text-shadow:0_1px_12px_rgb(0_0_0/0.4)]">
                 {promotion.description}{" "}
                 <strong className="font-bold">
-                  {formatPrice(promotion.price)}
+                  {formatPrice(promotion.priceInCents)}
                 </strong>
                 .
               </p>
