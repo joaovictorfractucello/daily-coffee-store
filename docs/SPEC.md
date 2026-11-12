@@ -279,7 +279,7 @@ Cada ambiente usa um branch próprio do banco, para que mudanças de teste nunca
  
 | Ambiente | Branch do Neon |
 |---|---|
-| Produção (`main`) | `main` |
+| Produção (`main`) | `production` |
 | Preview/staging (`develop` e PRs) | `dev` |
 | Local | `dev` ou branch pessoal |
  
@@ -366,7 +366,7 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
   - enxerga apenas dados fictícios do seed (ex.: campo `isDemo`), nunca dados reais de visitantes (LGPD);
   - testes unitários garantindo o 403 em ações de escrita e o filtro de dados;
   - banner no site avisando que é ambiente de demonstração.
-- [ ] Criar o **CLAUDE.md** do projeto (regras de trabalho para o Claude Code; a seção 16 deste arquivo deve migrar para lá)
+- [x] Criar o **CLAUDE.md** do projeto (regras de trabalho para o Claude Code; a seção 16 deste arquivo deve migrar para lá)
 ---
  
 ## 16. Como trabalhar neste projeto (orientações para a IA)
