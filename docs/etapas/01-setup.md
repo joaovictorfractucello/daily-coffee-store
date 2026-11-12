@@ -1,7 +1,7 @@
 # Etapa 1 — Setup
  
 > Local no repositório: `docs/etapas/01-setup.md`
-> Status: **planejada**
+> Status: **concluída** (2026-11-12)
  
 ---
  
@@ -85,9 +85,9 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 - [x] `robots.txt` (via `app/robots.ts`) bloqueando `/api/` para buscadores → `src/app/robots.ts` (teste em `robots.test.ts`)
 - [x] Bloquear a indexação de staging (`noindex`), para o Google não indexar a URL da `develop` como uma cópia do site → `VERCEL_ENV !== production` gera `noindex` e `Disallow: /`
 ### 7. `feature/setup-docs`
-- [ ] `README.md` inicial: sobre o projeto, stack, como rodar localmente
-- [ ] `.env.example` com todas as variáveis (sem valores reais)
-- [ ] ADRs em `docs/adr/`:
+- [x] `README.md` inicial: sobre o projeto, stack, como rodar localmente
+- [x] `.env.example` com todas as variáveis (sem valores reais)
+- [x] ADRs em `docs/adr/` (com um `README.md` explicando o formato):
   - 001 — Next.js full-stack com Route Handlers (sem back-end separado e sem Server Actions para dados)
   - 002 — Arquitetura em camadas
   - 003 — Sessão no banco em vez de JWT
@@ -97,7 +97,8 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
   - 007 — Categorias como enum
   - 008 — Imagens no Cloudinary com URL no banco
   - 009 — Branches do Neon por ambiente
-- [ ] Preencher a Parte 2 deste documento
+- [x] Preencher a Parte 2 deste documento
+- [x] Collection e ambientes do Postman em `docs/postman/`
 ---
  
 ## Endpoints
@@ -125,14 +126,14 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
   - Staging: URL fixa da `develop` + `/api`
   - Produção: `https://daily-coffee-store.vercel.app/api` (ou o domínio definido pela Vercel)
 ### Checklist manual
-- [ ] `npm run dev` funciona e o visual da landing está intacto
-- [ ] Lint, format:check, typecheck, test e build passam localmente
-- [ ] Remover uma variável do `.env` faz o projeto falhar com mensagem clara
-- [ ] O PR gera preview na Vercel
+- [x] `npm run dev` funciona e o visual da landing está intacto (HTML e CSS do build comparados na `setup-english`)
+- [x] Lint, format:check, typecheck, test e build passam localmente
+- [x] Remover uma variável do `.env` faz o projeto falhar com mensagem clara
+- [x] O PR gera preview na Vercel (check `Vercel` nos PRs desde o #9)
 - [x] **Um PR com teste quebrado é bloqueado** (quebrar de propósito, confirmar e reverter) → provado no PR #7 (CI falhou, `mergeStateStatus: BLOCKED`, merge recusado; fechado sem merge)
-- [ ] Staging usa o Neon `dev` e produção usa o Neon `main`
-- [ ] `/api/health` responde `ok` em staging e produção
-- [ ] `/robots.txt` em produção bloqueia `/api/`; staging não é indexável
+- [x] Staging usa o Neon `dev` e produção usa o Neon `production` (variáveis separadas por ambiente no painel da Vercel)
+- [x] `/api/health` responde `ok` em staging e produção
+- [x] `/robots.txt` em produção bloqueia `/api/`; staging não é indexável (`Disallow: /` e `noindex`)
 ---
  
 ## Critério de pronto
@@ -144,11 +145,54 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 ---
  
 # Parte 2 — Registro
- 
-> Preencher ao concluir a etapa.
- 
+
 ## O que mudou em relação ao plano
- 
+
+| Ponto | Plano | Como ficou | Motivo |
+|---|---|---|---|
+| Proteção de `main` e `develop` | Ligada desde a tarefa 0 | Desligada no início (projeto solo) e religada na tarefa 5, no padrão de mercado: PR obrigatório, check `CI`, branch atualizada, conversas resolvidas, vale para admins, sem force-push, 0 aprovações | O check obrigatório só pode ser ligado depois que o workflow existe |
+| Inglês no código | Traduzir todos os identificadores | URLs públicas continuam em português: âncoras (`#queridinhos`), rotas futuras (`/cardapio`) e arquivos de `public/` | São parte da URL que o visitante vê; regra registrada no `CLAUDE.md` |
+| `typecheck` | `tsc --noEmit` | `next typegen && tsc --noEmit` | O tipo `LayoutProps` é gerado pelo Next; sem o `typegen` o CI falharia |
+| Prettier | Configuração padrão | `endOfLine: auto` | O git no Windows grava CRLF na pasta local; no repositório tudo fica LF |
+| Pastas de `src/server/` | Criar todas | Criadas com o primeiro arquivo de cada uma | Sem pasta vazia nem `.gitkeep` |
+| Variáveis de ambiente | `.env.local` | Um único `.env` | O Prisma 7 não lê `.env` sozinho; um arquivo só para Next e Prisma |
+| Validação do env | `z.url()` | URL Postgres completa (protocolo, usuário, senha, banco) | O `z.url()` aceitava o texto de exemplo do `.env` |
+| Prisma | "Versão atual" | Fixado em `7.10.1` | O `latest` do npm aponta para uma RC 8.x |
+| `@types/node` | 20 (herdado) | 24 | O Vitest 5 exige 22 ou superior; 24 é o Node do projeto |
+| Scripts de instalação | — | `allowScripts` no `package.json` para `prisma`, `@prisma/engines` e `unrs-resolver` | O npm 12 bloqueia scripts de instalação não aprovados |
+| Branch de produção do Neon | `main` | `production` | Nome padrão criado pelo Neon; mesma função |
+| Staging | Preview da `develop` | Domínio fixo `daily-coffee-store-staging.vercel.app`, **público**, com `noindex` e `robots.txt` bloqueando tudo | Asaas e webhook vão precisar de URL pública fora da produção |
+| Comentários no código | — | Código gerado sem comentários; nomes descrevem o que fazem | Decisão do João: cada arquivo faz uma coisa e se explica pelo nome |
+| Testes | `formatPrice` e `health.service` | Também `withErrorHandler` e `robots` | O handler já tinha tido um defeito; toda regra nova vem com teste |
+
 ## Problemas encontrados e soluções
- 
+
+| Problema | Causa | Solução |
+|---|---|---|
+| `typecheck` falhava com `Cannot find name 'LayoutProps'` | O tipo é gerado pelo Next no build | `next typegen` antes do `tsc` |
+| `format:check` acusava arquivos sem mudança | CRLF na cópia local (Windows, `autocrlf=true`) | `endOfLine: auto` no Prettier |
+| Renomeação para inglês podia quebrar o visual sem erro de build | Classes do Tailwind ficam em dois lugares (CSS e JSX) | Renomeação por script + comparação do HTML e do CSS gerados antes e depois (0 diferenças) |
+| Atributos `data-*` e uma variável de ambiente escaparam da renomeação | Atributos JSX são código, não string; o TypeScript não pega | Busca específica depois do script |
+| `withErrorHandler` registrava um erro no build | O `try/catch` engolia sinais internos do Next (`connection()` na pré-renderização) | `unstable_rethrow` antes de tratar o erro; teste cobre o caso |
+| `/api/health` seria pré-renderizado no build | `cacheComponents` pré-renderiza `GET` que não lê a requisição | `connection()` no controller |
+| `npm i prisma` instalaria versão incompatível | `latest` do pacote `prisma` aponta para uma RC | Versões exatas `7.10.1` |
+| `ERESOLVE` ao instalar o Vitest 5 | `@types/node` 20 herdado da landing | Subir para `@types/node` 24 |
+| `/api/health` respondia 503 localmente | `.env` ainda com texto de exemplo | Diagnóstico sem expor credenciais; validação estrita no `env.ts` para falhar cedo |
+| Push recusado ao criar `.github/workflows/ci.yml` | Credencial em cache (outra conta) sem o escopo `workflow` | `git -c credential.helper= push` com token de escopo `workflow`; usuário do GitHub fixado na configuração local do repositório |
+| `npm test` falhava com `Cannot read properties of undefined (reading 'config')` | VS Code abre a pasta como `c:\dev\...` (drive minúsculo) e o Vitest carrega duas cópias de si mesmo no Windows | Rodar a partir de `C:\dev\daily-coffee-store` (maiúsculo); o CI (Linux) não é afetado |
+| `migrate deploy` sem migrations poderia quebrar o build | Comportamento não documentado | Testado no Neon `dev`: termina com código 0 |
+
 ## Aprendizados
+
+- O fluxo `feature/* → develop → main` com PR, CI e proteção de branch funciona bem mesmo sozinho: o CI pegou o teste quebrado de propósito e bloqueou o merge.
+- Validar o ambiente na inicialização economiza tempo: o erro aparece no `dev` e no `build`, não na primeira consulta.
+- Testar o caminho de falha (503 sem detalhes, erro interno do Next passando adiante) encontrou defeitos que o caminho de sucesso não mostrava.
+- Conferir a documentação da versão instalada (Prisma 7, Next 16, Vercel) evitou configuração antiga.
+- Mudança grande sem efeito visual se verifica comparando a saída gerada (HTML e CSS), não só pelo build.
+- Credenciais e dados do banco nunca passam pelo chat: o diagnóstico usa só o formato das URLs.
+
+## Pendências para as próximas etapas
+
+- Previews de PR rodam o migrate no Neon `dev` compartilhado (ADR 009): rever quando houver dois PRs com migrations.
+- `gh` sem o escopo `workflow`: pushes que mexem em `.github/workflows/` precisam do token com esse escopo.
+- Plano Hobby da Vercel é só para uso não comercial: migrar para o Pro antes de vender de verdade.

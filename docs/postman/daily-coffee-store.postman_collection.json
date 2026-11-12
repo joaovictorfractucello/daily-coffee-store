@@ -1,0 +1,39 @@
+{
+  "info": {
+    "name": "Daily Coffee Store",
+    "description": "API REST do Daily Coffee. Escolha um ambiente (Local, Staging ou Produção): a variável baseUrl já inclui /api.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"banco respondeu\", () => pm.expect(pm.response.json()).to.eql({ status: \"ok\" }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Atravessa todas as camadas até o banco. 200 { status: \"ok\" } quando o banco responde; 503 { status: \"error\" } quando não responde, sem detalhes internos."
+          }
+        }
+      ]
+    }
+  ]
+}

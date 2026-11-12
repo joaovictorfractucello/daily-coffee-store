@@ -1,65 +1,97 @@
-# Daily Coffee
+# Daily Coffee — E-commerce
 
-Landing page de uma cafeteria fictícia, feita como **projeto de portfólio** por João Victor. Ela também serve de demonstração para apresentar a donos de cafeterias reais o tipo de site que posso entregar.
-
-O objetivo da página é simples: o visitante conhece o café, vê os produtos mais pedidos e **chama no WhatsApp ou vai até o local**.
+E-commerce de uma cafeteria fictícia na Vila Mariana (São Paulo), construído como **projeto de portfólio**, mas tratado como produto real: regras de negócio coerentes, segurança, tratamento de erros, testes e documentação.
 
 > Todos os dados (nome, endereço, telefone, preços, cardápio) são fictícios. O endereço usa uma rua real só para o mapa funcionar.
 
-## O que tem na página
+- **Produção:** https://daily-coffee-store.vercel.app
+- **Staging:** https://daily-coffee-store-staging.vercel.app (branch `develop`, não indexado)
 
-- **Hero** com três fotos que se alternam em transição suave; o botão principal troca de cor junto com a foto
-- **Mais pedidos**: 5 produtos em faixa deslizante no celular e em grade no desktop
-- **Faixa promocional** com o combo da casa
-- **Quem somos**, com três diferenciais ilustrados
-- **Localização**: endereço, horários, mapa do Google e botão "Como chegar"
-- **Chamada final** para o WhatsApp
-- Cardápio completo em PDF, botão fixo de WhatsApp no celular e menu lateral animado
+## Status
 
-## Decisões de design e desempenho
+A **Etapa 1 (Setup)** está concluída: infraestrutura, arquitetura em camadas, banco por ambiente, CI e deploy. A home ainda é a landing page original; ela vira loja na Etapa 2.
 
-- Mobile-first, em português do Brasil
-- Uma cor de destaque (marrom café), um único tema, sem sombras nem efeitos decorativos
-- Respeita `prefers-reduced-motion`; sem JavaScript, o conteúdo continua visível
-- Imagens em WebP otimizadas pelo `next/image`; o mapa só carrega depois do restante da página
-- Animações só em `opacity` e `transform`, para o scroll ficar fluido no celular
+| Etapa | Entrega |
+|---|---|
+| 1. Setup | Repositório, estrutura, Neon + Prisma, CI, deploy ✅ |
+| 2. Catálogo | Produtos no banco, API e páginas; home adaptada para loja |
+| 3. Carrinho | Carrinho no navegador, total recalculado no servidor |
+| 4. Autenticação | Cadastro, login, sessão, verificação de e-mail, recuperação de senha, Google |
+| 5. Entrega e retirada | Bairros, taxas, endereço com ViaCEP |
+| 6. Checkout e pagamento | Pedido, Asaas sandbox (Pix e cartão), webhook |
+| 7. Painel administrativo | Produtos, bairros, pedidos e status |
+| 8. Polimento | E-mails de pedido, revisão de segurança, documentação final |
 
-## Tecnologias
+## Stack
 
-[Next.js 16](https://nextjs.org) (App Router) · [React 19](https://react.dev) · TypeScript · [Tailwind CSS 4](https://tailwindcss.com) · [Motion](https://motion.dev) · [Phosphor Icons](https://phosphoricons.com)
+Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS 4 · Motion · Phosphor Icons · Prisma 7 + Neon (Postgres) · Zod · Vitest · GitHub Actions · Vercel
+
+Detalhes e motivos em [`docs/SPEC.md`](docs/SPEC.md#3-stack).
+
+## Arquitetura
+
+Projeto único (front e back no Next.js), com API REST em Route Handlers e back-end em camadas:
+
+```
+route.ts → controller → service → repository → banco
+```
+
+- **controller:** lê e valida a requisição (Zod), monta a resposta HTTP
+- **service:** regras de negócio, sem conhecer HTTP
+- **repository:** único lugar que usa o Prisma
+- Erros do domínio (`AppError`) viram status HTTP em um só lugar (`withErrorHandler`)
+
+Exemplo real: `GET /api/health` atravessa todas as camadas e responde `200 { "status": "ok" }` ou `503 { "status": "error" }`.
+
+As decisões ficam registradas em [ADRs](docs/adr/README.md).
 
 ## Como rodar
 
-Precisa de [Node.js](https://nodejs.org) 20 ou mais novo.
+Pré-requisitos: [Node.js 24](https://nodejs.org) (veja `.nvmrc`) e um banco Postgres no [Neon](https://neon.tech).
 
-```bash
-npm install
-npm run dev
-```
+1. Copie `.env.example` para `.env` e preencha as URLs da branch **`dev`** do Neon (`DATABASE_URL` com pooler, `DIRECT_URL` direta).
+2. Instale as dependências (isso também gera o cliente do Prisma):
 
-Abra http://localhost:3000.
+   ```bash
+   npm install
+   ```
 
-Outros comandos:
+3. Suba o servidor:
+
+   ```bash
+   npm run dev
+   ```
+
+4. Abra http://localhost:3000 e confira http://localhost:3000/api/health.
+
+Se faltar alguma variável, o projeto não sobe e diz qual falta.
+
+## Scripts
 
 | Comando | O que faz |
 |---|---|
-| `npm run build` | gera a versão de produção |
-| `npm run start` | serve a versão de produção (rode o `build` antes) |
-| `npm run lint` | verifica o código |
+| `npm run dev` | Servidor de desenvolvimento |
+| `npm run build` | Build de produção |
+| `npm run lint` | ESLint |
+| `npm run format` / `format:check` | Formata / confere a formatação (Prettier) |
+| `npm run typecheck` | Checagem de tipos |
+| `npm test` / `test:watch` | Testes unitários (Vitest) |
 
-Para abrir no celular pela rede local, use o IP do computador (ex.: `http://192.168.0.10:3000`). Os endereços `192.168.*.*` e `10.*.*.*` já estão liberados em `next.config.ts`.
-
-## Estrutura
+## Fluxo de trabalho e deploy
 
 ```
-app/            layout, página, fontes e estilos globais (cores em app/globals.css)
-components/     cabeçalho, rodapé, botão fixo, animações e as seções (components/secoes)
-data/           textos e produtos
-lib/            registro de imagens, links, formatação e mapa
-public/         fotos, marca e cardapio.pdf
-site.config.ts  dados do negócio (nome, endereço, horários, WhatsApp, Instagram)
+feature/* → PR para develop → CI + preview → merge → staging
+develop   → PR para main    → CI           → merge → produção
 ```
 
-## Feito por
+- `main` e `develop` são protegidas: merge só por PR, com o CI (lint, formatação, tipos, testes e build) passando.
+- O deploy é feito pela Vercel a cada merge. O build roda `prisma migrate deploy` antes do `next build`.
+- Cada ambiente tem seu banco: produção usa a branch `production` do Neon; staging, previews e local usam a `dev`.
 
-[João Victor Fractucello](https://github.com/joaovictorfractucello/) · sites para cafeterias e pequenos negócios.
+## Documentação
+
+- [`docs/SPEC.md`](docs/SPEC.md): escopo, arquitetura, regras de negócio e decisões
+- [`docs/data-model.md`](docs/data-model.md): tabelas, enums e dados pessoais
+- [`docs/adr/`](docs/adr/README.md): decisões de arquitetura
+- [`docs/etapas/`](docs/etapas/01-setup.md): plano e registro de cada etapa
+- [`docs/postman/`](docs/postman): collection e ambientes (local, staging, produção)
