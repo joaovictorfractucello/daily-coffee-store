@@ -13,17 +13,21 @@ Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · shadcn/ui ·
  
 ## Comandos
  
-> Atualizar esta seção ao final da Etapa 1 (Setup).
- 
 ```bash
-npm run dev            # servidor de desenvolvimento
-npm run build          # build de produção
-npm run lint           # ESLint
-npm run typecheck      # checagem de tipos
-npm run test           # testes unitários (Vitest)
-npx prisma migrate dev # criar/aplicar migration em desenvolvimento
-npx prisma db seed     # popular o banco com dados de exemplo
+npm run dev             # servidor de desenvolvimento
+npm run build           # build de produção
+npm run lint            # ESLint
+npm run format          # formata o código (Prettier)
+npm run format:check    # confere a formatação (usado no CI)
+npm run typecheck       # gera os tipos do Next e checa os tipos
+npm test                # testes unitários (Vitest)
+npm run test:watch      # testes em modo observação
+npx prisma generate     # gera o cliente do Prisma (roda sozinho no npm install)
+npx prisma migrate dev  # criar/aplicar migration em desenvolvimento (banco dev)
+npx prisma db seed      # popular o banco com dados de exemplo (a partir da Etapa 2)
 ```
+
+O CI roda, nesta ordem: `npm ci`, `lint`, `format:check`, `typecheck`, `test` e `build`. Rode os mesmos antes de abrir um PR.
  
 ## Arquitetura (regras obrigatórias)
  
