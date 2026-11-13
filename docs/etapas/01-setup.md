@@ -163,6 +163,7 @@ Traduzir para inglês os identificadores herdados da landing (componentes, funç
 | Branch de produção do Neon | `main` | `production` | Nome padrão criado pelo Neon; mesma função |
 | Staging | Preview da `develop` | Domínio fixo `daily-coffee-store-staging.vercel.app`, **público**, com `noindex` e `robots.txt` bloqueando tudo | Asaas e webhook vão precisar de URL pública fora da produção |
 | Comentários no código | — | Código gerado sem comentários; nomes descrevem o que fazem | Decisão do João: cada arquivo faz uma coisa e se explica pelo nome |
+| Fluxo de trabalho | `feature/*` → PR para `develop` → PR para `main` | Depois da etapa: commits direto na `develop`, `main` só por PR com CI obrigatório | Projeto solo: mais ágil; a rede de segurança é a `main` protegida. Regras no SPEC §10 |
 | Testes | `formatPrice` e `health.service` | Também `withErrorHandler` e `robots` | O handler já tinha tido um defeito; toda regra nova vem com teste |
 
 ## Problemas encontrados e soluções
