@@ -35,13 +35,13 @@ export function Visit() {
     <section
       id="visitar"
       aria-labelledby="visit-title"
-      className="scroll-mt-12 px-4 pb-20 sm:px-6 md:scroll-mt-16 md:pb-28 lg:px-10"
+      className="scroll-mt-4 px-4 pb-20 sm:px-6 md:pb-28 lg:px-10"
     >
       <div className="mx-auto max-w-7xl">
         <Reveal>
           <h2
             id="visit-title"
-            className="heading-soft text-[2rem] md:text-[2.5rem]"
+            className="heading-soft text-[1.25rem] md:text-[1.75rem]"
           >
             {visit.title}
           </h2>

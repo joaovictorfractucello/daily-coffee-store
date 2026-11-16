@@ -10,14 +10,14 @@ export function AboutUs() {
     <section
       id="quem-somos"
       aria-labelledby="about-us-title"
-      className="px-4 pb-20 sm:px-6 md:pb-28 lg:px-10"
+      className="scroll-mt-4 px-4 pb-20 sm:px-6 md:pb-28 lg:px-10"
     >
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 md:grid-cols-12 md:items-center md:gap-x-12">
           <Reveal className="md:col-span-5">
             <h2
               id="about-us-title"
-              className="heading-soft text-[2rem] md:text-[2.5rem]"
+              className="heading-soft text-[1.25rem] md:text-[1.75rem]"
             >
               {aboutUs.title}
             </h2>

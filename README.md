@@ -80,12 +80,13 @@ Se faltar alguma variável, o projeto não sobe e diz qual falta.
 ## Fluxo de trabalho e deploy
 
 ```
-feature/* → PR para develop → CI + preview → merge → staging
-develop   → PR para main    → CI           → merge → produção
+develop (commits diretos) → CI avisa → staging
+develop → PR para main    → CI obrigatório → merge → produção
 ```
 
-- `main` e `develop` são protegidas: merge só por PR, com o CI (lint, formatação, tipos, testes e build) passando.
-- O deploy é feito pela Vercel a cada merge. O build roda `prisma migrate deploy` antes do `next build`.
+- O trabalho acontece na `develop`; mudanças grandes ou arriscadas podem usar uma `feature/*`.
+- A `main` é protegida: só entra código por PR da `develop`, com o CI (lint, formatação, tipos, testes e build) passando.
+- O deploy é feito pela Vercel: a cada push na `develop` (staging) e a cada merge na `main` (produção). O build roda `prisma migrate deploy` antes do `next build`.
 - Cada ambiente tem seu banco: produção usa a branch `production` do Neon; staging, previews e local usam a `dev`.
 
 ## Documentação

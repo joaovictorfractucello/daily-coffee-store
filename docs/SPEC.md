@@ -24,6 +24,7 @@ Apesar de fictício, **deve ser pensado como um produto real**: regras de negóc
  
 ### Cliente
 - Catálogo de produtos (vindo do banco, não mais fixo no código)
+- Busca de produtos pelo nome ou descrição (sem acento nem maiúscula)
 - Carrinho (não exige login)
 - Checkout (exige login)
 - Cadastro e login (e-mail/senha + Google)
@@ -124,6 +125,9 @@ export const GET = productController.list
 export const POST = withAuth(productController.create, { role: 'ADMIN' })
 ```
  
+### Páginas (leitura de dados)
+Server Components leem dados chamando o **service** direto, a mesma camada que o controller usa. Não fazem `fetch` para a própria API: estão no mesmo servidor, e a chamada HTTP seria uma ida e volta inútil. A API REST continua sendo o caminho para clientes externos, o carrinho no navegador e o Postman.
+
 ### Middlewares
 - **Global** (`proxy.ts`, nome usado no Next.js 16 para o antigo `middleware.ts`): um único arquivo que roda antes de todas as requisições. Apenas checagens leves, como redirecionar para o login quando não há cookie de sessão.
 - **Por rota:** funções que envolvem o controller, no estilo do Express. Ex.: `withAuth(handler, { role: 'ADMIN' })` valida a sessão no banco e o papel do usuário, e responde 401 (não autenticado) ou 403 (sem permissão).
@@ -134,11 +138,16 @@ export const POST = withAuth(productController.create, { role: 'ADMIN' })
 E-mail e pagamento ficam atrás de **interfaces**, com implementações trocáveis.
 Exemplo: `EmailService` com implementação `GmailEmailService` hoje e `ResendEmailService` no futuro, sem o resto do sistema saber qual está em uso.
  
+### Home e página Sobre
+A home é uma **vitrine curta**, não uma landing: hero, atalhos de categoria e "Mais pedidos". O cliente já conhece a loja e vem para comprar.
+"Quem somos", endereço, horário e mapa ficam em `/sobre`. A promoção do combo sai da home e volta como banner no hero promocional (a definir).
+
 ### Estrutura de pastas
 ```
 src/
 ├── app/
-│   ├── (loja)/            → páginas (interface)
+│   ├── (home)/            → home (cabeçalho transparente sobre o hero)
+│   ├── (store)/           → páginas da loja (cardápio, produto, sobre...)
 │   └── api/               → route.ts (rotas)
 └── server/
     ├── controllers/
@@ -224,39 +233,44 @@ Foco nos **pontos críticos**.
 ## 10. Git, CI e deploy
  
 ### Branches
-- `main`: produção
-- `develop`: homologação (staging), com URL fixa de preview na Vercel
-- `feature/*`: desenvolvimento de cada funcionalidade
+- `main`: produção. Só recebe código por PR vindo da `develop`.
+- `develop`: onde o trabalho acontece (commits diretos, projeto com um único desenvolvedor) e homologação (staging), com URL fixa na Vercel.
+- `feature/*`: opcional, para mudança grande ou arriscada que não deve parar no staging pela metade.
 ### Fluxo
 ```
-feature/* → PR para develop → CI + preview da Vercel
-develop   → PR para main    → produção
+develop (commits diretos) → CI avisa a cada push → staging
+develop → PR para main    → CI obrigatório       → merge → produção
 ```
+Depois de cada release, a `main` ganha um merge commit. Para não acumular diferença, a `develop` é adiantada até ela: `git merge --ff-only origin/main` e `git push`.
+
+Antes de empurrar para a `develop`: rodar `lint`, `typecheck` e `test`, porque o push já publica o staging. Migration e troca de dependência se testam localmente antes do push (o staging roda `migrate deploy` no banco `dev`) ou vão numa `feature/*`.
  
 ### CI (GitHub Actions)
-Roda em todo PR para `develop` e `main`: install (`npm ci`), lint, `format:check`, typecheck, testes e build, nesta ordem. O build usa `DATABASE_URL` e `DIRECT_URL` fictícias, definidas no workflow. O job se chama `CI`.
+Roda a cada push na `develop` (só avisa, não bloqueia) e em todo PR para a `main` (obrigatório): install (`npm ci`), lint, `format:check`, typecheck, testes e build, nesta ordem. O build usa `DATABASE_URL` e `DIRECT_URL` fictícias, definidas no workflow. O job se chama `CI`.
  
 ### Proteção de branch
-`main` e `develop` (padrão de mercado, valendo também para administradores):
+**`main`** (produção, padrão de mercado, valendo também para administradores):
 - merge só via PR, sem exigir aprovação de revisor enquanto o projeto tem um único desenvolvedor (o GitHub não permite aprovar o próprio PR);
 - o check `CI` precisa passar, e a branch precisa estar atualizada com a base;
 - comentários do PR resolvidos antes do merge;
 - sem force-push e sem exclusão da branch.
+
+**`develop`:** push direto liberado; apenas sem force-push e sem exclusão. A rede de segurança é o CI obrigatório na `main`: a `develop` e o staging podem quebrar, a produção não.
  
 ### Deploy
 Feito automaticamente pela integração Git da Vercel. Quem publica é o merge; o CI decide se ele pode acontecer.
 
 | Momento | O que acontece |
 |---|---|
-| PR `feature/*` → `develop` | CI + **preview** do PR (banco Neon `dev`, `noindex`) |
-| Merge na `develop` | **staging** em `daily-coffee-store-staging.vercel.app` (banco Neon `dev`, `noindex`) |
+| Push na `develop` | CI avisa e a Vercel publica o **staging** em `daily-coffee-store-staging.vercel.app` (banco Neon `dev`, `noindex`) |
+| PR `develop` → `main` | CI obrigatório + **preview** do PR |
 | Merge na `main` | **produção** em `daily-coffee-store.vercel.app` (banco Neon `production`) |
 
 - O build roda `prisma migrate deploy` antes do `next build` (`vercel.json`).
 - `VERCEL_ENV=production` é o que libera a indexação: só a produção tem `robots.txt` permitindo o site (e bloqueando `/api/`) e fica sem `noindex`. Staging e previews bloqueiam tudo. Staging e previews são públicos (sem login da Vercel), sem dados reais.
 - O `canonical` e o `og:url` apontam sempre para o domínio de produção.
 - Rollback: pelo painel da Vercel (Deployments → deploy anterior → Promote), e a correção entra por PR.
-- Risco conhecido: PRs de feature também geram preview e rodam as migrations no Neon `dev` compartilhado. Quando dois PRs tiverem migrations diferentes, trocar para rodar o migrate só na produção e na `develop`.
+- Risco conhecido: previews de PR e o staging rodam as migrations no Neon `dev` compartilhado. Uma migration errada empurrada para a `develop` já altera o banco `dev`. Por isso migration se testa localmente antes do push.
 - Plano Hobby da Vercel é só para uso não comercial: migrar para o Pro antes de vender de verdade.
  
 ---

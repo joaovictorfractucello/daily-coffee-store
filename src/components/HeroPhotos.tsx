@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
+import { heroCopy } from "@/data/copy";
 
 type Slide = {
   src: string;
@@ -12,14 +14,20 @@ type Slide = {
 
 const INTERVAL_MS = 5000;
 
-// Fotos empilhadas que se alternam com fade (só opacidade). Sem movimento reduzido, passa a cada
-// 5s e pausa com a aba escondida. Com movimento reduzido, fica na primeira foto.
-// A cada troca, também muda a cor do botão principal do hero e a do botão do cabeçalho enquanto ele
-// está transparente (variáveis --cta-background e --cta-text, só na seção #inicio e no <header>: mudar
-// a variável na raiz da página refaria o estilo de tudo, o que pesa na rolagem do celular).
-// O carrossel só avança enquanto o hero está na tela, para não gastar processamento escondido.
+function subscribeToNothing() {
+  return () => {};
+}
+
 export function HeroPhotos({ slides }: { slides: Slide[] }) {
   const [active, setActive] = useState(0);
+  // Sobe a cada toque numa bolinha para reiniciar a contagem dos 5 segundos.
+  const [manualChanges, setManualChanges] = useState(0);
+  // Elemento das bolinhas (no Hero, fora do banner). No servidor é nulo; no cliente, o elemento.
+  const dotsContainer = useSyncExternalStore(
+    subscribeToNothing,
+    () => document.getElementById("hero-dots"),
+    () => null,
+  );
   const heroOnScreen = useRef(true);
 
   useEffect(() => {
@@ -41,7 +49,7 @@ export function HeroPhotos({ slides }: { slides: Slide[] }) {
         setActive((current) => (current + 1) % slides.length);
     }, INTERVAL_MS);
     return () => window.clearInterval(id);
-  }, [slides.length]);
+  }, [slides.length, manualChanges]);
 
   useEffect(() => {
     const { background, text } = slides[active].cta;
@@ -54,23 +62,53 @@ export function HeroPhotos({ slides }: { slides: Slide[] }) {
     }
   }, [active, slides]);
 
+  const dots =
+    dotsContainer && slides.length > 1
+      ? createPortal(
+          <div role="group" aria-label={heroCopy.dotsLabel} className="flex">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.src}
+                type="button"
+                aria-label={heroCopy.showPhoto(index + 1)}
+                aria-current={index === active}
+                onClick={() => {
+                  setActive(index);
+                  setManualChanges((count) => count + 1);
+                }}
+                className="grid size-6 place-items-center"
+              >
+                <span
+                  aria-hidden="true"
+                  className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${index === active ? "w-5 bg-accent" : "w-2 bg-accent/30"}`}
+                />
+              </button>
+            ))}
+          </div>,
+          dotsContainer,
+        )
+      : null;
+
   return (
-    <div className="hero-photo absolute inset-0 -z-10">
-      {slides.map((slide, index) => (
-        <Image
-          key={slide.src}
-          src={slide.src}
-          alt={index === active ? slide.alt : ""}
-          aria-hidden={index !== active}
-          fill
-          sizes={slide.sizes}
-          unoptimized
-          loading={index === 0 ? "eager" : undefined}
-          fetchPriority={index === 0 ? "high" : undefined}
-          className="object-cover object-center transition-opacity duration-[1400ms] ease-in-out motion-reduce:transition-none"
-          style={{ opacity: index === active ? 1 : 0 }}
-        />
-      ))}
-    </div>
+    <>
+      <div className="hero-photo absolute inset-0 -z-10 max-md:overflow-hidden max-md:rounded-[1.5rem]">
+        {slides.map((slide, index) => (
+          <Image
+            key={slide.src}
+            src={slide.src}
+            alt={index === active ? slide.alt : ""}
+            aria-hidden={index !== active}
+            fill
+            sizes={slide.sizes}
+            unoptimized
+            loading={index === 0 ? "eager" : undefined}
+            fetchPriority={index === 0 ? "high" : undefined}
+            className="object-cover object-center transition-opacity duration-[1400ms] ease-in-out motion-reduce:transition-none"
+            style={{ opacity: index === active ? 1 : 0 }}
+          />
+        ))}
+      </div>
+      {dots}
+    </>
   );
 }

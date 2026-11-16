@@ -67,8 +67,10 @@ Toda regra de negócio nova vem acompanhada de teste unitário.
  
 ## Git
  
-- `feature/*` → PR para `develop` → PR para `main`.
-- Nunca commitar direto em `main` ou `develop`.
+- Trabalho do dia a dia na `develop`, com commits diretos (projeto solo). `feature/*` só para mudança grande ou arriscada.
+- `develop` → PR para `main` (CI obrigatório) → produção. **Nunca commitar direto na `main`.**
+- Antes de empurrar para a `develop`: `lint`, `typecheck` e `test` passando (o push já publica o staging). Migration e troca de dependência: testar localmente antes do push.
+- Depois de cada release, adiantar a `develop` até a `main`: `git merge --ff-only origin/main` e `git push`.
 - **Os commits são feitos por mim.** Não execute `git commit`, `git push`, merge ou abertura de PR.
 - Ao terminar uma parte do trabalho, sugira a mensagem de commit (Conventional Commits) e quais arquivos entram nele. Se houver mudanças de assuntos diferentes, sugira separá-las em commits distintos.
 

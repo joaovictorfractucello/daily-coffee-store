@@ -1,5 +1,6 @@
 import { InstagramLogo, MapPin, WhatsappLogo } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
+import Link from "next/link";
 import { navigation, footer, labels } from "@/data/copy";
 import { formatTime, formatPhone } from "@/lib/format";
 import { instagramLink, whatsAppLink } from "@/lib/links";
@@ -16,12 +17,12 @@ export function Footer() {
 
   return (
     // No celular, o espaço extra embaixo evita que a barra fixa do WhatsApp cubra o rodapé.
-    <footer className="border-t border-line px-4 pb-24 sm:px-6 md:pb-0 lg:px-10">
+    <footer className="border-t border-line px-4 pb-20 sm:px-6 lg:px-10 lg:pb-0">
       <div className="mx-auto max-w-7xl py-10 md:py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr_1.4fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">
-            <a
-              href="#inicio"
+            <Link
+              href="/#inicio"
               aria-label={`${site.name}, ${labels.backToTop}`}
               className="inline-flex items-center gap-2"
             >
@@ -43,7 +44,7 @@ export function Footer() {
                   className="object-contain"
                 />
               </span>
-            </a>
+            </Link>
             <p className="mt-4 max-w-[30ch] text-sm text-ink-soft">
               {footer.description}
             </p>
@@ -54,9 +55,9 @@ export function Footer() {
             <ul className="mt-2">
               {navigation.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} className={linkClass}>
+                  <Link href={link.href} className={linkClass}>
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

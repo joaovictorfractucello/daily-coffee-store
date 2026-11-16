@@ -1,122 +1,125 @@
+import Image from "next/image";
+import Link from "next/link";
 import { Fragment, type CSSProperties } from "react";
-import { HeroPhotos } from "@/components/HeroPhotos";
-import { hero, labels } from "@/data/copy";
-import { existsInPublic } from "@/lib/files";
-import { heroPhotos } from "@/lib/images";
-import { menuLink, whatsAppLink } from "@/lib/links";
+import { heroPromo, labels, productPage } from "@/data/copy";
+import { frappeHero } from "@/lib/images";
+import { buildWhatsAppLink, menuLink } from "@/lib/links";
+import { site } from "@/site.config";
 
 function order(position: number) {
   return { "--order": position } as CSSProperties;
 }
 
-// "SEU CAFÉ" / "DE TODO DIA." em duas linhas, no desktop e no celular.
-// O espaço entre as linhas mantém a frase inteira para leitor de tela e Google.
+const promoWhatsAppLink = buildWhatsAppLink(
+  site.whatsapp.phone,
+  productPage.whatsAppMessage(heroPromo.productName),
+);
+
+// "FRAPPÉ" / "DE OREO" em duas linhas. O espaço entre as linhas mantém a frase inteira para leitor de
+// tela e Google.
 function HeroTitle() {
   return (
     <>
-      {hero.title.map((line, index) => (
+      {heroPromo.title.map((line, index) => (
         <Fragment key={line}>
           {index > 0 && " "}
-          <span className="block">{line}</span>
+          <span className="block whitespace-nowrap">{line}</span>
         </Fragment>
       ))}
     </>
   );
 }
 
+// TESTE: o hero mostra só o banner do frappé, com a mesma composição no desktop e no celular: palavra
+// "FRAPPÉ" gigante e apagada ao fundo, copo grande à direita e, à esquerda dele, título, texto promocional
+// (só a partir de xl) e botões. Tudo é medido em --vw e --vh: no desktop são 1vw e 1svh da tela; no celular
+// são 1cqw e 1cqh do banner (que tem proporção 16:9, a mesma da composição), então ele é uma versão
+// reduzida do desktop.
 export function Hero() {
-  // Só entram as fotos que existem em public/. Sem nenhuma, o fundo é chocolate liso.
-  const slides = heroPhotos
-    .filter((photo) => existsInPublic(photo.file))
-    .map((photo) => ({
-      src: photo.file,
-      alt: photo.alt,
-      sizes: photo.sizes,
-      cta: photo.cta,
-    }));
-
   return (
-    <section
-      id="inicio"
-      aria-labelledby="hero-title"
-      // A cor do botão principal começa na da primeira foto e muda com o carrossel (HeroPhotos).
-      style={
-        slides.length > 0
-          ? ({
-              "--cta-background": slides[0].cta.background,
-              "--cta-text": slides[0].cta.text,
-            } as CSSProperties)
-          : undefined
-      }
-      className="on-dark relative isolate flex min-h-svh flex-col items-center justify-center overflow-hidden bg-dark px-4 pt-12 pb-10 text-center text-light md:pt-14"
-    >
-      {slides.length > 0 && (
-        <>
-          <HeroPhotos slides={slides} />
-          {/* Camada escura neutra para o texto passar no contraste AA (as fotos de caramelo e morango
-              são claras), e faixa no topo para o menu transparente ficar legível. */}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-black/30"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-x-0 top-0 -z-10 h-[140px] bg-linear-to-b from-black/55 to-transparent"
-          />
-        </>
-      )}
-
-      <div className="hero-text">
-        <p
-          className="hero-enter pl-[0.3em] eyebrow text-[0.8125rem] tracking-[0.3em] md:text-sm"
-          style={order(0)}
-        >
-          {hero.topLine}
-        </p>
-        <h1
-          id="hero-title"
-          className="hero-enter mt-5 heading text-[clamp(3rem,17vw,4.5rem)] md:mt-6 md:text-[clamp(4rem,min(12vw,16dvh),10rem)]"
-          style={order(1)}
-        >
-          <HeroTitle />
-        </h1>
-        <p
-          className="hero-enter mt-6 pl-[0.3em] eyebrow text-[0.8125rem] tracking-[0.3em] md:mt-8 md:text-sm"
-          style={order(2)}
-        >
-          {hero.baseLine.map((phrase, index) => (
-            <Fragment key={phrase}>
-              {index > 0 && " "}
-              <span className="block md:inline">{phrase}</span>
-            </Fragment>
-          ))}
-        </p>
-      </div>
-
-      <div
-        className="hero-enter hero-text mt-10 flex w-full flex-col items-center gap-3 md:mt-12 md:flex-row md:justify-center md:gap-4"
-        style={order(3)}
+    <>
+      <section
+        id="inicio"
+        aria-labelledby="hero-title"
+        style={
+          {
+            "--cta-background": "#F6EEE4",
+            "--cta-text": "#2A1D16",
+          } as CSSProperties
+        }
+        className="on-dark relative isolate overflow-hidden bg-dark text-center text-light [--cx:68%] [--vh:1cqh] [--vw:1cqw] max-md:[container-type:size] max-md:mx-4 max-md:mt-14 max-md:aspect-[16/10] max-md:min-h-0 max-md:rounded-[1.5rem] max-md:[clip-path:inset(0_round_1.5rem)] md:min-h-svh md:[--cx:60%] md:[--vh:1svh] md:[--vw:1vw]"
       >
-        <a
-          href={whatsAppLink}
-          data-cta-whatsapp=""
-          target="_blank"
-          rel="noopener noreferrer"
-          className="button button-hero-cta w-full max-w-xs md:w-auto md:max-w-none"
+        <Image
+          src={frappeHero.background.file}
+          alt={frappeHero.background.alt}
+          width={frappeHero.background.width}
+          height={frappeHero.background.height}
+          sizes={frappeHero.background.sizes}
+          unoptimized
+          priority
+          className="absolute inset-0 -z-10 size-full object-cover"
+        />
+
+        {/* Palavra fantasma: gigante e bem apagada, só como textura atrás do copo (não é lida). */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-[46%] left-(--cx) z-0 -translate-x-1/2 -translate-y-1/2 heading text-[min(calc(var(--vw)*32),calc(var(--vh)*52))] leading-none whitespace-nowrap text-light/12"
         >
-          {labels.whatsapp}
-          <span className="sr-only"> {labels.opensWhatsApp}</span>
-        </a>
-        <a
-          href={menuLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="button button-outline w-full max-w-xs md:w-auto md:max-w-none"
-        >
-          {labels.menu}
-          <span className="sr-only"> {labels.opensMenuPdf}</span>
-        </a>
-      </div>
-    </section>
+          {heroPromo.ghostWord}
+        </span>
+
+        <Image
+          src={frappeHero.cup.file}
+          alt={frappeHero.cup.alt}
+          width={frappeHero.cup.width}
+          height={frappeHero.cup.height}
+          sizes={frappeHero.cup.sizes}
+          unoptimized
+          priority
+          className="pointer-events-none absolute top-1/2 left-(--cx) z-[1] h-[calc(var(--vh)*108)] w-auto -translate-x-1/2 -translate-y-1/2"
+        />
+
+        {/* A borda direita do bloco fica 41 vh antes do centro do copo (60% da largura): perto do respingo,
+            sem entrar nele. */}
+        <div className="hero-text absolute top-[46%] right-[calc(100%_-_var(--cx)_+_var(--vh)*41)] z-[2] -translate-y-1/2 text-left">
+          <h1
+            id="hero-title"
+            className="hero-enter heading text-[min(calc(var(--vw)*10),calc(var(--vh)*17))] md:text-[min(calc(var(--vw)*6.4),calc(var(--vh)*13))]"
+            style={order(1)}
+          >
+            <HeroTitle />
+          </h1>
+          <p
+            className="hero-enter mt-5 mr-auto hidden max-w-[19rem] text-lg leading-snug text-light/85 xl:block"
+            style={order(2)}
+          >
+            {heroPromo.text}
+          </p>
+          <div
+            className="hero-enter hero-text mt-[calc(var(--vh)*5)] flex w-auto flex-col items-start gap-1.5 md:mt-8 md:gap-3 xl:flex-row"
+            style={order(3)}
+          >
+            <a
+              href={promoWhatsAppLink}
+              data-cta-whatsapp=""
+              target="_blank"
+              rel="noopener noreferrer"
+              className="button button-hero-cta px-7 text-base max-md:min-h-10 max-md:px-3.5 max-md:py-1.5 max-md:text-[0.8125rem]"
+            >
+              {heroPromo.button}
+              <span className="sr-only"> {labels.opensWhatsApp}</span>
+            </a>
+            <Link
+              href={menuLink}
+              className="button button-outline px-7 text-base max-md:hidden"
+            >
+              {labels.menu}
+            </Link>
+          </div>
+        </div>
+      </section>
+      {/* Espaço das bolinhas do carrossel (só no celular): o HeroPhotos desenha aqui quando o carrossel voltar. */}
+      <div id="hero-dots" className="flex min-h-6 justify-center md:hidden" />
+    </>
   );
 }

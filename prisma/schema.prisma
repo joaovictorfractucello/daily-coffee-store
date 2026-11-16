@@ -6,3 +6,26 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum ProductCategory {
+  CAFES
+  BEBIDAS_GELADAS
+  SALGADOS
+  DOCES
+}
+
+model Product {
+  id           String          @id @default(cuid())
+  name         String
+  slug         String          @unique
+  description  String
+  priceInCents Int
+  imageUrl     String
+  category     ProductCategory
+  isActive     Boolean         @default(true)
+  isFeatured   Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([isActive, category])
+}

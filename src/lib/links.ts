@@ -16,7 +16,7 @@ export const comboWhatsAppLink = buildWhatsAppLink(
   site.whatsapp.comboMessage,
 );
 
-export const menuLink = site.menuPdfUrl;
+export const menuLink = "/cardapio";
 
 export const instagramLink = `https://www.instagram.com/${site.instagram.username}/`;
 

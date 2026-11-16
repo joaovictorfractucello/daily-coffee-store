@@ -36,8 +36,7 @@
 
 /*
   Camadas (z-index), do fundo para a frente:
-  30 barra do WhatsApp no celular | 40 cabeçalho | 45 overlay do menu | 46 drawer do menu
-  | 47 botão do menu (acima da drawer, vira o X) | 50 link "Pular para o conteúdo"
+  40 cabeçalho e barra de navegação do celular | 50 link "Pular para o conteúdo"
 */
 
 @layer base {
@@ -49,7 +48,7 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 3.5rem;
+    scroll-padding-top: 4rem;
     font-synthesis: none;
     -webkit-tap-highlight-color: transparent;
   }
@@ -132,14 +131,13 @@
   letter-spacing: 0.01em;
 }
 
-/* Título de seção mais leve: a mesma Anton, mas em caixa normal e com entrelinha folgada. O tamanho
-   fica por conta de quem usa (menor que o das seções grandes). */
+/* Título de seção e de página: fonte de texto do site em negrito, bem mais leve que o Anton do hero.
+   O tamanho fica por conta de quem usa. */
 @utility heading-soft {
-  font-family: var(--font-display), sans-serif;
-  font-weight: 400;
-  font-synthesis: none;
-  line-height: 1.1;
-  letter-spacing: 0.015em;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
 }
 
 /* Linhas pequenas espaçadas: fonte de texto, caixa alta, semi-bold. */
@@ -256,115 +254,142 @@
     }
   }
 
-  /* Menu do celular: drawer que entra da direita, sobre um overlay. Fecha mais rápido do que abre. */
-  .drawer {
-    transform: translateX(100%);
-    visibility: hidden;
-    transition:
-      transform 260ms var(--ease-drawer),
-      visibility 0s linear 260ms;
+  /* Com a busca aberta o teclado ocupa a base: esconde a barra para ela não subir por cima das teclas. */
+  body:has(.header-search[data-open="true"]) .bottom-nav {
+    display: none;
   }
 
-  .drawer[data-open="true"] {
-    transform: translateX(0);
-    visibility: visible;
-    transition:
-      transform 380ms var(--ease-drawer),
-      visibility 0s;
-  }
-
-  .drawer-overlay {
-    opacity: 0;
-    visibility: hidden;
-    transition:
-      opacity 260ms ease,
-      visibility 0s linear 260ms;
-  }
-
-  .drawer-overlay[data-open="true"] {
-    opacity: 1;
-    visibility: visible;
-    transition:
-      opacity 320ms ease,
-      visibility 0s;
-  }
-
-  /* Os links da drawer entram em cascata curta depois que ela começa a abrir. */
-  .drawer-item {
-    opacity: 0;
-    transform: translateX(12px);
-    transition:
-      opacity 160ms ease,
-      transform 160ms var(--ease-snappy);
-  }
-
-  .drawer[data-open="true"] .drawer-item {
-    opacity: 1;
-    transform: none;
-    transition:
-      opacity 320ms ease calc(var(--i, 0) * 50ms + 120ms),
-      transform 420ms var(--ease-snappy) calc(var(--i, 0) * 50ms + 120ms);
-  }
-
-  /* Ícone do menu: três barras que viram um X. */
-  .hamburger-bars {
+  /* Busca do cabeçalho. A lupa fica num quadrado fixo (nunca se mexe); a pílula é uma camada
+     absoluta presa à borda direita dela e desliza para a esquerda. Não participa do layout. */
+  .header-search {
+    --search-width: min(20rem, calc(100vw - 11rem));
     position: relative;
-    display: block;
-    width: 1.25rem;
-    height: 1rem;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 2.75rem;
   }
 
-  .hamburger-bars > span {
+  @media (min-width: 64rem) {
+    .header-search {
+      --search-width: clamp(9rem, calc(50vw - 18.6rem), 18rem);
+    }
+  }
+
+  @media (min-width: 80rem) {
+    .header-search {
+      --search-width: clamp(9rem, calc(50vw - 30.2rem), 18rem);
+    }
+  }
+
+  .header-search-pill {
     position: absolute;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: currentColor;
-    transition:
-      transform 320ms var(--ease-drawer),
-      opacity 160ms ease;
-  }
-
-  .hamburger-bars > span:nth-child(1) {
     top: 0;
+    right: 0;
+    width: 2.75rem;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    transition:
+      width 420ms var(--ease-drawer),
+      border-color 280ms ease,
+      background-color 280ms ease;
   }
 
-  .hamburger-bars > span:nth-child(2) {
-    top: calc(50% - 1px);
+  .header-search[data-open="true"] .header-search-pill {
+    width: var(--search-width);
+    border-color: color-mix(in srgb, currentColor 45%, transparent);
+    background-color: var(--color-background);
   }
 
-  .hamburger-bars > span:nth-child(3) {
-    bottom: 0;
+  /* Pílula creme: texto e lupa escuros (no desktop sobre o hero a regra abaixo reverte isso). */
+  .header-search[data-open="true"] {
+    color: var(--color-ink);
   }
 
-  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+  /* Cabeçalho transparente sobre o hero (só no desktop; no celular ele é sólido): a pílula volta a ser
+     translúcida e o texto, claro. */
+  @media (min-width: 48rem) {
+    .on-dark .header-search[data-open="true"] {
+      color: inherit;
+    }
+
+    .on-dark .header-search[data-open="true"] .header-search-pill {
+      background-color: color-mix(in srgb, currentColor 10%, transparent);
+    }
   }
 
-  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(2) {
+  /* O campo tem largura fixa e fica preso à direita: ao crescer, a pílula revela o texto
+     deslizando, sem reorganizar nada por dentro. */
+  .header-search-field {
+    position: absolute;
+    top: 0;
+    right: calc(2.75rem - 1px);
+    width: calc(var(--search-width) - 2.75rem - 1px);
+    height: 100%;
+    padding-left: 1rem;
+    background: transparent;
+    font-size: 0.875rem;
+    text-overflow: ellipsis;
     opacity: 0;
-    transform: scaleX(0.2);
+    transition: opacity 160ms ease;
   }
 
-  .hamburger[data-open="true"] .hamburger-bars > span:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+  .header-search-field::placeholder {
+    color: color-mix(in srgb, currentColor 60%, transparent);
   }
 
-  /* Barra fixa do WhatsApp no celular: sobe da base depois que o hero sai da tela. */
-  .whatsapp-bar {
-    transform: translateY(100%);
-    visibility: hidden;
+  .header-search-field:focus-visible {
+    outline: none;
+  }
+
+  .header-search[data-open="true"] .header-search-field {
+    opacity: 1;
+    transition: opacity 280ms ease 140ms;
+  }
+
+  .header-search[data-open="true"] .header-search-pill:focus-within {
+    border-color: currentColor;
+  }
+
+  .header-search-button {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    cursor: pointer;
     transition:
-      transform 200ms var(--ease-snappy),
-      visibility 0s linear 200ms;
+      background-color 200ms ease,
+      scale 160ms ease;
   }
 
-  .whatsapp-bar[data-visible="true"] {
-    transform: none;
-    visibility: visible;
-    transition:
-      transform 260ms var(--ease-snappy),
-      visibility 0s;
+  .header-search-button:focus-visible {
+    background-color: color-mix(in srgb, currentColor 5%, transparent);
+  }
+
+  /* No toque o :hover fica preso depois do clique; só o mouse mostra o hover. */
+  @media (hover: hover) {
+    .header-search-button:hover {
+      background-color: color-mix(in srgb, currentColor 5%, transparent);
+    }
+  }
+
+  /* Sobre o hero (texto claro), o toque de fundo precisa ser um pouco mais forte para aparecer. */
+  .on-dark .header-search-button:focus-visible {
+    background-color: color-mix(in srgb, currentColor 10%, transparent);
+  }
+
+  @media (hover: hover) {
+    .on-dark .header-search-button:hover {
+      background-color: color-mix(in srgb, currentColor 10%, transparent);
+    }
+  }
+
+  .header-search-button:active {
+    scale: 0.95;
   }
 }
 
@@ -430,45 +455,19 @@
     transform: none;
   }
 
-  /* Gaveta: sem deslocamento, só fade-in e some. */
-  .drawer,
-  .drawer[data-open="true"] {
-    transform: none;
-    opacity: 0;
+  /* Busca do cabeçalho: sem deslizar, só aparece e some. */
+  .header-search-pill {
     transition:
-      opacity 200ms ease,
-      visibility 0s linear 200ms;
+      border-color 200ms ease,
+      background-color 200ms ease;
   }
 
-  .drawer[data-open="true"] {
-    opacity: 1;
-    transition:
-      opacity 200ms ease,
-      visibility 0s;
+  .header-search[data-open="true"] .header-search-pill {
+    width: var(--search-width);
   }
 
-  .drawer-item,
-  .drawer[data-open="true"] .drawer-item {
-    transform: none;
-    transition-delay: 0s;
-  }
-
-  .hamburger-bars > span {
-    transition-duration: 0.01ms;
-  }
-
-  .whatsapp-bar {
-    transform: none;
-    opacity: 0;
-    transition:
-      opacity 200ms ease,
-      visibility 0s linear 200ms;
-  }
-
-  .whatsapp-bar[data-visible="true"] {
-    opacity: 1;
-    transition:
-      opacity 200ms ease,
-      visibility 0s;
+  .header-search-field,
+  .header-search[data-open="true"] .header-search-field {
+    transition: opacity 200ms ease;
   }
 }
