@@ -90,12 +90,12 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
 
             <div className="flex items-center justify-self-end">
               <HeaderSearch open={searchOpen} onOpenChange={setSearchOpen} />
+              <HeaderIconButton label={headerCopy.basket}>
+                <ShoppingCart aria-hidden="true" size={ICON_SIZE} />
+              </HeaderIconButton>
               <div className="hidden items-center lg:flex">
                 <HeaderIconButton label={headerCopy.profile}>
                   <User aria-hidden="true" size={ICON_SIZE} />
-                </HeaderIconButton>
-                <HeaderIconButton label={headerCopy.basket}>
-                  <ShoppingCart aria-hidden="true" size={ICON_SIZE} />
                 </HeaderIconButton>
                 <AuthButtons />
               </div>

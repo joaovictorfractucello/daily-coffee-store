@@ -65,7 +65,7 @@ export const bottomNavCopy = {
   label: "Navegação do celular",
   home: "Início",
   menu: "Cardápio",
-  basket: "Carrinho",
+  orders: "Pedidos",
   profile: "Perfil",
   comingSoon: "Em breve",
 };
@@ -92,6 +92,15 @@ export const heroPromo = {
   text: "Gelado, cremoso e cheio de pedaços de biscoito, coberto com chantilly e calda de chocolate.",
   button: "Pedir o Frappé",
   productName: "Frappé de Oreo",
+};
+
+// TESTE do segundo banner promocional: torta de limão (mesma composição do frappé).
+export const tartPromo = {
+  title: ["Torta", "de Limão"],
+  ghostWord: "Limão",
+  text: "Massa amanteigada, creme cítrico de limão e merengue maçaricado na hora.",
+  button: "Pedir a Torta",
+  productName: "Torta de limão",
 };
 
 export const heroCopy = {

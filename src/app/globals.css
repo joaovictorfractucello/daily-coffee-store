@@ -262,7 +262,7 @@
   /* Busca do cabeçalho. A lupa fica num quadrado fixo (nunca se mexe); a pílula é uma camada
      absoluta presa à borda direita dela e desliza para a esquerda. Não participa do layout. */
   .header-search {
-    --search-width: min(20rem, calc(100vw - 11rem));
+    --search-width: min(20rem, calc(100vw - 13.5rem));
     position: relative;
     flex-shrink: 0;
     width: 2.75rem;
