@@ -10,7 +10,7 @@ export function AboutUs() {
     <section
       id="quem-somos"
       aria-labelledby="about-us-title"
-      className="scroll-mt-4 px-4 pb-20 sm:px-6 md:pb-28 lg:px-10"
+      className="scroll-mt-4 px-4 pb-12 sm:px-6 md:pb-[4.5rem] lg:px-10"
     >
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-10 md:grid-cols-12 md:items-center md:gap-x-12">

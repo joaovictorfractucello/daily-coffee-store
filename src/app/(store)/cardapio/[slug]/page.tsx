@@ -35,7 +35,7 @@ async function ProductContent({
 
 export default function ProductPage({ params }: PageProps<"/cardapio/[slug]">) {
   return (
-    <div className="px-4 pt-24 pb-20 sm:px-6 md:pt-28 md:pb-28 lg:px-10">
+    <div className="px-4 pt-24 pb-12 sm:px-6 md:pt-28 md:pb-[4.5rem] lg:px-10">
       <div className="mx-auto max-w-7xl">
         <Suspense fallback={<ProductDetailsSkeleton />}>
           <ProductContent params={params} />
