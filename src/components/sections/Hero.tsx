@@ -1,8 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, type CSSProperties } from "react";
-import { heroPromo, labels, productPage, tartPromo } from "@/data/copy";
-import { frappeHero, tartHero, type ImageAsset } from "@/lib/images";
+import {
+  coldBrewPromo,
+  heroPromo,
+  labels,
+  productPage,
+  tartPromo,
+} from "@/data/copy";
+import {
+  coldBrewHero,
+  frappeHero,
+  tartHero,
+  type ImageAsset,
+} from "@/lib/images";
 import { buildWhatsAppLink, menuLink } from "@/lib/links";
 import { site } from "@/site.config";
 
@@ -31,6 +42,11 @@ const heroBanners = {
     images: tartHero,
     artClass: "h-[calc(var(--vh)*96)]",
   },
+  coldBrew: {
+    promo: coldBrewPromo,
+    images: coldBrewHero,
+    artClass: "h-[calc(var(--vh)*88)] max-md:h-[calc(var(--vh)*96)]",
+  },
 } satisfies Record<string, HeroBanner>;
 
 export type HeroBannerName = keyof typeof heroBanners;
@@ -50,12 +66,11 @@ function HeroTitle({ promo }: { promo: Promo }) {
   );
 }
 
-// TESTE: o hero mostra só o banner do frappé, com a mesma composição no desktop e no celular: palavra
-// "FRAPPÉ" gigante e apagada ao fundo, copo grande à direita e, à esquerda dele, título, texto promocional
-// (só a partir de xl) e botões. Tudo é medido em --vw e --vh: no desktop são 1vw e 1svh da tela; no celular
-// são 1cqw e 1cqh do banner (que tem proporção 16:9, a mesma da composição), então ele é uma versão
-// reduzida do desktop.
-export function Hero({ banner = "tart" }: { banner?: HeroBannerName }) {
+// TESTE: banner promocional com a mesma composição no desktop e no celular: palavra gigante e apagada
+// centrada ao fundo, arte do produto grande à direita e, à esquerda dela, título, texto promocional (só a
+// partir de xl) e botões. Tudo é medido em --vw e --vh: no desktop são 1vw e 1svh da tela; no celular são
+// 1cqw e 1cqh do banner, então ele é uma versão reduzida do desktop.
+export function Hero({ banner }: { banner: HeroBannerName }) {
   const { promo, images, artClass } = heroBanners[banner];
   const promoWhatsAppLink = buildWhatsAppLink(
     site.whatsapp.phone,
@@ -87,10 +102,10 @@ export function Hero({ banner = "tart" }: { banner?: HeroBannerName }) {
           className="absolute inset-0 -z-10 size-full object-cover"
         />
 
-        {/* Palavra fantasma: gigante e bem apagada, só como textura atrás do copo (não é lida). */}
+        {/* Palavra fantasma: gigante e bem apagada, centrada no banner, só como textura (não é lida). */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute top-[46%] left-(--cx) z-0 -translate-x-1/2 -translate-y-1/2 heading text-[min(calc(var(--vw)*32),calc(var(--vh)*52))] leading-none whitespace-nowrap text-light/12"
+          className="pointer-events-none absolute top-[46%] left-1/2 z-0 -translate-x-1/2 -translate-y-1/2 heading text-[min(calc(var(--vw)*32),calc(var(--vh)*52))] leading-none whitespace-nowrap text-light/12"
         >
           {promo.ghostWord}
         </span>
@@ -106,9 +121,9 @@ export function Hero({ banner = "tart" }: { banner?: HeroBannerName }) {
           className={`pointer-events-none absolute top-1/2 left-(--cx) z-[1] w-auto -translate-x-1/2 -translate-y-1/2 ${artClass}`}
         />
 
-        {/* A borda direita do bloco fica 41 vh antes do centro do copo (60% da largura): perto do respingo,
-            sem entrar nele. */}
-        <div className="hero-text absolute top-[46%] right-[calc(100%_-_var(--cx)_+_var(--vh)*41)] z-[2] -translate-y-1/2 text-left">
+        {/* Celular: o bloco começa a 6% da borda esquerda do banner (margem). Desktop: a borda direita do bloco
+            fica 41 vh antes do centro da arte (60% da largura), perto do respingo, sem entrar nele. */}
+        <div className="hero-text absolute top-[46%] left-[6%] z-[2] -translate-y-1/2 text-left md:right-[calc(100%_-_var(--cx)_+_var(--vh)*41)] md:left-auto">
           <h1
             id={titleId}
             className="hero-enter heading text-[min(calc(var(--vw)*10),calc(var(--vh)*17))] md:text-[min(calc(var(--vw)*6.4),calc(var(--vh)*13))]"
@@ -138,7 +153,7 @@ export function Hero({ banner = "tart" }: { banner?: HeroBannerName }) {
             </a>
             <Link
               href={menuLink}
-              className="button button-outline px-7 text-base max-md:hidden"
+              className="button button-outline px-7 text-base max-xl:hidden"
             >
               {labels.menu}
             </Link>

@@ -103,6 +103,15 @@ export const tartPromo = {
   productName: "Torta de limão",
 };
 
+// TESTE do terceiro banner promocional: cold brew.
+export const coldBrewPromo = {
+  title: ["Cold", "Brew"],
+  ghostWord: "Brew",
+  text: "Extraído a frio por 16 horas. Menos ácido, mais doce.",
+  button: "Pedir o Cold Brew",
+  productName: "Cold brew",
+};
+
 export const heroCopy = {
   dotsLabel: "Fotos de destaque",
   showPhoto: (position: number) => `Mostrar foto ${position}`,
