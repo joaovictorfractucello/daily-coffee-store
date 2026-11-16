@@ -5,5 +5,6 @@ const directUrl = process.env.DIRECT_URL ?? "";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
+  migrations: { seed: "tsx prisma/seed.ts" },
   datasource: { url: directUrl },
 });

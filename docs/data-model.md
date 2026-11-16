@@ -87,6 +87,7 @@ Nova categoria = alteração no enum + migration (aceitável: o cardápio muda p
 | `imageUrl` | URL do Cloudinary ou imagem local do seed |
 | `category` | `ProductCategory` |
 | `isActive` | desativar em vez de apagar |
+| `isFeatured` | aparece nos destaques ("Mais pedidos") da home; padrão `false` |
 | `createdAt`, `updatedAt` | |
  
 **Neighborhood** (bairros atendidos)
