@@ -27,10 +27,285 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             },
             "description": "Atravessa todas as camadas até o banco. 200 { status: \"ok\" } quando o banco responde; 503 { status: \"error\" } quando não responde, sem detalhes internos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Produtos",
+      "item": [
+        {
+          "name": "GET /products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "const isProduct = (p) => [\"id\",\"name\",\"slug\",\"description\",\"priceInCents\",\"imageUrl\",\"category\",\"isFeatured\"].every((k) => k in p) && !(\"isActive\" in p);",
+                  "pm.test(\"lista de produtos públicos\", () => { const body = pm.response.json(); pm.expect(body).to.be.an(\"array\").that.is.not.empty; pm.expect(body.every(isProduct)).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ]
+            },
+            "description": "Produtos ativos, ordenados por categoria e preço."
+          }
+        },
+        {
+          "name": "GET /products?category=BEBIDAS_GELADAS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"só bebidas geladas\", () => pm.expect(pm.response.json().every((p) => p.category === \"BEBIDAS_GELADAS\")).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?category=BEBIDAS_GELADAS",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "BEBIDAS_GELADAS"
+                }
+              ]
+            },
+            "description": "Filtro por categoria: CAFES, BEBIDAS_GELADAS, SALGADOS ou DOCES."
+          }
+        },
+        {
+          "name": "GET /products?featured=true",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"só destaques\", () => pm.expect(pm.response.json().every((p) => p.isFeatured)).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?featured=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "featured",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "Destaques da home (\"Mais pedidos\")."
+          }
+        },
+        {
+          "name": "GET /products?category=INVALIDA (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"código INVALID_INPUT\", () => pm.expect(pm.response.json().error.code).to.eql(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?category=INVALIDA",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "INVALIDA"
+                }
+              ]
+            },
+            "description": "Categoria inexistente é rejeitada."
+          }
+        },
+        {
+          "name": "GET /products?q=pao (busca sem acento)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"acha o pão de queijo sem acento\", () => pm.expect(pm.response.json().map((p) => p.slug)).to.include(\"pao-de-queijo-quentinho\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?q=pao",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "pao"
+                }
+              ]
+            },
+            "description": "Busca por nome ou descrição, sem diferenciar acento nem maiúscula."
+          }
+        },
+        {
+          "name": "GET /products?q=sushi (sem resultado)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lista vazia\", () => pm.expect(pm.response.json()).to.eql([]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?q=sushi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "sushi"
+                }
+              ]
+            },
+            "description": "Termo sem correspondência devolve lista vazia."
+          }
+        },
+        {
+          "name": "GET /products/:slug",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "const isProduct = (p) => [\"id\",\"name\",\"slug\",\"description\",\"priceInCents\",\"imageUrl\",\"category\",\"isFeatured\"].every((k) => k in p) && !(\"isActive\" in p);",
+                  "pm.test(\"produto público pedido\", () => { const p = pm.response.json(); pm.expect(isProduct(p)).to.be.true; pm.expect(p.slug).to.eql(\"cappuccino-cremoso\"); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/cappuccino-cremoso",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "cappuccino-cremoso"
+              ]
+            },
+            "description": "Produto ativo pelo slug."
+          }
+        },
+        {
+          "name": "GET /products/:slug inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"código PRODUCT_NOT_FOUND\", () => pm.expect(pm.response.json().error.code).to.eql(\"PRODUCT_NOT_FOUND\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/nao-existe",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "products",
+                "nao-existe"
+              ]
+            },
+            "description": "Slug que não existe ou produto inativo."
           }
         }
       ]
