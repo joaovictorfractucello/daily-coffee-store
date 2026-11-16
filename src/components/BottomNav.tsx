@@ -37,6 +37,16 @@ function ComingSoonItem({
   );
 }
 
+// Mesma barra, sem links, enquanto o BottomNav espera o caminho da página (usePathname precisa de Suspense).
+export function BottomNavFallback() {
+  return (
+    <div
+      aria-hidden="true"
+      className="bottom-nav fixed inset-x-0 bottom-0 z-40 h-14 border-t border-line bg-background pb-[env(safe-area-inset-bottom)] lg:hidden"
+    />
+  );
+}
+
 export function BottomNav() {
   const pathname = usePathname();
   const onMenu = pathname.startsWith(menuLink);
