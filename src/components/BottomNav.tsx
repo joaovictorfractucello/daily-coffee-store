@@ -1,6 +1,6 @@
 "use client";
 
-import { Coffee, House, ShoppingCart, User } from "@phosphor-icons/react/ssr";
+import { Coffee, House, Receipt, User } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import type { ComponentType } from "react";
 import { usePathname } from "next/navigation";
@@ -87,7 +87,7 @@ export function BottomNav() {
           </Link>
         </li>
         <li className="contents">
-          <ComingSoonItem label={bottomNavCopy.basket} icon={ShoppingCart} />
+          <ComingSoonItem label={bottomNavCopy.orders} icon={Receipt} />
         </li>
         <li className="contents">
           <ComingSoonItem label={bottomNavCopy.profile} icon={User} />

@@ -107,4 +107,22 @@ export const frappeHero = {
   },
 } satisfies Record<string, ImageAsset>;
 
+// TESTE do banner da torta de limão: a arte (torta + limões, já recortada) fica numa camada própria.
+export const tartHero = {
+  background: {
+    file: "/images/hero/torta-fundo.webp",
+    alt: "",
+    width: 2560,
+    height: 1430,
+    sizes: "100vw",
+  },
+  cup: {
+    file: "/images/hero/torta-limao.webp",
+    alt: "Fatia de torta de limão com merengue maçaricado, cercada por limões verdes, folhas e farelos de massa",
+    width: 994,
+    height: 1162,
+    sizes: "(min-width: 768px) 60svh, 1px",
+  },
+} satisfies Record<string, ImageAsset>;
+
 export type ImageKey = keyof typeof images;
