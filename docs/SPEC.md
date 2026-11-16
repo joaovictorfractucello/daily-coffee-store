@@ -24,6 +24,7 @@ Apesar de fictício, **deve ser pensado como um produto real**: regras de negóc
  
 ### Cliente
 - Catálogo de produtos (vindo do banco, não mais fixo no código)
+- Busca de produtos pelo nome ou descrição (sem acento nem maiúscula)
 - Carrinho (não exige login)
 - Checkout (exige login)
 - Cadastro e login (e-mail/senha + Google)
@@ -124,6 +125,9 @@ export const GET = productController.list
 export const POST = withAuth(productController.create, { role: 'ADMIN' })
 ```
  
+### Páginas (leitura de dados)
+Server Components leem dados chamando o **service** direto, a mesma camada que o controller usa. Não fazem `fetch` para a própria API: estão no mesmo servidor, e a chamada HTTP seria uma ida e volta inútil. A API REST continua sendo o caminho para clientes externos, o carrinho no navegador e o Postman.
+
 ### Middlewares
 - **Global** (`proxy.ts`, nome usado no Next.js 16 para o antigo `middleware.ts`): um único arquivo que roda antes de todas as requisições. Apenas checagens leves, como redirecionar para o login quando não há cookie de sessão.
 - **Por rota:** funções que envolvem o controller, no estilo do Express. Ex.: `withAuth(handler, { role: 'ADMIN' })` valida a sessão no banco e o papel do usuário, e responde 401 (não autenticado) ou 403 (sem permissão).
@@ -134,11 +138,16 @@ export const POST = withAuth(productController.create, { role: 'ADMIN' })
 E-mail e pagamento ficam atrás de **interfaces**, com implementações trocáveis.
 Exemplo: `EmailService` com implementação `GmailEmailService` hoje e `ResendEmailService` no futuro, sem o resto do sistema saber qual está em uso.
  
+### Home e página Sobre
+A home é uma **vitrine curta**, não uma landing: hero, atalhos de categoria e "Mais pedidos". O cliente já conhece a loja e vem para comprar.
+"Quem somos", endereço, horário e mapa ficam em `/sobre`. A promoção do combo sai da home e volta como banner no hero promocional (a definir).
+
 ### Estrutura de pastas
 ```
 src/
 ├── app/
-│   ├── (loja)/            → páginas (interface)
+│   ├── (home)/            → home (cabeçalho transparente sobre o hero)
+│   ├── (store)/           → páginas da loja (cardápio, produto, sobre...)
 │   └── api/               → route.ts (rotas)
 └── server/
     ├── controllers/
