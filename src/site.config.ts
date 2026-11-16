@@ -45,10 +45,6 @@ export type SiteConfig = {
   // O que o mapa do Google procura. Vazio: usa o endereço completo acima (o certo para um cliente
   // real). Na demonstração o endereço é fictício e o Google não o encontra, então ela busca só o bairro.
   mapSearch: string;
-  // Endereço do cardápio em PDF, aberto numa aba nova (sem baixar). Pode ser um arquivo do
-  // próprio site ("/cardapio.pdf", em public/) ou um link completo (ex.: Google Drive no formato
-  // "https://drive.google.com/file/d/ID/view", que abre no visualizador do Google sem baixar).
-  menuPdfUrl: string;
 };
 
 export const site: SiteConfig = {
@@ -91,6 +87,4 @@ export const site: SiteConfig = {
   // EXEMPLO: só a rua, para o mapa não apontar para um comércio real que tenha o número inventado.
   // Apague (deixe "") num cliente real, para o mapa e o "Como chegar" usarem o endereço completo.
   mapSearch: "Rua Capitão Macedo, Vila Mariana, São Paulo, SP",
-  // EXEMPLO: PDF de demonstração gerado com o cardápio fictício. Troque pelo cardápio real.
-  menuPdfUrl: "/cardapio.pdf",
 };

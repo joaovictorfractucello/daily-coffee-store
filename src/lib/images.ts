@@ -11,46 +11,8 @@ export type ImageAsset = {
   sizes: string;
 };
 
-const favoriteSizes =
-  "(min-width: 1280px) 380px, (min-width: 768px) 30vw, 92vw";
-
 export const images = {
-  creamyCappuccino: {
-    file: "/images/queridinhos/cappuccino-cremoso.webp",
-    alt: "Cappuccino com desenho de folha na espuma, em xícara de cerâmica sobre mesa de madeira",
-    width: 1080,
-    height: 1080,
-    sizes: favoriteSizes,
-  },
-  chocolateFrappe: {
-    file: "/images/queridinhos/frappe-de-chocolate.webp",
-    alt: "Frappé de chocolate com chantilly e calda escorrendo, em copo transparente com tampa de domo",
-    width: 1080,
-    height: 1080,
-    sizes: favoriteSizes,
-  },
-  cheeseBread: {
-    file: "/images/queridinhos/pao-de-queijo.webp",
-    alt: "Pães de queijo dourados, recém-saídos do forno, em uma cesta forrada com pano",
-    width: 1080,
-    height: 1080,
-    sizes: favoriteSizes,
-  },
-  butterCroissant: {
-    file: "/images/queridinhos/croissant-de-manteiga.webp",
-    alt: "Croissant de manteiga dourado e folhado, partido ao meio sobre prato de cerâmica",
-    width: 1080,
-    height: 1080,
-    sizes: favoriteSizes,
-  },
-  carrotCake: {
-    file: "/images/queridinhos/bolo-de-cenoura.webp",
-    alt: "Fatia de bolo de cenoura com cobertura de chocolate escorrendo pela lateral",
-    width: 1080,
-    height: 1080,
-    sizes: favoriteSizes,
-  },
-  // Faixa promocional em largura total da tela. A foto é 2:1 e aparece cortada em 10:3 (veja Promotion.tsx).
+  // Foto da promoção do combo (2:1). Fora da home por enquanto: volta no hero promocional.
   // O texto promocional entra depois por cima, então a imagem é sem texto.
   promotionCombo: {
     file: "/images/promocao/combo-cappuccino-pao-de-queijo.webp",
@@ -65,14 +27,6 @@ export const images = {
     width: 1600,
     height: 1000,
     sizes: "(min-width: 1280px) 740px, (min-width: 768px) 58vw, 92vw",
-  },
-  // Faixa final de chamada para ação (largura total, texto centralizado por cima; imagem sem texto).
-  finalCta: {
-    file: "/images/cta/mesa-esperando.webp",
-    alt: "Fundo desfocado e acolhedor de café, com luz quente e mesa de madeira",
-    width: 2000,
-    height: 1000,
-    sizes: "100vw",
   },
   // Ícones dos 3 itens do Quem somos (PNG com fundo transparente, 256 x 256).
   coffeeIcon: {
@@ -133,5 +87,24 @@ export const heroPhotos: HeroPhoto[] = [
     cta: { background: "#C81E52", text: "#FFF8EF" },
   },
 ];
+
+// TESTE do banner do frappé (hero): fundo e copo em camadas separadas, para o título ficar entre os dois.
+// As 3 fotos de `heroPhotos` ficam registradas, mas o hero não as usa por enquanto.
+export const frappeHero = {
+  background: {
+    file: "/images/hero/frappe-fundo.webp",
+    alt: "",
+    width: 2560,
+    height: 1430,
+    sizes: "100vw",
+  },
+  cup: {
+    file: "/images/hero/frappe-copo.webp",
+    alt: "Frappé de cookies and cream com respingo de creme e biscoitos de chocolate",
+    width: 1200,
+    height: 1600,
+    sizes: "(min-width: 768px) 60svh, 1px",
+  },
+} satisfies Record<string, ImageAsset>;
 
 export type ImageKey = keyof typeof images;

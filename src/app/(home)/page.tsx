@@ -1,19 +1,13 @@
-import { FinalCta } from "@/components/sections/FinalCta";
-import { Hero } from "@/components/sections/Hero";
-import { AboutUs } from "@/components/sections/AboutUs";
-import { Promotion } from "@/components/sections/Promotion";
+import { Categories } from "@/components/sections/Categories";
 import { Favorites } from "@/components/sections/Favorites";
-import { Visit } from "@/components/sections/Visit";
+import { Hero } from "@/components/sections/Hero";
 
 export default function Home() {
   return (
     <>
       <Hero />
+      <Categories />
       <Favorites />
-      <Promotion />
-      <AboutUs />
-      <Visit />
-      <FinalCta />
     </>
   );
 }

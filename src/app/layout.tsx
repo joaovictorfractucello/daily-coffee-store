@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { WhatsAppBar } from "@/components/WhatsAppBar";
-import { Header } from "@/components/Header";
 import { StructuredData } from "@/components/StructuredData";
+import { BottomNav } from "@/components/BottomNav";
 import { Footer } from "@/components/Footer";
 import { labels, seo } from "@/data/copy";
 import { existsInPublic } from "@/lib/files";
@@ -50,6 +49,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   themeColor: "#2a1d16",
   viewportFit: "cover",
+  interactiveWidget: "overlays-content",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -65,10 +65,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           {labels.skipToContent}
         </a>
-        <Header />
-        <main id="conteudo">{children}</main>
+        {children}
         <Footer />
-        <WhatsAppBar />
+        <BottomNav />
         <StructuredData />
         {/* Sem JavaScript, o conteúdo que seria revelado ao rolar aparece direto. */}
         <noscript>

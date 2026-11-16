@@ -1,28 +1,74 @@
 // Todos os textos da página. Para mudar uma frase, mexa só aqui.
 
+import {
+  categoryAnchors,
+  categoryLabels,
+  categoryOrder,
+} from "@/lib/product-categories";
+import { menuLink } from "@/lib/links";
 import { site } from "@/site.config";
 
 // Um rótulo por intenção: o pedido geral é sempre "Pedir no WhatsApp" (cabeçalho, hero, menu e barra
-// fixa), o cardápio é sempre "Ver cardápio". A promoção e a faixa final têm rótulo próprio
-// (veja `promotion.button` e `finalCta.button`) porque a intenção delas é outra.
+// fixa), o cardápio é sempre "Ver cardápio". A promoção tem rótulo próprio (`promotion.button`)
+// porque a intenção dela é outra.
 export const labels = {
   whatsapp: "Pedir no WhatsApp",
   menu: "Ver cardápio",
   opensWhatsApp: "(abre o WhatsApp)",
   opensInstagram: "(abre o Instagram)",
-  opensMenuPdf: "(abre o cardápio em PDF)",
   skipToContent: "Pular para o conteúdo",
-  openMenu: "Abrir menu",
-  closeMenu: "Fechar menu",
   backToTop: "voltar ao início",
 };
 
-export const navigation = [
-  // "Cardápio" leva à primeira seção (os queridinhos); o PDF abre pelos botões "Ver cardápio".
-  { label: "Cardápio", href: "#queridinhos" },
-  { label: "Quem somos", href: "#quem-somos" },
-  { label: "Localização", href: "#visitar" },
-] as const;
+export type NavigationChild = { label: string; href: string };
+
+export type NavigationLink = {
+  label: string;
+  href: string;
+  children?: NavigationChild[];
+};
+
+const categoryLinks: NavigationChild[] = categoryOrder.map((category) => ({
+  label: categoryLabels[category],
+  href: `${menuLink}#${categoryAnchors[category]}`,
+}));
+
+export const navigation: NavigationLink[] = [
+  { label: "Cardápio", href: menuLink, children: categoryLinks },
+  {
+    label: "Sobre nós",
+    href: "/sobre",
+    children: [
+      { label: "Quem somos", href: "/sobre#quem-somos" },
+      { label: "Mais pedidos", href: "/#queridinhos" },
+      { label: "Horário de funcionamento", href: "/sobre#visitar" },
+    ],
+  },
+  { label: "Localização", href: "/sobre#visitar" },
+];
+
+export const headerCopy = {
+  mainNavigation: "Principal",
+  searchLabel: "Buscar produtos",
+  searchPlaceholder: "Cafés, Salgados, Doces...",
+  openSearch: "Abrir busca",
+  submitSearch: "Buscar produtos",
+  closeSearch: "Fechar busca",
+  profile: "Minha conta",
+  signIn: "Entrar",
+  signUp: "Cadastrar",
+  basket: "Carrinho",
+  comingSoon: "Em breve",
+};
+
+export const bottomNavCopy = {
+  label: "Navegação do celular",
+  home: "Início",
+  menu: "Cardápio",
+  basket: "Carrinho",
+  profile: "Perfil",
+  comingSoon: "Em breve",
+};
 
 export const seo = {
   title: "Daily Coffee | Cafeteria em São Paulo",
@@ -37,6 +83,26 @@ export const hero = {
   baseLine: ["Coado na hora.", "Servido com calma"],
 };
 
+// TESTE do hero promocional do frappé (substitui `hero` por enquanto).
+export const heroPromo = {
+  // Cada item é uma linha do título.
+  title: ["Frappé", "de Oreo"],
+  // Palavra gigante e apagada atrás do copo (decorativa, no desktop).
+  ghostWord: "Frappé",
+  text: "Gelado, cremoso e cheio de pedaços de biscoito, coberto com chantilly e calda de chocolate.",
+  button: "Pedir o Frappé",
+  productName: "Frappé de Oreo",
+};
+
+export const heroCopy = {
+  dotsLabel: "Fotos de destaque",
+  showPhoto: (position: number) => `Mostrar foto ${position}`,
+};
+
+export const categoriesCopy = {
+  title: "Categorias do cardápio",
+};
+
 export const favoritesCopy = {
   title: "Mais pedidos",
 };
@@ -49,12 +115,6 @@ export const promotion = {
   // EXEMPLO (café fictício): troque pelo preço real do combo.
   priceInCents: 2200,
   button: "Pedir o combo",
-};
-
-export const finalCta = {
-  title: "Sua mesa está esperando",
-  text: "Passe aqui para um café ou peça pelo WhatsApp.",
-  button: "Fazer meu pedido",
 };
 
 export const aboutUs = {
@@ -100,4 +160,31 @@ export const footer = {
   hoursTitle: "Horário",
   contactTitle: "Contato",
   rights: "Todos os direitos reservados.",
+};
+
+export const aboutPage = {
+  metaTitle: "Sobre nós | Daily Coffee",
+  title: "Sobre o Daily Coffee",
+  description:
+    "Conheça o Daily Coffee: nossa história, o ambiente, o endereço e o horário de funcionamento.",
+};
+
+export const menuPage = {
+  metaTitle: "Cardápio | Daily Coffee",
+  title: "Cardápio",
+  description:
+    "Cafés, bebidas geladas, salgados e doces feitos para comer com calma.",
+};
+
+export const searchResults = {
+  title: (term: string) => `Resultados para “${term}”`,
+  count: (total: number) =>
+    total === 1 ? "1 produto encontrado" : `${total} produtos encontrados`,
+  empty: (term: string) => `Nenhum produto encontrado para “${term}”.`,
+  seeFullMenu: "Ver cardápio completo",
+};
+
+export const productPage = {
+  backToMenu: "Voltar ao cardápio",
+  whatsAppMessage: (productName: string) => `Oi! Quero pedir: ${productName}.`,
 };
