@@ -51,7 +51,7 @@ export function Favorites() {
     <section
       id="queridinhos"
       aria-labelledby="favorites-title"
-      className="py-20 md:py-28 lg:px-10"
+      className="py-12 md:py-[4.5rem] lg:px-10"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
         <Reveal className="flex items-baseline justify-between gap-6">

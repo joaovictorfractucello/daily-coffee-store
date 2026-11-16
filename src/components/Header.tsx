@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, User } from "@phosphor-icons/react/ssr";
+import { ShoppingCart } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -93,12 +93,7 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
               <HeaderIconButton label={headerCopy.basket}>
                 <ShoppingCart aria-hidden="true" size={ICON_SIZE} />
               </HeaderIconButton>
-              <div className="hidden items-center lg:flex">
-                <HeaderIconButton label={headerCopy.profile}>
-                  <User aria-hidden="true" size={ICON_SIZE} />
-                </HeaderIconButton>
-                <AuthButtons />
-              </div>
+              <AuthButtons />
             </div>
           </div>
         </div>

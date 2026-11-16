@@ -125,4 +125,22 @@ export const tartHero = {
   },
 } satisfies Record<string, ImageAsset>;
 
+// TESTE do banner do cold brew: copo, respingo, gelo e grãos já recortados numa camada só.
+export const coldBrewHero = {
+  background: {
+    file: "/images/hero/coldbrew-fundo.webp",
+    alt: "",
+    width: 2560,
+    height: 1430,
+    sizes: "100vw",
+  },
+  cup: {
+    file: "/images/hero/coldbrew-copo.webp",
+    alt: "Copo de cold brew com gelo, respingo de café ao fundo, grãos e uma fatia de laranja",
+    width: 961,
+    height: 964,
+    sizes: "(min-width: 768px) 60svh, 1px",
+  },
+} satisfies Record<string, ImageAsset>;
+
 export type ImageKey = keyof typeof images;

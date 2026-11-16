@@ -8,8 +8,9 @@ export default function Home() {
     <>
       <HeroCarousel
         slides={[
-          { name: "tart", content: <Hero banner="tart" /> },
           { name: "frappe", content: <Hero banner="frappe" /> },
+          { name: "tart", content: <Hero banner="tart" /> },
+          { name: "coldBrew", content: <Hero banner="coldBrew" /> },
         ]}
       />
       <Categories />

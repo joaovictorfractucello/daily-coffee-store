@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function MenuPage({ searchParams }: PageProps<"/cardapio">) {
   return (
-    <div className="px-4 pt-24 pb-20 sm:px-6 md:pt-28 md:pb-28 lg:px-10">
+    <div className="px-4 pt-24 pb-12 sm:px-6 md:pt-28 md:pb-[4.5rem] lg:px-10">
       <div className="mx-auto max-w-7xl">
         <h1 className="heading-soft text-[1.625rem] md:text-[2.25rem]">
           {menuPage.title}

@@ -8,7 +8,7 @@ export const signUpButtonClass = `${baseClass} bg-accent text-light hover:bright
 
 export function AuthButtons() {
   return (
-    <div className="ml-2 hidden items-center gap-2 xl:flex">
+    <div className="ml-2 hidden items-center gap-2 lg:flex">
       <button
         type="button"
         aria-disabled="true"
