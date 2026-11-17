@@ -12,16 +12,16 @@ function Dropdown({
   items: NavigationChild[];
 }) {
   return (
-    <div className="invisible absolute top-full left-0 translate-y-1 pt-4 opacity-0 transition-[opacity,translate,visibility] duration-200 ease-snappy group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+    <div className="invisible absolute top-full left-0 translate-y-1 pt-7 opacity-0 transition-[opacity,translate,visibility] duration-200 ease-snappy group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
       <ul
         aria-label={label}
-        className="min-w-52 rounded-2xl border border-line bg-background p-2 text-ink"
+        className="min-w-52 rounded-[1.25rem] border border-line bg-background p-2 text-ink shadow-[0_16px_40px_-12px_rgb(43_30_23/0.35)] in-[.on-dark]:border-light/20 in-[.on-dark]:bg-dark/40 in-[.on-dark]:text-light in-[.on-dark]:backdrop-blur-xl"
       >
         {items.map((item) => (
           <li key={item.href + item.label}>
             <Link
               href={item.href}
-              className="block rounded-xl px-3 py-2.5 text-[0.8125rem] font-semibold transition-colors duration-150 hover:bg-muted focus-visible:bg-muted focus-visible:outline-none"
+              className="block rounded-[0.875rem] px-3 py-2.5 text-[0.8125rem] font-semibold transition-colors duration-150 hover:bg-current/5 focus-visible:bg-current/5 focus-visible:outline-none [.on-dark_&]:hover:bg-current/10 [.on-dark_&]:focus-visible:bg-current/10"
             >
               {item.label}
             </Link>
@@ -34,7 +34,10 @@ function Dropdown({
 
 export function DesktopNav() {
   return (
-    <nav aria-label={headerCopy.mainNavigation} className="hidden lg:block">
+    <nav
+      aria-label={headerCopy.mainNavigation}
+      className="hidden transition-opacity duration-200 lg:block"
+    >
       <ul className="flex items-center gap-8">
         {navigation.map((link) => (
           <li key={link.href + link.label} className="group relative">
