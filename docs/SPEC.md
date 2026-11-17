@@ -40,6 +40,7 @@ Apesar de fictício, **deve ser pensado como um produto real**: regras de negóc
 - Fica no **navegador (localStorage)**. Carrinho de visitante não ocupa servidor nem banco.
 - Pode ser montado sem login. O login é pedido só ao finalizar.
 - **O servidor nunca confia no front-end.** Na finalização, recebe apenas IDs e quantidades, busca os preços no banco, confere se os produtos estão ativos e recalcula o total.
+- **Quantidade por item: de 1 a 99.** Hoje o limite existe só na tela (`src/lib/quantity.ts`). Quando o carrinho existir, o servidor valida a quantidade de novo (inteira e dentro do limite), usando a mesma constante.
 ### Status do pedido
 Máquina de estados: cada status só pode avançar para os permitidos. Regras no service, com testes unitários.
  
@@ -141,6 +142,16 @@ Exemplo: `EmailService` com implementação `GmailEmailService` hoje e `ResendEm
 ### Home e página Sobre
 A home é uma **vitrine curta**, não uma landing: hero, atalhos de categoria e "Mais pedidos". O cliente já conhece a loja e vem para comprar.
 "Quem somos", endereço, horário e mapa ficam em `/sobre`. A promoção do combo sai da home e volta como banner no hero promocional (a definir).
+
+### Cardápio e página do produto
+- **`/cardapio`** mostra todas as categorias, cada uma em uma fileira (no celular, a fileira rola de lado). Os botões de categoria no topo são **filtros**: clicar leva a **`/cardapio/<categoria>`** (ex.: `/cardapio/cafes`), que mostra só os produtos daquela categoria em grade. Clicar de novo no botão ativo volta para `/cardapio`. Os links de categoria do cabeçalho, da home e da página do produto usam o mesmo endereço (`menuCategoryLink`).
+- **Mesma rota para categoria e produto:** `/cardapio/[slug]` serve as duas coisas. O slug de categoria vence, então **nenhum produto pode ter o slug de uma categoria** (`cafes`, `bebidas-geladas`, `salgados`, `doces`). Um teste confere o seed; o CRUD de produtos (Etapa 7) precisa rejeitar esses slugs.
+- **Busca:** `/cardapio?q=termo` mostra os resultados da busca, sem categorias.
+- **Título e caminho:** com uma categoria aberta, o caminho "Início > Cardápio > Cafés" aparece acima do título (o item atual em negrito). Na página do produto, "Início > Cardápio > Cafés > Nome do produto". É o componente `Breadcrumb`.
+- **Página do produto:** caminho, foto, nome, preço, quantidade, "Adicionar ao carrinho", "Comprar agora", descrição e **produtos relacionados** (outros produtos ativos da mesma categoria, em fileira que rola; regra em `productService.listRelated`).
+- **Carrinho ainda não existe (Etapa 3):** "Adicionar ao carrinho" e "Comprar agora" já estão na tela, sem ação, com a dica "Em breve". A quantidade (de 1 a 99) funciona na tela, mas ainda não vai para lugar nenhum.
+- **WhatsApp:** saiu da página do produto. Continua no hero promocional e no rodapé.
+- **Barra de baixo no celular:** Início, Cardápio, Pedidos e Perfil (os dois últimos "em breve"). O ícone do Cardápio é um livro aberto.
 
 ### Estrutura de pastas
 ```
