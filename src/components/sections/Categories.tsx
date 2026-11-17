@@ -2,11 +2,10 @@ import Link from "next/link";
 import { ProductPhoto } from "@/components/products/ProductPhoto";
 import { Reveal } from "@/components/Reveal";
 import { categoriesCopy } from "@/data/copy";
-import { menuLink } from "@/lib/links";
 import {
-  categoryAnchors,
   categoryLabels,
   categoryOrder,
+  menuCategoryLink,
 } from "@/lib/product-categories";
 import type { ProductCategory } from "@/generated/prisma/enums";
 
@@ -36,7 +35,7 @@ export function Categories() {
           <li key={category}>
             <Reveal delay={index * 0.06}>
               <Link
-                href={`${menuLink}#${categoryAnchors[category]}`}
+                href={menuCategoryLink(category)}
                 className="favorite block"
               >
                 <ProductPhoto

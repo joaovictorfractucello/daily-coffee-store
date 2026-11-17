@@ -1,9 +1,9 @@
 // Todos os textos da página. Para mudar uma frase, mexa só aqui.
 
 import {
-  categoryAnchors,
   categoryLabels,
   categoryOrder,
+  menuCategoryLink,
 } from "@/lib/product-categories";
 import { menuLink } from "@/lib/links";
 import { site } from "@/site.config";
@@ -30,7 +30,7 @@ export type NavigationLink = {
 
 const categoryLinks: NavigationChild[] = categoryOrder.map((category) => ({
   label: categoryLabels[category],
-  href: `${menuLink}#${categoryAnchors[category]}`,
+  href: menuCategoryLink(category),
 }));
 
 export const navigation: NavigationLink[] = [
@@ -182,6 +182,7 @@ export const aboutPage = {
 export const menuPage = {
   metaTitle: "Cardápio | Daily Coffee",
   title: "Cardápio",
+  breadcrumbHome: "Início",
   description:
     "Cafés, bebidas geladas, salgados e doces feitos para comer com calma.",
 };
@@ -195,6 +196,14 @@ export const searchResults = {
 };
 
 export const productPage = {
-  backToMenu: "Voltar ao cardápio",
+  quantity: "Quantidade",
+  decreaseQuantity: "Diminuir quantidade",
+  increaseQuantity: "Aumentar quantidade",
+  addToCart: "Adicionar ao carrinho",
+  buyNow: "Comprar agora",
+  comingSoon: "Em breve",
+  descriptionTitle: "Descrição",
+  relatedTitle: "Produtos relacionados",
+  seeCategory: (categoryName: string) => `Ver ${categoryName}`,
   whatsAppMessage: (productName: string) => `Oi! Quero pedir: ${productName}.`,
 };

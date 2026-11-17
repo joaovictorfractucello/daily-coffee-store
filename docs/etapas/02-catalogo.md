@@ -17,15 +17,15 @@ Levar o catálogo para o banco: tabela `Product`, primeira migration, seed com o
 - Seed idempotente com 17 produtos em 4 categorias, rodando no build da Vercel
 - API: `GET /api/products` (filtros por categoria e destaque) e `GET /api/products/:slug`
 - Home: seção "Mais pedidos" lendo os destaques do banco
-- Página `/cardapio` (por categoria) e página de produto `/cardapio/[slug]`
-- Novo cabeçalho (estilo Header 3 do 21st.dev, recriado no projeto): links centralizados, dropdown de categorias, busca que abre para a esquerda e ícones de perfil e cesta
+- Página `/cardapio` (todas as categorias), `/cardapio/<categoria>` (uma categoria, em grade) e página de produto `/cardapio/[slug]`
+- Novo cabeçalho (estilo Header 3 do 21st.dev, recriado no projeto): links centralizados, dropdown de categorias, busca que abre para a esquerda, cesta e, no desktop, botões Entrar e Cadastrar
 - Remoção do cardápio em PDF e dos produtos fixos no código
 - Testes unitários, collection do Postman e checklist manual
 
 ## Fora do escopo
 
 - CRUD de produtos e upload de fotos (Etapa 7)
-- Carrinho (Etapa 3); os botões de WhatsApp continuam até o checkout (Etapa 6)
+- Carrinho (Etapa 3): na página do produto, a quantidade e os botões "Adicionar ao carrinho" e "Comprar agora" ficam prontos, sem ação. O "Pedir no WhatsApp" saiu dessa página (continua no hero promocional e no rodapé)
 - Paginação (poucos produtos), estoque e busca por sugestões ao digitar
 - Cache das páginas de produto (quando houver edição pelo admin, com invalidação)
 
@@ -41,9 +41,12 @@ Levar o catálogo para o banco: tabela `Product`, primeira migration, seed com o
 | Listas de produtos renderizadas a cada requisição (`connection()` + `Suspense`) | O build (inclusive o do CI, com banco fictício) não consulta o banco |
 | Ordem: categoria (ordem do enum) e preço crescente | Igual ao cardápio em PDF; reproduz a ordem atual dos destaques |
 | Busca sem acento nem maiúscula, feita no service em memória | São poucos produtos e o Postgres só faria isso com a extensão `unaccent`; passa a valer a pena revisar com centenas de itens |
-| Perfil e cesta visíveis, sem ação | Login é a Etapa 4 e carrinho a Etapa 3; ganham destino nelas |
-| Menu hambúrguer vale até `lg` (1024px) | A busca precisa de espaço ao lado dos links; a barra fixa do WhatsApp acompanha |
-| Foto por `imageUrl`; caminho local inexistente vira bloco vazio | 12 produtos ainda sem foto; as fotos entram em `public/images/produtos/<slug>.webp` sem mudar o banco |
+| Cesta e Entrar/Cadastrar visíveis, sem ação | Login é a Etapa 4 e carrinho a Etapa 3; ganham destino nelas. O ícone de perfil volta quando houver usuário logado |
+| Navegação do celular: barra fixa embaixo (Início, Cardápio, Pedidos, Perfil), sem menu hambúrguer | Pedidos e Perfil ficam "em breve" até existirem; a busca fica na primeira linha do cabeçalho |
+| Categoria em `/cardapio/<categoria>`, não em âncora (`#cafes`) nem em `?categoria=` | Filtra de verdade (só os produtos da categoria), o endereço é curto, compartilhável e tem título próprio |
+| Categoria e produto dividem `/cardapio/[slug]`; o slug de categoria vence | Evita uma rota a mais. Custo: nenhum produto pode ter slug de categoria (teste no seed; o CRUD da Etapa 7 deve recusar) |
+| Foto por `imageUrl`; caminho local inexistente vira bloco vazio | Os 17 produtos têm foto: 5 em `public/images/queridinhos/` e 12 em `public/images/produtos/<slug>.webp`. Trocar uma foto não muda o banco |
+| Quantidade de 1 a 99 só na tela | O carrinho (Etapa 3) valida de novo no servidor, com a mesma constante |
 
 ---
 
@@ -77,17 +80,18 @@ Levar o catálogo para o banco: tabela `Product`, primeira migration, seed com o
 
 ### 6. Interface
 - [x] Home: "Mais pedidos" a partir do banco, cards levando à página do produto
-- [x] `/cardapio` por categoria, com âncoras em português
-- [x] `/cardapio/[slug]`, com `notFound()` e título do produto
+- [x] `/cardapio` com as categorias em fileiras e botões que filtram: `/cardapio/<categoria>` mostra só aquela categoria, em grade (`menuCategoryLink`, `MenuShell`)
+- [x] `/cardapio/[slug]`, com `notFound()` e título do produto; o mesmo endereço serve as categorias
+- [x] Página do produto: caminho (`Breadcrumb`), nome, preço, quantidade, botões de carrinho e compra sem ação, descrição e produtos relacionados (`productService.listRelated`, com teste)
 - [x] Links "Ver cardápio" e menu para `/cardapio`; JSON-LD com o novo endereço
 - [x] Remover `public/cardapio.pdf`, `src/data/menu.ts`, `menuPdfUrl` e as imagens de produto do registro fixo
 - [x] Grupos de rotas `(home)` e `(store)`: o cabeçalho recebe a variante (transparente sobre o hero ou sólido) sem ler a URL
-- [x] Cabeçalho novo: dropdown de categorias (sem ícones), lupa com busca que abre para a esquerda, ícones de perfil e cesta (Phosphor, sem ação por enquanto), WhatsApp só na gaveta e na barra do celular
+- [x] Cabeçalho novo: dropdown de categorias (sem ícones), lupa com busca que abre para a esquerda, cesta (Phosphor, sem ação por enquanto) e, no desktop, botões Entrar e Cadastrar (sem ação até a Etapa 4)
 - [x] Busca: `GET /api/products?q=`, `/cardapio?q=` com resultados e mensagem de lista vazia (sem acento, nome ou descrição); testes e Postman
 
 - [x] Home enxuta: hero, atalhos de categoria (`Categories`) e "Mais pedidos"; saem Promoção, Quem somos, Visitar e a faixa final do WhatsApp
 - [x] Página `/sobre` com Quem somos, endereço, horário e mapa; menu e rodapé apontam para ela
-- [x] Barra de navegação fixa no celular (Início, Cardápio, Carrinho, Perfil) no lugar do menu hambúrguer; busca na primeira linha do cabeçalho
+- [x] Barra de navegação fixa no celular (Início, Cardápio, Pedidos, Perfil; ícone do Cardápio é um livro aberto) no lugar do menu hambúrguer; busca na primeira linha do cabeçalho
 
 ### 7. Fechamento
 - [ ] Checklist manual
@@ -150,8 +154,8 @@ Produto na resposta: `id, name, slug, description, priceInCents, imageUrl, categ
 
 ### Checklist manual
 - [ ] Home igual à anterior, com os 5 destaques vindos do banco
-- [ ] `/cardapio` com 4 categorias e 17 produtos na ordem certa; âncoras funcionando
-- [ ] `/cardapio/cappuccino-cremoso` abre; `/cardapio/nao-existe` dá 404
+- [ ] `/cardapio` com 4 categorias e 17 produtos na ordem certa; os botões e os links do menu levam a `/cardapio/<categoria>`; clicar no botão ativo volta para `/cardapio`
+- [ ] `/cardapio/cappuccino-cremoso` abre, com caminho, quantidade e relacionados; `/cardapio/nao-existe` mostra "não encontrado" (responde 200 com `noindex`, por causa do carregamento em partes; já era assim em produção)
 - [ ] Celular e desktop
 - [ ] Staging e produção com os 17 produtos depois do deploy
 

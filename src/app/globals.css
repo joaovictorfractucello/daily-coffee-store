@@ -220,6 +220,13 @@
     color: var(--color-light);
   }
 
+  /* Botão só de borda sobre fundo claro (o .button-outline é para o fundo escuro do hero). */
+  .button-outline-ink {
+    --overlay: rgb(42 29 22 / 0.06);
+    border: 1.5px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+
   /* Sublinhado que cresce da esquerda no hover (links do menu). */
   .link-underline {
     position: relative;

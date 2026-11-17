@@ -104,6 +104,48 @@ describe("productService.list with search", () => {
   });
 });
 
+describe("productService.listRelated", () => {
+  afterEach(() => {
+    vi.resetAllMocks();
+  });
+
+  const espresso: Product = {
+    ...cappuccino,
+    id: "prod_3",
+    name: "Espresso",
+    slug: "espresso",
+    isFeatured: false,
+  };
+
+  it("lists the other products of the same category", async () => {
+    vi.mocked(productRepository.findActive).mockResolvedValue([
+      cappuccino,
+      espresso,
+    ]);
+
+    const related = await productService.listRelated({
+      slug: "cappuccino-cremoso",
+      category: "CAFES",
+    });
+
+    expect(productRepository.findActive).toHaveBeenCalledWith({
+      category: "CAFES",
+    });
+    expect(related).toEqual([espresso]);
+  });
+
+  it("returns an empty list when the product is alone in its category", async () => {
+    vi.mocked(productRepository.findActive).mockResolvedValue([cappuccino]);
+
+    await expect(
+      productService.listRelated({
+        slug: "cappuccino-cremoso",
+        category: "CAFES",
+      }),
+    ).resolves.toEqual([]);
+  });
+});
+
 describe("productService.getBySlug", () => {
   afterEach(() => {
     vi.resetAllMocks();

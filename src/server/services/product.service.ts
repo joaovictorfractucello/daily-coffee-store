@@ -1,4 +1,5 @@
 import "server-only";
+import type { ProductCategory } from "@/generated/prisma/enums";
 import { ProductNotFoundError } from "@/server/errors/product-not-found.error";
 import { normalizeSearchText } from "@/lib/search-text";
 import {
@@ -19,6 +20,18 @@ export const productService = {
         term,
       ),
     );
+  },
+
+  // Relacionados = outros produtos ativos da mesma categoria (o próprio produto fica de fora).
+  async listRelated({
+    slug,
+    category,
+  }: {
+    slug: string;
+    category: ProductCategory;
+  }) {
+    const products = await productRepository.findActive({ category });
+    return products.filter((product) => product.slug !== slug);
   },
 
   async getBySlug(slug: string) {
