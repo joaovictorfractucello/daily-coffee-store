@@ -1,6 +1,6 @@
 "use client";
 
-import { Coffee, House, Receipt, User } from "@phosphor-icons/react/ssr";
+import { BookOpen, House, Receipt, User } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import type { ComponentType } from "react";
 import { usePathname } from "next/navigation";
@@ -78,7 +78,7 @@ export function BottomNav() {
             aria-current={onMenu ? "page" : undefined}
             className={`${itemClass} ${onMenu ? "text-accent" : "text-ink-soft"}`}
           >
-            <Coffee
+            <BookOpen
               aria-hidden="true"
               size={24}
               weight={onMenu ? "fill" : "regular"}
