@@ -35,15 +35,7 @@ const categoryLinks: NavigationChild[] = categoryOrder.map((category) => ({
 
 export const navigation: NavigationLink[] = [
   { label: "Cardápio", href: menuLink, children: categoryLinks },
-  {
-    label: "Sobre nós",
-    href: "/sobre",
-    children: [
-      { label: "Quem somos", href: "/sobre#quem-somos" },
-      { label: "Mais pedidos", href: "/#queridinhos" },
-      { label: "Horário de funcionamento", href: "/sobre#visitar" },
-    ],
-  },
+  { label: "Sobre nós", href: "/sobre#quem-somos" },
   { label: "Localização", href: "/sobre#visitar" },
 ];
 

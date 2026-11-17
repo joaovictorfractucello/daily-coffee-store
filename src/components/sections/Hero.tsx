@@ -45,7 +45,8 @@ const heroBanners = {
   coldBrew: {
     promo: coldBrewPromo,
     images: coldBrewHero,
-    artClass: "h-[calc(var(--vh)*88)] max-md:h-[calc(var(--vh)*96)]",
+    artClass:
+      "max-md:top-[46%] max-md:h-[calc(var(--vh)*96)] md:top-[calc(4.5rem_+_var(--vh)*39)] md:h-[calc(var(--vh)*78)]",
   },
 } satisfies Record<string, HeroBanner>;
 
