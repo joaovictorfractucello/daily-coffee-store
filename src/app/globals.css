@@ -269,15 +269,19 @@
     height: 2.75rem;
   }
 
+  /* A pílula aberta cresce para a esquerda e não pode cobrir o menu. O espaço livre entre o menu e a lupa
+     é ~(50vw - 26.6rem) e para de crescer em ~15.8rem (o cabeçalho tem largura máxima). Abaixo de 70rem
+     nem o mínimo cabe, então o menu some enquanto a busca está aberta. */
   @media (min-width: 64rem) {
     .header-search {
-      --search-width: clamp(9rem, calc(50vw - 18.6rem), 18rem);
+      --search-width: min(15.5rem, max(8rem, calc(50vw - 27rem)));
     }
   }
 
-  @media (min-width: 80rem) {
-    .header-search {
-      --search-width: clamp(9rem, calc(50vw - 30.2rem), 18rem);
+  @media (min-width: 64rem) and (max-width: 69.99rem) {
+    header:has(.header-search[data-open="true"]) nav {
+      opacity: 0;
+      pointer-events: none;
     }
   }
 
