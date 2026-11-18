@@ -50,12 +50,12 @@ export function ProductPurchase() {
         </button>
       </div>
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-6 flex flex-col gap-3 lg:flex-row">
         <button
           type="button"
           aria-disabled="true"
           title={productPage.comingSoon}
-          className="button button-accent w-full"
+          className="button button-accent w-full cursor-pointer lg:flex-1"
         >
           {productPage.addToCart}
         </button>
@@ -63,7 +63,7 @@ export function ProductPurchase() {
           type="button"
           aria-disabled="true"
           title={productPage.comingSoon}
-          className="button button-outline-ink w-full"
+          className="button button-outline-ink w-full cursor-pointer lg:flex-1"
         >
           {productPage.buyNow}
         </button>
