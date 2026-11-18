@@ -20,6 +20,8 @@ export const homeLink = "/";
 
 export const menuLink = "/cardapio";
 
+export const cartLink = "/carrinho";
+
 export const instagramLink = `https://www.instagram.com/${site.instagram.username}/`;
 
 // Abre o Google Maps já com o endereço (busca), pronto para traçar a rota.
