@@ -1,7 +1,7 @@
 # Etapa 3 — Carrinho
 
 > Local no repositório: `docs/etapas/03-carrinho.md`
-> Status: **em andamento**
+> Status: **concluída**
 
 ---
 
@@ -73,9 +73,9 @@ Carrinho funcionando sem login: o cliente adiciona produtos pela página do prod
 - [x] Página `/carrinho` (`CartView`, `CartLine`, `CartSkeleton`)
 
 ### 6. Fechamento
-- [ ] Checklist manual
-- [ ] Parte 2 deste documento
-- [ ] Release `develop` → `main`
+- [x] Checklist manual
+- [x] Parte 2 deste documento
+- [x] Release `develop` → `main`
 
 ---
 
@@ -100,15 +100,15 @@ Corpo: `{ "items": [{ "productId": "…", "quantity": 2 }] }`. Qualquer outro ca
 - Carrinho válido, preço enviado ignorado, produto indisponível, quantidade 0 e 100 (400), JSON inválido (400)
 
 ### Checklist manual
-- [ ] Adicionar 2 unidades: botão mostra "Adicionado ao carrinho" e a cesta mostra 2; adicionar de novo soma
-- [ ] Teto de 99 com aviso "Limite de 99 por item"
-- [ ] "Comprar agora" adiciona e abre `/carrinho`
-- [ ] No carrinho: mudar quantidade e remover atualizam totais e contador; recarregar mantém o carrinho
-- [ ] Carrinho vazio com link para o cardápio
-- [ ] localStorage editado (preço falso, quantidade 500, id inexistente): preço do banco, quantidade 99 e aviso de indisponível
-- [ ] API fora do ar: mensagem e "Tentar de novo"
-- [ ] Celular e desktop; teclado e leitor de tela no controle de quantidade e no remover
-- [ ] Sem erro de hidratação no console
+- [x] Adicionar 2 unidades: botão mostra "Adicionado ao carrinho" e a cesta mostra 2; adicionar de novo soma
+- [x] Teto de 99 com aviso "Limite de 99 por item"
+- [x] "Comprar agora" adiciona e abre `/carrinho`
+- [x] No carrinho: mudar quantidade e remover atualizam totais e contador; recarregar mantém o carrinho
+- [x] Carrinho vazio com link para o cardápio
+- [x] localStorage editado (preço falso, quantidade 500, id inexistente): preço do banco, quantidade 99 e aviso de indisponível
+- [x] API fora do ar: mensagem e "Tentar de novo"
+- [x] Celular e desktop; teclado e leitor de tela no controle de quantidade e no remover
+- [x] Sem erro de hidratação no console
 
 ---
 
@@ -129,10 +129,22 @@ Corpo: `{ "items": [{ "productId": "…", "quantity": 2 }] }`. Qualquer outro ca
 
 # Parte 2 — Registro
 
-> Preencher ao concluir a etapa.
-
 ## O que mudou em relação ao plano
+
+- **Cartão do item:** a lixeira ficou só com o ícone, no canto superior direito. A quantidade ficou embaixo à esquerda e o total do item embaixo à direita, igual em todas as telas. A foto é quadrada (1:1).
+- **Resumo:** card com borda arredondada (`1.25rem`, o mesmo dos cards de categoria), alinhado ao primeiro item e fixo (`sticky`) a partir de `lg`.
+- **Início no menu de baixo:** ao voltar para o início depois de trocar de aba, a página abria nas categorias. Corrigido com um `scrollTo` depois da navegação (o Next restaura o scroll antigo).
+- **Fora do plano, só registrado:** cupom de desconto entrou no backlog do SPEC.
 
 ## Problemas encontrados e soluções
 
+- **Erro de hidratação evitado:** o servidor não conhece o carrinho. Contador e página só desenham depois de ler o localStorage (`skipHydration` + `useCartHydrated`).
+- **localStorage editado à mão:** `sanitizeCartItems` descarta item fora do formato e limita a quantidade a 1–99. Testado com preço falso, quantidade 500 e id inexistente: o preço vem do banco e o item inexistente sai com aviso.
+- **Foto esticada:** o `aspect-square` perdia para o alinhamento do flex. Resolvido com `self-start`.
+- **Next 16.4.2 com aviso de segurança** (cache em `'use cache'`): a correção é a 16.4.6, fora da faixa fixada. Não atualizado nesta etapa; fazer em commit separado, testando antes.
+
 ## Aprendizados
+
+- Preço, nome e foto vêm sempre do servidor: o carrinho do navegador guarda só `productId` e `quantity` (ADR 010).
+- Regra de negócio no service (`cartService.quote`) deixa o checkout da Etapa 6 reaproveitar o cálculo.
+- Pendências conhecidas: sem limite de requisições em `/api/cart/quote` (entra com o login, Etapa 4) e o preço pode mudar entre o carrinho e o pagamento (tratar na Etapa 6).
