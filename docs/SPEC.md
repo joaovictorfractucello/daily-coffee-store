@@ -37,10 +37,12 @@ Apesar de fictício, **deve ser pensado como um produto real**: regras de negóc
 - Cadastro de bairros atendidos e suas taxas de entrega
 - Lista de pedidos e mudança de status
 ### Regras do carrinho
-- Fica no **navegador (localStorage)**. Carrinho de visitante não ocupa servidor nem banco.
+- Fica no **navegador (localStorage)**. Carrinho de visitante não ocupa servidor nem banco. Guarda só `productId` e `quantity`; nome, foto e preço vêm do servidor. Migrar para o servidor (conta logada, com merge no login) só quando houver multi-dispositivo ou aviso de carrinho abandonado: veja o [ADR 010](adr/010-carrinho-no-navegador.md).
 - Pode ser montado sem login. O login é pedido só ao finalizar.
 - **O servidor nunca confia no front-end.** Na finalização, recebe apenas IDs e quantidades, busca os preços no banco, confere se os produtos estão ativos e recalcula o total.
-- **Quantidade por item: de 1 a 99.** Hoje o limite existe só na tela (`src/lib/quantity.ts`). Quando o carrinho existir, o servidor valida a quantidade de novo (inteira e dentro do limite), usando a mesma constante.
+- **Quantidade por item: de 1 a 99** (`src/lib/quantity.ts`, a mesma constante na tela e no servidor). Adicionar um produto que já está no carrinho soma as quantidades, até 99.
+- **Conferência no servidor:** `POST /api/cart/quote` recebe `{ items: [{ productId, quantity }] }` (até 50 itens), devolve os produtos com o preço do banco, o total de cada item, o subtotal e os ids indisponíveis (desativados ou inexistentes), que a tela tira do carrinho com aviso. Regra em `cartService.quote`, reaproveitada pelo checkout na Etapa 6.
+- **Página `/carrinho`:** itens com foto, preço, quantidade editável e botão de remover; subtotal; a taxa de entrega aparece só no checkout. Página com `noindex`.
 ### Status do pedido
 Máquina de estados: cada status só pode avançar para os permitidos. Regras no service, com testes unitários.
  
@@ -59,6 +61,8 @@ O admin **não** marca pedidos como pagos e **não** cancela pedidos já pagos n
 - Categorias gerenciadas pelo admin (trocar o enum `ProductCategory` por uma tabela `Category` com CRUD no painel)
 - Envio nacional de café em grão/kits via Melhor Envio (faria sentido só se a loja vendesse produtos embalados)
 - Outros provedores de login além do Google
+- **Cupom de desconto** (planejar com calma depois das 8 etapas). Pontos a decidir: tabela `Coupon` (código, tipo percentual ou valor fixo, validade, limite de usos, ativo); desconto calculado só no servidor (`cartService.quote` e checkout), copiado no pedido como snapshot; se vale sobre a taxa de entrega; valor mínimo do pedido; uso único por cliente. Riscos: código adivinhável e uso repetido (limite de tentativas na rota) e total negativo ou abaixo do mínimo do Pix/cartão (teste obrigatório)
+- Botão rápido de carrinho nos cards de produto (adiciona 1 unidade sem abrir o produto). Exige mudar o card, que hoje é um link inteiro
 ---
  
 ## 3. Stack
@@ -149,7 +153,7 @@ A home é uma **vitrine curta**, não uma landing: hero, atalhos de categoria e 
 - **Busca:** `/cardapio?q=termo` mostra os resultados da busca, sem categorias.
 - **Título e caminho:** com uma categoria aberta, o caminho "Início > Cardápio > Cafés" aparece acima do título (o item atual em negrito). Na página do produto, "Início > Cardápio > Cafés > Nome do produto". É o componente `Breadcrumb`.
 - **Página do produto:** caminho, foto, nome, preço, quantidade, "Adicionar ao carrinho", "Comprar agora", descrição e **produtos relacionados** (outros produtos ativos da mesma categoria, em fileira que rola; regra em `productService.listRelated`).
-- **Carrinho ainda não existe (Etapa 3):** "Adicionar ao carrinho" e "Comprar agora" já estão na tela, sem ação, com a dica "Em breve". A quantidade (de 1 a 99) funciona na tela, mas ainda não vai para lugar nenhum.
+- **Carrinho (Etapa 3):** "Adicionar ao carrinho" soma a quantidade escolhida ao carrinho e mostra "Adicionado ao carrinho" por 2 segundos; a cesta do cabeçalho mostra o total de unidades. "Comprar agora" adiciona e leva a `/carrinho` (vai direto ao checkout quando ele existir, na Etapa 6).
 - **WhatsApp:** saiu da página do produto. Continua no hero promocional e no rodapé.
 - **Barra de baixo no celular:** Início, Cardápio, Pedidos e Perfil (os dois últimos "em breve"). O ícone do Cardápio é um livro aberto.
 
