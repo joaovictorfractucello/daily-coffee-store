@@ -2,7 +2,7 @@
 
 import { BookOpen, House, Receipt, User } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
-import type { ComponentType } from "react";
+import { useEffect, useRef, type ComponentType } from "react";
 import { usePathname } from "next/navigation";
 import { bottomNavCopy } from "@/data/copy";
 import { menuLink } from "@/lib/links";
@@ -51,6 +51,19 @@ export function BottomNav() {
   const pathname = usePathname();
   const onMenu = pathname.startsWith(menuLink);
   const onHome = pathname === "/";
+  const wantsHomeAtTop = useRef(false);
+
+  // O Next mantém a posição de rolagem da página que ficou guardada e o Início abria no meio (nas
+  // categorias). Depois que a home aparece, forçamos o topo. O frame de espera deixa o Next terminar
+  // de restaurar a posição antes.
+  useEffect(() => {
+    if (!onHome || !wantsHomeAtTop.current) return;
+    wantsHomeAtTop.current = false;
+    const frame = requestAnimationFrame(() =>
+      window.scrollTo({ top: 0, behavior: "instant" }),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [onHome]);
 
   return (
     <nav
@@ -61,6 +74,10 @@ export function BottomNav() {
         <li className="contents">
           <Link
             href="/"
+            onClick={() => {
+              wantsHomeAtTop.current = true;
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
             aria-current={onHome ? "page" : undefined}
             className={`${itemClass} ${onHome ? "text-accent" : "text-ink-soft"}`}
           >
