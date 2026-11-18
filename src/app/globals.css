@@ -196,7 +196,7 @@
   }
 
   .button-accent {
-    --overlay: rgb(42 29 22 / 0.28);
+    --overlay: rgb(42 29 22 / 0.1);
     background: var(--color-accent);
     color: var(--color-light);
   }
@@ -204,7 +204,7 @@
   /* Botão principal do hero: a cor vem das variáveis --cta-background e --cta-text da seção #inicio, que
      o carrossel troca junto com a foto. */
   .button-hero-cta {
-    --overlay: rgb(42 29 22 / 0.28);
+    --overlay: rgb(42 29 22 / 0.1);
     background: var(--cta-background, var(--color-accent));
     color: var(--cta-text, var(--color-light));
     border: 1px solid transparent;
@@ -215,14 +215,14 @@
 
   /* Botão só de borda, usado sobre a foto do hero. */
   .button-outline {
-    --overlay: rgb(246 238 228 / 0.14);
+    --overlay: rgb(246 238 228 / 0.08);
     border: 1.5px solid rgb(246 238 228 / 0.8);
     color: var(--color-light);
   }
 
   /* Botão só de borda sobre fundo claro (o .button-outline é para o fundo escuro do hero). */
   .button-outline-ink {
-    --overlay: rgb(42 29 22 / 0.06);
+    --overlay: rgb(42 29 22 / 0.04);
     border: 1.5px solid var(--color-ink);
     color: var(--color-ink);
   }
