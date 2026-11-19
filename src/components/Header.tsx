@@ -1,14 +1,13 @@
 "use client";
 
-import { ShoppingCart } from "@phosphor-icons/react/ssr";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AuthButtons } from "@/components/header/AuthButtons";
 import { DesktopNav } from "@/components/header/DesktopNav";
-import { HeaderIconButton } from "@/components/header/HeaderIconButton";
+import { HeaderCartLink } from "@/components/header/HeaderCartLink";
 import { HeaderSearch } from "@/components/header/HeaderSearch";
-import { headerCopy, labels } from "@/data/copy";
+import { labels } from "@/data/copy";
 import { site } from "@/site.config";
 
 const ICON_SIZE = 22;
@@ -90,9 +89,7 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
 
             <div className="flex items-center justify-self-end">
               <HeaderSearch open={searchOpen} onOpenChange={setSearchOpen} />
-              <HeaderIconButton label={headerCopy.basket}>
-                <ShoppingCart aria-hidden="true" size={ICON_SIZE} />
-              </HeaderIconButton>
+              <HeaderCartLink iconSize={ICON_SIZE} />
               <AuthButtons />
             </div>
           </div>

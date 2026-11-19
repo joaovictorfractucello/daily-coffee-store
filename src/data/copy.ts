@@ -49,7 +49,10 @@ export const headerCopy = {
   profile: "Minha conta",
   signIn: "Entrar",
   signUp: "Cadastrar",
-  basket: "Carrinho",
+  basketWithCount: (units: number) =>
+    units === 0
+      ? "Carrinho, vazio"
+      : `Carrinho, ${units} ${units === 1 ? "item" : "itens"}`,
   comingSoon: "Em breve",
 };
 
@@ -200,10 +203,33 @@ export const productPage = {
   decreaseQuantity: "Diminuir quantidade",
   increaseQuantity: "Aumentar quantidade",
   addToCart: "Adicionar ao carrinho",
+  added: "Adicionado ao carrinho",
+  limitReached: "Limite de 99 por item",
   buyNow: "Comprar agora",
-  comingSoon: "Em breve",
   descriptionTitle: "Descrição",
   relatedTitle: "Produtos relacionados",
   seeCategory: (categoryName: string) => `Ver ${categoryName}`,
   whatsAppMessage: (productName: string) => `Oi! Quero pedir: ${productName}.`,
+};
+
+export const cartPage = {
+  title: "Carrinho",
+  metaTitle: "Carrinho | Daily Coffee",
+  loading: "Carregando o carrinho",
+  emptyTitle: "Seu carrinho está vazio",
+  emptyText: "Escolha um café, um salgado ou um doce no cardápio.",
+  seeMenu: "Ver cardápio",
+  unitPrice: (price: string) => `${price} cada`,
+  remove: (productName: string) => `Remover ${productName} do carrinho`,
+  quantityOf: (productName: string) => `Quantidade de ${productName}`,
+  summaryTitle: "Resumo",
+  subtotal: "Subtotal",
+  deliveryNote: "Taxa de entrega calculada no checkout.",
+  checkout: "Finalizar pedido",
+  comingSoon: "Em breve",
+  unavailable:
+    "Alguns produtos não estão mais disponíveis e saíram do carrinho.",
+  error: "Não foi possível carregar o carrinho.",
+  retry: "Tentar de novo",
+  itemCount: (units: number) => (units === 1 ? "1 item" : `${units} itens`),
 };

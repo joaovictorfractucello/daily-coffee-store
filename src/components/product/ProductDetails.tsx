@@ -39,10 +39,10 @@ export function ProductDetails({ product }: { product: PublicProduct }) {
           <p className="mt-3 text-2xl font-bold tabular-nums">
             {formatPrice(product.priceInCents)}
           </p>
-          <ProductPurchase />
+          <ProductPurchase productId={product.id} />
           <section
             aria-labelledby="product-description-title"
-            className="mt-8 border-y border-line py-5"
+            className="mt-6 border-y border-line py-5"
           >
             <h2
               id="product-description-title"

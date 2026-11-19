@@ -309,6 +309,327 @@
           }
         }
       ]
+    },
+    {
+      "name": "Carrinho",
+      "description": "Confere o carrinho do navegador: recebe só ids e quantidades e calcula tudo com os preços do banco.",
+      "item": [
+        {
+          "name": "POST /cart/quote",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Os ids mudam entre bancos: busca o id do Espresso antes de montar o carrinho.",
+                  "pm.sendRequest(pm.variables.replaceIn(\"{{baseUrl}}/products/espresso\"), (error, response) => {",
+                  "  if (error) throw error;",
+                  "  const espresso = response.json();",
+                  "  pm.variables.set(\"espressoId\", espresso.id);",
+                  "  pm.variables.set(\"espressoPrice\", espresso.priceInCents);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "const price = Number(pm.variables.get(\"espressoPrice\"));",
+                  "pm.test(\"total do item com o preço do banco\", () => { pm.expect(body.items[0].quantity).to.equal(2); pm.expect(body.items[0].lineTotalInCents).to.equal(price * 2); });",
+                  "pm.test(\"subtotal calculado no servidor\", () => pm.expect(body.subtotalInCents).to.equal(price * 2));",
+                  "pm.test(\"produto público, sem isActive\", () => pm.expect(body.items[0].product).to.not.have.property(\"isActive\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productId\": \"{{espressoId}}\", \"quantity\": 2 }]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "Carrinho válido. Resposta: itens com o produto público, quantidade e total do item; ids indisponíveis; subtotal."
+          }
+        },
+        {
+          "name": "POST /cart/quote (preço enviado é ignorado)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Os ids mudam entre bancos: busca o id do Espresso antes de montar o carrinho.",
+                  "pm.sendRequest(pm.variables.replaceIn(\"{{baseUrl}}/products/espresso\"), (error, response) => {",
+                  "  if (error) throw error;",
+                  "  const espresso = response.json();",
+                  "  pm.variables.set(\"espressoId\", espresso.id);",
+                  "  pm.variables.set(\"espressoPrice\", espresso.priceInCents);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"usa o preço do banco\", () => pm.expect(pm.response.json().subtotalInCents).to.equal(Number(pm.variables.get(\"espressoPrice\"))));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productId\": \"{{espressoId}}\", \"quantity\": 1, \"priceInCents\": 1 }],\n  \"subtotalInCents\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "O servidor nunca confia no front-end: preço e subtotal do corpo são descartados."
+          }
+        },
+        {
+          "name": "POST /cart/quote (produto indisponível)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Os ids mudam entre bancos: busca o id do Espresso antes de montar o carrinho.",
+                  "pm.sendRequest(pm.variables.replaceIn(\"{{baseUrl}}/products/espresso\"), (error, response) => {",
+                  "  if (error) throw error;",
+                  "  const espresso = response.json();",
+                  "  pm.variables.set(\"espressoId\", espresso.id);",
+                  "  pm.variables.set(\"espressoPrice\", espresso.priceInCents);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "const body = pm.response.json();",
+                  "pm.test(\"id inexistente volta em unavailableProductIds\", () => pm.expect(body.unavailableProductIds).to.eql([\"cmhy1n2xk0000abcd1234efgh\"]));",
+                  "pm.test(\"só o produto ativo entra no subtotal\", () => pm.expect(body.items).to.have.lengthOf(1));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    { \"productId\": \"{{espressoId}}\", \"quantity\": 1 },\n    { \"productId\": \"cmhy1n2xk0000abcd1234efgh\", \"quantity\": 1 }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "Produto inexistente ou desativado não entra na conta e volta separado, para a tela tirá-lo do carrinho."
+          }
+        },
+        {
+          "name": "POST /cart/quote (quantidade 0)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Os ids mudam entre bancos: busca o id do Espresso antes de montar o carrinho.",
+                  "pm.sendRequest(pm.variables.replaceIn(\"{{baseUrl}}/products/espresso\"), (error, response) => {",
+                  "  if (error) throw error;",
+                  "  const espresso = response.json();",
+                  "  pm.variables.set(\"espressoId\", espresso.id);",
+                  "  pm.variables.set(\"espressoPrice\", espresso.priceInCents);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"código INVALID_INPUT\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productId\": \"{{espressoId}}\", \"quantity\": 0 }]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "Quantidade fora de 1 a 99 → 400."
+          }
+        },
+        {
+          "name": "POST /cart/quote (quantidade 100)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Os ids mudam entre bancos: busca o id do Espresso antes de montar o carrinho.",
+                  "pm.sendRequest(pm.variables.replaceIn(\"{{baseUrl}}/products/espresso\"), (error, response) => {",
+                  "  if (error) throw error;",
+                  "  const espresso = response.json();",
+                  "  pm.variables.set(\"espressoId\", espresso.id);",
+                  "  pm.variables.set(\"espressoPrice\", espresso.priceInCents);",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"código INVALID_INPUT\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [{ \"productId\": \"{{espressoId}}\", \"quantity\": 100 }]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "Quantidade fora de 1 a 99 → 400."
+          }
+        },
+        {
+          "name": "POST /cart/quote (JSON inválido)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"código INVALID_INPUT\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ items: "
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cart/quote",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "cart",
+                "quote"
+              ]
+            },
+            "description": "Corpo que não é JSON → 400."
+          }
+        }
+      ]
     }
   ]
 }

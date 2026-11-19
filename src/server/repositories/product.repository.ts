@@ -21,6 +21,12 @@ export const productRepository = {
     });
   },
 
+  findActiveByIds(ids: string[]) {
+    return prisma.product.findMany({
+      where: { id: { in: ids }, isActive: true },
+    });
+  },
+
   findActiveBySlug(slug: string) {
     return prisma.product.findFirst({ where: { slug, isActive: true } });
   },
