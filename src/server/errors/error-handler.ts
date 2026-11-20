@@ -1,6 +1,7 @@
 import "server-only";
 import { unstable_rethrow as rethrowNextInternalError } from "next/navigation";
 import { AppError, type ErrorKind } from "./app-error";
+import { RateLimitedError } from "./auth.errors";
 
 const statusByKind: Record<ErrorKind, number> = {
   NOT_FOUND: 404,
@@ -8,12 +9,17 @@ const statusByKind: Record<ErrorKind, number> = {
   VALIDATION: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
+  RATE_LIMITED: 429,
 };
 
 function respondWithAppError(error: AppError): Response {
+  const headers =
+    error instanceof RateLimitedError
+      ? { "Retry-After": String(error.retryAfterSeconds) }
+      : undefined;
   return Response.json(
     { error: { code: error.code, message: error.message } },
-    { status: statusByKind[error.kind] },
+    { status: statusByKind[error.kind], headers },
   );
 }
 

@@ -1,7 +1,12 @@
 import "server-only";
 
 export type ErrorKind =
-  "NOT_FOUND" | "CONFLICT" | "VALIDATION" | "UNAUTHORIZED" | "FORBIDDEN";
+  | "NOT_FOUND"
+  | "CONFLICT"
+  | "VALIDATION"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "RATE_LIMITED";
 
 type AppErrorParams = {
   message: string;

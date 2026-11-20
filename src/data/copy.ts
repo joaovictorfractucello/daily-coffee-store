@@ -54,6 +54,79 @@ export const headerCopy = {
       ? "Carrinho, vazio"
       : `Carrinho, ${units} ${units === 1 ? "item" : "itens"}`,
   comingSoon: "Em breve",
+  greeting: (firstName: string) => `Olá, ${firstName}`,
+};
+
+export const authCopy = {
+  emailLabel: "E-mail",
+  passwordLabel: "Senha",
+  nameLabel: "Nome",
+  showPassword: "Mostrar senha",
+  hidePassword: "Esconder senha",
+  invalidEmail: "Digite um e-mail válido.",
+  nameTooShort: "Digite seu nome.",
+  passwordRequired: "Digite sua senha.",
+  passwordHint: (min: number) =>
+    `Pelo menos ${min} caracteres. Uma frase fácil de lembrar é ótima.`,
+  passwordTooShort: (min: number) =>
+    `A senha precisa ter pelo menos ${min} caracteres.`,
+  passwordTooLong: (max: number) =>
+    `A senha pode ter no máximo ${max} caracteres.`,
+  genericError: "Não foi possível concluir agora. Tente de novo em instantes.",
+  rateLimited: (minutes: number) =>
+    `Muitas tentativas. Tente de novo em ${minutes} ${minutes === 1 ? "minuto" : "minutos"}.`,
+
+  signIn: {
+    metaTitle: "Entrar",
+    title: "Entrar",
+    subtitle: "Entre para finalizar pedidos e acompanhar o histórico.",
+    submit: "Entrar",
+    submitting: "Entrando...",
+    invalidCredentials: "E-mail ou senha inválidos.",
+    notVerified:
+      "Confirme seu e-mail para entrar. Enviamos um link quando você se cadastrou.",
+    resend: "Reenviar link",
+    resent:
+      "Se houver uma conta aguardando confirmação, enviamos um novo link.",
+    noAccount: "Ainda não tem conta?",
+    createAccount: "Criar conta",
+  },
+
+  signUp: {
+    metaTitle: "Criar conta",
+    title: "Criar conta",
+    subtitle: "Leva menos de um minuto.",
+    submit: "Criar conta",
+    submitting: "Criando...",
+    sentTitle: "Confira seu e-mail",
+    sentText: (email: string) =>
+      `Enviamos um link para ${email}. Abra o e-mail e confirme para entrar. Não chegou? Veja o spam.`,
+    hasAccount: "Já tem conta?",
+    signIn: "Entrar",
+  },
+
+  verifyEmail: {
+    metaTitle: "Confirmar e-mail",
+    title: "Confirmar e-mail",
+    text: "Toque no botão para confirmar seu e-mail.",
+    submit: "Confirmar e-mail",
+    submitting: "Confirmando...",
+    successTitle: "E-mail confirmado",
+    successText: "Tudo certo! Agora é só entrar.",
+    invalid:
+      "Este link é inválido, já foi usado ou expirou. Tente entrar: se o e-mail ainda não estiver confirmado, dá para pedir um link novo.",
+    missingToken: "O link está incompleto. Abra de novo o link do e-mail.",
+    goToSignIn: "Ir para o login",
+  },
+
+  account: {
+    metaTitle: "Minha conta",
+    title: "Minha conta",
+    name: "Nome",
+    email: "E-mail",
+    signOut: "Sair",
+    signingOut: "Saindo...",
+  },
 };
 
 export const bottomNavCopy = {

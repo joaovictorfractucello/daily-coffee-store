@@ -1,0 +1,45 @@
+import "server-only";
+import { createHash } from "node:crypto";
+
+export type SecurityEvent =
+  | "register"
+  | "register_existing_email"
+  | "email_verified"
+  | "verification_resent"
+  | "login_success"
+  | "login_failure"
+  | "login_unverified"
+  | "logout"
+  | "rate_limited"
+  | "cross_site_request_blocked";
+
+type SecurityLogDetails = {
+  userId?: string;
+  email?: string;
+  ip?: string;
+  rule?: string;
+};
+
+// Identifica sem expor: o mesmo e-mail ou IP sempre gera o mesmo código, então dá para seguir um
+// ataque no log sem guardar o dado pessoal.
+export function fingerprint(value: string): string {
+  return createHash("sha256").update(value).digest("hex").slice(0, 16);
+}
+
+// Quem, o quê, quando e resultado. Nunca senha, token ou cookie.
+export function logSecurityEvent(
+  event: SecurityEvent,
+  { userId, email, ip, rule }: SecurityLogDetails = {},
+) {
+  console.info(
+    JSON.stringify({
+      type: "security",
+      event,
+      at: new Date().toISOString(),
+      userId,
+      email: email && fingerprint(email),
+      ip: ip && fingerprint(ip),
+      rule,
+    }),
+  );
+}
