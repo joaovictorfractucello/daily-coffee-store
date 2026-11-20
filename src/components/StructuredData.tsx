@@ -43,6 +43,8 @@ export function StructuredData() {
   return (
     <script
       type="application/ld+json"
+      // Exceção à regra react/no-danger: dados fixos do site.config (nada vem do usuário) e "<" escapado.
+      // eslint-disable-next-line react/no-danger
       dangerouslySetInnerHTML={{ __html: json }}
     />
   );

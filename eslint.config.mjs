@@ -7,6 +7,10 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   prettier,
+  {
+    // XSS: o React escapa todo texto; o único furo comum é injetar HTML cru. Proibido no projeto.
+    rules: { "react/no-danger": "error" },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
