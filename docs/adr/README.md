@@ -23,4 +23,5 @@ Status possíveis: *Aceita*, *Substituída por ADR-xxx*, *Descartada*. Um ADR n�
 | [007](007-categorias-como-enum.md) | Categorias como enum | Etapa 2 |
 | [008](008-imagens-no-cloudinary.md) | Imagens no Cloudinary com URL no banco | Etapa 7 |
 | [009](009-branches-do-neon-por-ambiente.md) | Branches do Neon por ambiente | Implementada |
-| [010](010-carrinho-no-navegador.md) | Carrinho no navegador, checkout recalculado no servidor | Etapa 3 |
+| [010](010-carrinho-no-navegador.md) | Carrinho no navegador, checkout recalculado no servidor | Implementada |
+| [011](011-rate-limit-no-postgres.md) | Limite de tentativas guardado no Postgres | Etapa 4 |
