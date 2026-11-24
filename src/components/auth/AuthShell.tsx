@@ -40,10 +40,12 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
           <div className="flex justify-center">
             <BrandLink />
           </div>
-          <h1 className="mt-8 heading-soft text-[1.75rem] md:text-[2rem]">
+          <h1 className="mt-8 text-center heading-soft text-[1.75rem] md:text-[2rem]">
             {title}
           </h1>
-          {subtitle && <p className="mt-2 text-ink-soft">{subtitle}</p>}
+          {subtitle && (
+            <p className="mt-2 text-center text-ink-soft">{subtitle}</p>
+          )}
           <div className="mt-8">{children}</div>
         </div>
       </div>
