@@ -9,7 +9,6 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
-import { PASSWORD_MIN_LENGTH } from "@/lib/auth-schemas";
 import { forgotPasswordLink, signInLink } from "@/lib/links";
 import { useSessionStore } from "@/stores/session-store";
 import { FormMessage, rateLimitMinutes } from "./FormFeedback";
@@ -18,7 +17,17 @@ import { newPasswordFormField } from "./form-schemas";
 
 const copy = authCopy.resetPassword;
 
-const resetPasswordFormSchema = z.object({ password: newPasswordFormField });
+// "Repetir a senha" é só da tela: o servidor recebe apenas a senha nova. O erro de diferença aparece
+// no campo de repetir, que é onde a pessoa vai corrigir.
+const resetPasswordFormSchema = z
+  .object({
+    password: newPasswordFormField,
+    confirmPassword: z.string().min(1, authCopy.confirmPasswordRequired),
+  })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: authCopy.passwordsDontMatch,
+    path: ["confirmPassword"],
+  });
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordFormSchema>;
 
@@ -104,10 +113,19 @@ export function ResetPasswordForm() {
         autoComplete="new-password"
         icon={LockSimple}
         placeholder={authCopy.newPasswordPlaceholder}
-        hint={authCopy.passwordHint(PASSWORD_MIN_LENGTH)}
         registration={register("password")}
         error={errors.password?.message}
         missing={isMissing(errors.password, values.password)}
+      />
+      <FormField
+        label={authCopy.confirmPasswordLabel}
+        type="password"
+        autoComplete="new-password"
+        icon={LockSimple}
+        placeholder={authCopy.confirmPasswordPlaceholder}
+        registration={register("confirmPassword")}
+        error={errors.confirmPassword?.message}
+        missing={isMissing(errors.confirmPassword, values.confirmPassword)}
       />
 
       <button

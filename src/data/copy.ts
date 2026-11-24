@@ -78,8 +78,6 @@ export const authCopy = {
   passwordsDontMatch: "As senhas não são iguais.",
   nameTooShort: "Digite seu nome.",
   passwordRequired: "Digite sua senha.",
-  passwordHint: (min: number) =>
-    `Pelo menos ${min} caracteres. Uma frase fácil de lembrar é ótima.`,
   passwordTooShort: (min: number) =>
     `A senha precisa ter pelo menos ${min} caracteres.`,
   passwordTooLong: (max: number) =>
