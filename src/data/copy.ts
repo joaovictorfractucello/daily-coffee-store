@@ -58,12 +58,24 @@ export const headerCopy = {
 };
 
 export const authCopy = {
+  backToStore: "Voltar para a loja",
   emailLabel: "E-mail",
   passwordLabel: "Senha",
   nameLabel: "Nome",
+  emailPlaceholder: "seu@email.com",
+  passwordPlaceholder: "Digite sua senha",
+  newPasswordPlaceholder: "Crie uma senha",
+  namePlaceholder: "Como podemos te chamar?",
   showPassword: "Mostrar senha",
   hidePassword: "Esconder senha",
-  invalidEmail: "Digite um e-mail válido.",
+  required: "obrigatório",
+  emailRequired: "Digite seu e-mail.",
+  invalidEmail: "Digite um e-mail válido, como nome@email.com.",
+  newPasswordRequired: "Crie uma senha.",
+  confirmPasswordLabel: "Repita a senha",
+  confirmPasswordPlaceholder: "Digite a senha de novo",
+  confirmPasswordRequired: "Repita a senha.",
+  passwordsDontMatch: "As senhas não são iguais.",
   nameTooShort: "Digite seu nome.",
   passwordRequired: "Digite sua senha.",
   passwordHint: (min: number) =>
@@ -79,10 +91,10 @@ export const authCopy = {
   signIn: {
     metaTitle: "Entrar",
     title: "Entrar",
-    subtitle: "Entre para finalizar pedidos e acompanhar o histórico.",
+    subtitle: "Entre para pedir seu café e acompanhar seus pedidos.",
     submit: "Entrar",
     submitting: "Entrando...",
-    invalidCredentials: "E-mail ou senha inválidos.",
+    invalidCredentials: "E-mail ou senha incorretos. Confira e tente de novo.",
     notVerified:
       "Confirme seu e-mail para entrar. Enviamos um link quando você se cadastrou.",
     resend: "Reenviar link",
@@ -90,15 +102,16 @@ export const authCopy = {
       "Se houver uma conta aguardando confirmação, enviamos um novo link.",
     noAccount: "Ainda não tem conta?",
     createAccount: "Criar conta",
+    forgotPassword: "Esqueci minha senha",
   },
 
   signUp: {
     metaTitle: "Criar conta",
-    title: "Criar conta",
-    subtitle: "Leva menos de um minuto.",
-    submit: "Criar conta",
+    title: "Criar uma conta",
+    subtitle: "Crie sua conta em menos de um minuto e peça pelo site.",
+    submit: "Criar minha conta",
     submitting: "Criando...",
-    sentTitle: "Confira seu e-mail",
+    sentTitle: "Quase lá! Confira seu e-mail",
     sentText: (email: string) =>
       `Enviamos um link para ${email}. Abra o e-mail e confirme para entrar. Não chegou? Veja o spam.`,
     hasAccount: "Já tem conta?",
@@ -107,15 +120,45 @@ export const authCopy = {
 
   verifyEmail: {
     metaTitle: "Confirmar e-mail",
-    title: "Confirmar e-mail",
-    text: "Toque no botão para confirmar seu e-mail.",
+    title: "Só falta confirmar",
+    text: "Toque no botão abaixo para confirmar seu e-mail e ativar sua conta.",
     submit: "Confirmar e-mail",
     submitting: "Confirmando...",
-    successTitle: "E-mail confirmado",
-    successText: "Tudo certo! Agora é só entrar.",
+    successTitle: "E-mail confirmado!",
+    successText: "Sua conta está pronta. Agora é só entrar.",
     invalid:
       "Este link é inválido, já foi usado ou expirou. Tente entrar: se o e-mail ainda não estiver confirmado, dá para pedir um link novo.",
     missingToken: "O link está incompleto. Abra de novo o link do e-mail.",
+    goToSignIn: "Ir para o login",
+  },
+
+  forgotPassword: {
+    metaTitle: "Esqueci minha senha",
+    title: "Esqueceu a senha?",
+    subtitle:
+      "Acontece. Digite seu e-mail e enviamos um link para você criar uma nova.",
+    submit: "Enviar link",
+    submitting: "Enviando...",
+    sentTitle: "Confira seu e-mail",
+    sentText: (email: string) =>
+      `Se existir uma conta com ${email}, enviamos um link para criar uma nova senha. Ele vale por 30 minutos. Não chegou? Veja o spam.`,
+    backToSignIn: "Voltar para o login",
+  },
+
+  resetPassword: {
+    metaTitle: "Criar nova senha",
+    title: "Crie uma nova senha",
+    subtitle:
+      "Ao salvar, você sai de todos os aparelhos e entra de novo com ela.",
+    newPasswordLabel: "Nova senha",
+    submit: "Salvar nova senha",
+    submitting: "Salvando...",
+    successTitle: "Senha alterada!",
+    successText: "Pronto. Agora é só entrar com a senha nova.",
+    invalid:
+      "Este link é inválido, já foi usado ou expirou. Peça um novo na tela de login, em “Esqueci minha senha”.",
+    missingToken: "O link está incompleto. Abra de novo o link do e-mail.",
+    requestNewLink: "Pedir novo link",
     goToSignIn: "Ir para o login",
   },
 
