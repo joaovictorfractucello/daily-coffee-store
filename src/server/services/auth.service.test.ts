@@ -23,6 +23,7 @@ vi.mock("@/server/repositories/email-token.repository", () => ({
     replace: vi.fn(),
     findValid: vi.fn(),
     consumeAndVerifyEmail: vi.fn(),
+    consumeAndResetPassword: vi.fn(),
   },
 }));
 vi.mock("@/server/lib/password", () => ({
@@ -277,6 +278,111 @@ describe("authService.resendVerification", () => {
     await authService.resendVerification("ana@example.com", origin, now);
 
     expect(sentEmails()).toHaveLength(0);
+  });
+});
+
+describe("authService.requestPasswordReset", () => {
+  it("sends a 30-minute single-use link to an existing account", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(makeUser());
+
+    await authService.requestPasswordReset("ana@example.com", origin, now);
+
+    const [token] = vi.mocked(emailTokenRepository.replace).mock.calls[0];
+    expect(token.type).toBe("PASSWORD_RESET");
+    expect(token.expiresAt).toEqual(new Date("2026-11-20T12:30:00Z"));
+    expect(sentEmails()[0].text).toContain("/redefinir-senha?token=");
+  });
+
+  it("also works for a Google-only account, which then gets a password", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(
+      makeUser({ passwordHash: null }),
+    );
+
+    await authService.requestPasswordReset("ana@example.com", origin, now);
+
+    expect(sentEmails()).toHaveLength(1);
+  });
+
+  it("silently does nothing for an unknown email (same answer for the screen)", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(null);
+
+    await expect(
+      authService.requestPasswordReset("x@example.com", origin, now),
+    ).resolves.toBeUndefined();
+    expect(sentEmails()).toHaveLength(0);
+  });
+
+  it("limits requests per IP and per email, so nobody floods an inbox", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(null);
+
+    await authService.requestPasswordReset("ana@example.com", origin, now);
+
+    expect(rateLimitService.consume).toHaveBeenCalledWith(
+      "emailPerIp",
+      origin.ip,
+      now,
+    );
+    expect(rateLimitService.consume).toHaveBeenCalledWith(
+      "emailPerAddress",
+      "ana@example.com",
+      now,
+    );
+  });
+});
+
+describe("authService.resetPassword", () => {
+  const resetToken: EmailToken = {
+    id: "token-2",
+    tokenHash: "hash",
+    userId: "user-1",
+    type: "PASSWORD_RESET",
+    expiresAt: new Date("2026-11-20T12:30:00Z"),
+    usedAt: null,
+    createdAt: now,
+  };
+  const input = { token: "token", password: "nova senha longa" };
+
+  it("stores the new hash in the same step that uses up the link and ends the sessions", async () => {
+    vi.mocked(emailTokenRepository.findValid).mockResolvedValue(resetToken);
+    vi.mocked(emailTokenRepository.consumeAndResetPassword).mockResolvedValue(
+      true,
+    );
+
+    await authService.resetPassword(input, origin, now);
+
+    expect(hashPassword).toHaveBeenCalledWith("nova senha longa");
+    expect(emailTokenRepository.consumeAndResetPassword).toHaveBeenCalledWith(
+      "token-2",
+      "user-1",
+      "hash-novo",
+      now,
+    );
+    expect(sessionService.create).not.toHaveBeenCalled();
+  });
+
+  it("only accepts password reset links (not email verification ones)", async () => {
+    vi.mocked(emailTokenRepository.findValid).mockResolvedValue(null);
+
+    await expect(
+      authService.resetPassword(input, origin, now),
+    ).rejects.toBeInstanceOf(InvalidTokenError);
+    expect(emailTokenRepository.findValid).toHaveBeenCalledWith(
+      expect.any(String),
+      "PASSWORD_RESET",
+      now,
+    );
+    expect(hashPassword).not.toHaveBeenCalled();
+  });
+
+  it("rejects a link that was used at the same time by another request", async () => {
+    vi.mocked(emailTokenRepository.findValid).mockResolvedValue(resetToken);
+    vi.mocked(emailTokenRepository.consumeAndResetPassword).mockResolvedValue(
+      false,
+    );
+
+    await expect(
+      authService.resetPassword(input, origin, now),
+    ).rejects.toBeInstanceOf(InvalidTokenError);
   });
 });
 

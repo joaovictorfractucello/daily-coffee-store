@@ -42,4 +42,35 @@ export const emailTokenRepository = {
       return true;
     });
   },
+
+  // Tudo ou nada: marca o link como usado, grava a senha nova, confirma o e-mail (quem abriu o link
+  // provou acesso a ele) e apaga todas as sessões, inclusive uma que tenha sido roubada.
+  async consumeAndResetPassword(
+    tokenId: string,
+    userId: string,
+    passwordHash: string,
+    now: Date,
+  ) {
+    return prisma.$transaction(async (transaction) => {
+      const { count } = await transaction.emailToken.updateMany({
+        where: { id: tokenId, usedAt: null },
+        data: { usedAt: now },
+      });
+      if (count === 0) return false;
+
+      const user = await transaction.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { emailVerifiedAt: true },
+      });
+      await transaction.user.update({
+        where: { id: userId },
+        data: { passwordHash, emailVerifiedAt: user.emailVerifiedAt ?? now },
+      });
+      await transaction.session.deleteMany({ where: { userId } });
+      await transaction.emailToken.deleteMany({
+        where: { userId, type: "PASSWORD_RESET", usedAt: null },
+      });
+      return true;
+    });
+  },
 };
