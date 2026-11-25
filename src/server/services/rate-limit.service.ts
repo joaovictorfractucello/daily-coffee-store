@@ -15,6 +15,8 @@ export const rateLimitRules = {
   emailPerAddress: { limit: 3, windowMs: HOUR_MS },
   emailPerIp: { limit: 10, windowMs: HOUR_MS },
   tokenPerIp: { limit: 10, windowMs: 15 * MINUTE_MS },
+  // Rota pública que consulta o banco a cada chamada. A tela do carrinho chama uma vez por visita.
+  quotePerIp: { limit: 60, windowMs: MINUTE_MS },
 } as const;
 
 export type RateLimitRule = keyof typeof rateLimitRules;
