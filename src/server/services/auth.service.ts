@@ -1,12 +1,15 @@
 import "server-only";
-import type {
-  LoginInput,
-  RegisterInput,
-  ResetPasswordInput,
+import {
+  NAME_MAX_LENGTH,
+  normalizeEmail,
+  type LoginInput,
+  type RegisterInput,
+  type ResetPasswordInput,
 } from "@/lib/auth-schemas";
 import type { EmailTokenType } from "@/generated/prisma/enums";
 import {
   EmailNotVerifiedError,
+  GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
   InvalidTokenError,
 } from "@/server/errors/auth.errors";
@@ -16,10 +19,12 @@ import {
   verificationEmail,
 } from "@/server/lib/email/auth-emails";
 import { getEmailService } from "@/server/lib/email/email-service";
+import type { GoogleProfile } from "@/server/lib/oauth/google-oauth";
 import { hashPassword, verifyPassword } from "@/server/lib/password";
 import { logSecurityEvent } from "@/server/lib/security-log";
 import { generateToken, hashToken } from "@/server/lib/tokens";
 import { emailTokenRepository } from "@/server/repositories/email-token.repository";
+import { oauthAccountRepository } from "@/server/repositories/oauth-account.repository";
 import { userRepository } from "@/server/repositories/user.repository";
 import { rateLimitService } from "./rate-limit.service";
 import { sessionService } from "./session.service";
@@ -27,6 +32,8 @@ import { sessionService } from "./session.service";
 const VERIFICATION_TOKEN_MS = 24 * 60 * 60 * 1000;
 // Link que troca a senha vale pouco: se o e-mail vazar depois, já não serve.
 const PASSWORD_RESET_TOKEN_MS = 30 * 60 * 1000;
+
+const GOOGLE_PROVIDER = "google";
 
 // Quem fez a requisição. O service recebe só o IP, sem saber de onde ele veio (HTTP fica no controller).
 type RequestOrigin = { ip: string };
@@ -59,6 +66,61 @@ async function sendVerificationEmail(
     now,
   );
   await getEmailService().send(verificationEmail(user.email, user.name, token));
+}
+
+// Nome para a conta nova. Se o Google não mandar, usa o começo do e-mail ("ana" em ana@email.com).
+function nameFromGoogle(name: string | undefined, email: string) {
+  const trimmedName = name?.trim();
+  return (trimmedName || email.split("@")[0]).slice(0, NAME_MAX_LENGTH);
+}
+
+// Encontra ou cria a conta de quem voltou do Google, seguindo as regras de vínculo da SPEC §5.
+async function findOrCreateGoogleUser(
+  profile: GoogleProfile,
+  ip: string,
+  now: Date,
+) {
+  const account = {
+    provider: GOOGLE_PROVIDER,
+    providerUserId: profile.providerUserId,
+  };
+
+  const linkedUser = await oauthAccountRepository.findUser(account);
+  if (linkedUser) return linkedUser;
+
+  // Daqui em diante o e-mail decide de quem é a conta, então ele precisa ser verificado pelo Google.
+  if (!profile.emailVerified) throw new GoogleEmailNotVerifiedError();
+
+  const email = normalizeEmail(profile.email);
+  const existingUser = await userRepository.findByEmail(email);
+
+  if (existingUser?.emailVerifiedAt) {
+    await oauthAccountRepository.link(existingUser.id, account);
+    logSecurityEvent("google_linked", { userId: existingUser.id, ip });
+    return existingUser;
+  }
+
+  if (existingUser) {
+    const claimedUser = await oauthAccountRepository.claimUnverifiedUser(
+      existingUser.id,
+      account,
+      now,
+    );
+    logSecurityEvent("google_unverified_claimed", {
+      userId: existingUser.id,
+      ip,
+    });
+    return claimedUser;
+  }
+
+  const newUser = await oauthAccountRepository.createUser({
+    ...account,
+    name: nameFromGoogle(profile.name, email),
+    email,
+    now,
+  });
+  logSecurityEvent("register", { userId: newUser.id, ip });
+  return newUser;
 }
 
 export const authService = {
@@ -207,6 +269,21 @@ export const authService = {
       userId: emailToken.userId,
       ip,
     });
+  },
+
+  // Mesmo limite por IP do login com senha: o retorno do Google também cria sessão.
+  async loginWithGoogle(
+    profile: GoogleProfile,
+    { ip }: RequestOrigin,
+    now = new Date(),
+  ) {
+    await rateLimitService.consume("loginPerIp", ip, now);
+
+    const user = await findOrCreateGoogleUser(profile, ip, now);
+    // Sessão nova, como no login com senha. No caso da conta tomada, as antigas já foram apagadas.
+    const session = await sessionService.create(user, now);
+    logSecurityEvent("google_login", { userId: user.id, ip });
+    return { user, ...session };
   },
 
   async logout(token: string | undefined, { ip }: RequestOrigin) {
