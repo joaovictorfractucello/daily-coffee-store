@@ -43,6 +43,7 @@ export function SignUpForm() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({ resolver: zodResolver(signUpFormSchema) });
   const values = useWatch({ control });
@@ -51,6 +52,9 @@ export function SignUpForm() {
     setErrorText(null);
     const result = await postAuth("register", { name, email, password });
     if (result.ok) return setSentTo(email);
+    if (result.code === "PASSWORD_BREACHED") {
+      return setError("password", { message: authCopy.passwordBreached });
+    }
     setErrorText(
       result.status === 429
         ? authCopy.rateLimited(rateLimitMinutes(result.retryAfterSeconds))

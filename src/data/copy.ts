@@ -86,6 +86,8 @@ export const authCopy = {
     `A senha precisa ter pelo menos ${min} caracteres.`,
   passwordTooLong: (max: number) =>
     `A senha pode ter no máximo ${max} caracteres.`,
+  passwordBreached:
+    "Essa senha já apareceu em vazamentos de dados. Escolha outra.",
   genericError: "Não foi possível concluir agora. Tente de novo em instantes.",
   rateLimited: (minutes: number) =>
     `Muitas tentativas. Tente de novo em ${minutes} ${minutes === 1 ? "minuto" : "minutos"}.`,

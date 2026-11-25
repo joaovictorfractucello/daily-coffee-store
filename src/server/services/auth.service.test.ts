@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EmailToken, User } from "@/generated/prisma/client";
 import {
+  BreachedPasswordError,
   EmailNotVerifiedError,
   GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
@@ -9,6 +10,7 @@ import {
 } from "@/server/errors/auth.errors";
 import { getEmailService } from "@/server/lib/email/email-service";
 import { hashPassword, verifyPassword } from "@/server/lib/password";
+import { checkPasswordBreach } from "@/server/lib/pwned-passwords";
 import { logSecurityEvent } from "@/server/lib/security-log";
 import { emailTokenRepository } from "@/server/repositories/email-token.repository";
 import { oauthAccountRepository } from "@/server/repositories/oauth-account.repository";
@@ -51,6 +53,9 @@ vi.mock("./rate-limit.service", () => ({
 vi.mock("./session.service", () => ({
   sessionService: { create: vi.fn(), invalidate: vi.fn() },
 }));
+vi.mock("@/server/lib/pwned-passwords", () => ({
+  checkPasswordBreach: vi.fn(),
+}));
 vi.mock("@/server/lib/security-log", () => ({ logSecurityEvent: vi.fn() }));
 
 const now = new Date("2026-11-20T12:00:00Z");
@@ -75,6 +80,7 @@ function makeUser(overrides: Partial<User> = {}): User {
 
 beforeEach(() => {
   vi.mocked(hashPassword).mockResolvedValue("hash-novo");
+  vi.mocked(checkPasswordBreach).mockResolvedValue("safe");
 });
 
 afterEach(() => {
@@ -128,6 +134,36 @@ describe("authService.register", () => {
     await authService.register(input, origin, now);
 
     expect(hashPassword).toHaveBeenCalledWith("cafe com pao");
+  });
+
+  it("refuses a breached password before looking at the email, so it does not reveal who has an account", async () => {
+    vi.mocked(checkPasswordBreach).mockResolvedValue("breached");
+
+    await expect(
+      authService.register(input, origin, now),
+    ).rejects.toBeInstanceOf(BreachedPasswordError);
+
+    expect(userRepository.findByEmail).not.toHaveBeenCalled();
+    expect(userRepository.create).not.toHaveBeenCalled();
+    expect(logSecurityEvent).toHaveBeenCalledWith("password_breached", {
+      ip: origin.ip,
+    });
+  });
+
+  it("lets the sign-up go on and logs when the breach check is unavailable", async () => {
+    vi.mocked(checkPasswordBreach).mockResolvedValue("unavailable");
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(null);
+    vi.mocked(userRepository.create).mockResolvedValue(
+      makeUser({ emailVerifiedAt: null, passwordHash: "hash-novo" }),
+    );
+
+    await authService.register(input, origin, now);
+
+    expect(userRepository.create).toHaveBeenCalled();
+    expect(logSecurityEvent).toHaveBeenCalledWith(
+      "password_breach_check_failed",
+      { ip: origin.ip },
+    );
   });
 
   it("stops before touching the database when the rate limit is hit", async () => {
@@ -369,6 +405,28 @@ describe("authService.resetPassword", () => {
       now,
     );
     expect(sessionService.create).not.toHaveBeenCalled();
+  });
+
+  it("refuses a breached password without using up the link, so the person can try another", async () => {
+    vi.mocked(emailTokenRepository.findValid).mockResolvedValue(resetToken);
+    vi.mocked(checkPasswordBreach).mockResolvedValue("breached");
+
+    await expect(
+      authService.resetPassword(input, origin, now),
+    ).rejects.toBeInstanceOf(BreachedPasswordError);
+
+    expect(hashPassword).not.toHaveBeenCalled();
+    expect(emailTokenRepository.consumeAndResetPassword).not.toHaveBeenCalled();
+  });
+
+  it("does not query the breach service for an invalid link", async () => {
+    vi.mocked(emailTokenRepository.findValid).mockResolvedValue(null);
+
+    await expect(
+      authService.resetPassword(input, origin, now),
+    ).rejects.toBeInstanceOf(InvalidTokenError);
+
+    expect(checkPasswordBreach).not.toHaveBeenCalled();
   });
 
   it("only accepts password reset links (not email verification ones)", async () => {

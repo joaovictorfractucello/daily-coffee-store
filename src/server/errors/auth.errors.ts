@@ -32,6 +32,16 @@ export class InvalidTokenError extends AppError {
   }
 }
 
+export class BreachedPasswordError extends AppError {
+  constructor() {
+    super({
+      message: "Essa senha apareceu em vazamentos de dados.",
+      code: "PASSWORD_BREACHED",
+      kind: "VALIDATION",
+    });
+  }
+}
+
 export class UnauthenticatedError extends AppError {
   constructor() {
     super({

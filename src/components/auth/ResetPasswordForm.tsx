@@ -44,6 +44,7 @@ export function ResetPasswordForm() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordFormSchema),
@@ -57,6 +58,9 @@ export function ResetPasswordForm() {
       // O servidor encerrou todas as sessões, inclusive a deste navegador, se houver.
       signOut();
       return setStatus("done");
+    }
+    if (result.code === "PASSWORD_BREACHED") {
+      return setError("password", { message: authCopy.passwordBreached });
     }
     if (result.status === 400) return setStatus("invalid");
     setErrorText(
