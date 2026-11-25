@@ -49,7 +49,12 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 | Estado de login no cabeçalho por `GET /api/auth/me` | O `Header` é client component. Ler o cookie no servidor obrigaria todas as páginas a serem dinâmicas |
 | `/conta` lê a sessão no servidor, dentro de `Suspense` | Só ela fica dinâmica; o resto do site continua pré-renderizado |
 | Em desenvolvimento sem credenciais do Gmail, o e-mail vai para o terminal | Dá para testar sem configurar o Gmail. Em produção, sem as variáveis, a aplicação não sobe |
-| Have I Been Pwned fora do ar: deixa passar e registra | Um serviço de terceiro não pode travar o cadastro |
+| Have I Been Pwned fora do ar: deixa passar e registra (`password_breach_check_failed`) | Um serviço de terceiro não pode travar o cadastro. Timeout de 3 s |
+| Senha vazada é recusada **antes** de olhar o e-mail (cadastro) e **depois** de validar o link, mas antes de gastá-lo (redefinição) | A recusa depende só da senha, então não revela quem tem conta; e quem escolhe outra senha ainda usa o mesmo link |
+| Consulta ao HIBP com `Add-Padding` e só o prefixo de 5 caracteres do SHA-1 | k-anonymity: nem a senha nem o hash completo saem do servidor. Linhas de preenchimento (quantidade 0) são ignoradas |
+| Botão do Google abaixo do botão principal, separado por "ou", no login e no cadastro | E-mail e senha continuam sendo o caminho principal da tela |
+| "G" colorido do Google em SVG (`GoogleIcon`), exceção à regra de ícones só do Phosphor | As diretrizes de marca do Google pedem o logo oficial no botão de login; o Phosphor só tem a versão de uma cor |
+| Limite do `/api/cart/quote` no middleware `withRateLimit`, não no `cartService` | O checkout (Etapa 6) reaproveita o service e terá os próprios limites. O limite roda antes de ler o corpo |
 | Trabalho em `feature/auth-*`, cada uma com PR para a `develop` | Etapa grande, com migration e segurança: o staging só recebe cada parte pronta |
 
 ---
@@ -76,8 +81,8 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 - [ ] Teste real: conta nova, vínculo com conta verificada e tomada de conta não verificada
 
 ### `feature/auth-hardening`
-- [ ] Have I Been Pwned
-- [ ] Limite no `/api/cart/quote`
+- [x] Have I Been Pwned (cadastro e redefinição, com testes)
+- [x] Limite no `/api/cart/quote` (60 por minuto por IP, middleware `withRateLimit`, com testes)
 
 ### Fechamento
 - [ ] Checklist manual
@@ -90,14 +95,14 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 
 | Método | Rota | Acesso | Resposta |
 |---|---|---|---|
-| POST | `/api/auth/register` | Público | `202` sempre (mesma mensagem) |
+| POST | `/api/auth/register` | Público | `202` sempre (mesma mensagem) · `400 PASSWORD_BREACHED` |
 | POST | `/api/auth/verify-email` | Público | `200` · `400 INVALID_TOKEN` |
 | POST | `/api/auth/resend-verification` | Público | `202` sempre |
 | POST | `/api/auth/login` | Público | `200` + cookie · `401 INVALID_CREDENTIALS` · `403 EMAIL_NOT_VERIFIED` |
 | POST | `/api/auth/logout` | Público | `204` (idempotente) |
 | GET | `/api/auth/me` | Logado | `200 { user }` · `401` |
 | POST | `/api/auth/forgot-password` | Público | `202` sempre |
-| POST | `/api/auth/reset-password` | Público | `200` · `400 INVALID_TOKEN` |
+| POST | `/api/auth/reset-password` | Público | `200` · `400 INVALID_TOKEN` · `400 PASSWORD_BREACHED` |
 | GET | `/api/auth/google`, `/api/auth/google/callback` | Público | Redirecionamentos |
 
 Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-After`).
@@ -113,6 +118,8 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 - [ ] Cookie `__Host-session` com `HttpOnly`, `Secure`, `SameSite=Lax` (DevTools)
 - [ ] Redefinir a senha derruba as sessões abertas
 - [ ] Google: conta nova, vínculo com conta verificada e tomada de conta não verificada
+- [ ] Cadastro e redefinição com senha vazada (ex.: `password123`): aviso no campo de senha
+- [ ] Carrinho: a página continua abrindo normalmente (o limite de 60 por minuto não atrapalha o uso)
 - [ ] `/conta` sem sessão leva a `/entrar?next=/conta` e volta depois do login
 - [ ] Celular e desktop; teclado; sem erro no console
 
@@ -128,10 +135,26 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 
 # Parte 2 — Registro
 
-> Preencher ao concluir a etapa.
+> Preenchida com o que já foi feito. Falta o fechamento: variáveis na Vercel, PRs para a `develop`, checklist manual no staging e release.
 
 ## O que mudou em relação ao plano
 
+- **Telas de autenticação:** ficaram num grupo de rotas `(auth)`, sem cabeçalho e rodapé, com um layout único (`AuthShell`): card centralizado sobre a foto da cafeteria, título e subtítulo centralizados ("Entrar", "Criar uma conta").
+- **Redefinir senha:** a tela pede para repetir a senha nova. A conferência é só na tela; o servidor recebe uma senha.
+- **Google:** o botão fica abaixo do botão principal, separado por "ou", com o "G" colorido oficial em SVG (exceção à regra de ícones do Phosphor, nas Decisões).
+- **Middlewares novos:** `withRedirectOnError` (rotas GET do Google: qualquer erro vira volta para `/entrar?erro=google`) e `withRateLimit` (limite por IP antes do controller, usado no `/api/cart/quote`).
+- **Branches:** o trabalho foi em branches empilhadas (`auth-core` → `auth-password-reset` → `auth-google` → `auth-hardening`). Os PRs entram na `develop` nessa ordem.
+
 ## Problemas encontrados e soluções
 
+- **Origem inválida no Google Cloud:** o campo "Origens JavaScript autorizadas" aceita só a origem (`http://localhost:3000`). O caminho do callback vai em "URIs de redirecionamento autorizados".
+- **Segredo do Google num print:** o client secret apareceu numa captura de tela. Foi trocado no Google Cloud na hora. Regra: esconder segredos antes de mandar print.
+- **Nome da conta nova vindo do e-mail:** quando o Google não manda nome, o nome usava o e-mail cru (com maiúsculas). Corrigido usando o e-mail já normalizado, com teste.
+- **Servidor de desenvolvimento antigo:** um `next dev` aberto desde cedo respondeu com código velho e deixou passar uma senha vazada no teste manual. Reiniciado, a recusa funcionou. Lição: conferir no log se o evento esperado aparece antes de concluir que o código falhou ou passou.
+
 ## Aprendizados
+
+- **Pre-hijacking:** a conta criada com o e-mail de outra pessoa (e nunca confirmada) é tomada pelo dono quando ele entra com o Google verificado: senha e sessões apagadas numa transação. Testado com mocks e contra o Neon `dev` com e-mails falsos (`@example.test`), apagados depois.
+- **`id_token` sem checar a assinatura:** aceitável porque vem direto do Google por HTTPS na troca do código, não do navegador.
+- **Have I Been Pwned:** com `Add-Padding`, a resposta traz linhas falsas com quantidade 0, que precisam ser ignoradas. Só o prefixo de 5 caracteres do SHA-1 sai do servidor.
+- **Teste contra o banco real:** os testes unitários simulam o Prisma; rodar o service real contra o `dev` com dados falsos pegou o que os mocks não pegam (transação, chaves únicas).

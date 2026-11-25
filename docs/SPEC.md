@@ -228,7 +228,8 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
 - **Sem e-mail confirmado, sem login.** O aviso aparece só depois da senha certa, com botão para reenviar o link.
 - **Sessão:** cliente 30 dias, renovada quando faltam menos de 15; `ADMIN` e `DEMO_ADMIN` 8 horas, sem renovação.
 - **Limites de tentativas:** login 5 a cada 15 min por IP + e-mail e 30 por IP; cadastro 5 por hora por IP; recuperação e reenvio 3 por hora por e-mail e 10 por IP; confirmação de link 10 a cada 15 min por IP; `/api/cart/quote` 60 por minuto por IP. Estourou: `429` com `Retry-After`.
-- **Log de segurança** (JSON): login, falha, limite atingido, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
+- **Telas de autenticação** (`/entrar`, `/cadastro`, `/verificar-email`, `/esqueci-senha`, `/redefinir-senha`): grupo de rotas `(auth)`, sem cabeçalho e rodapé, num layout único com card centralizado sobre a foto da cafeteria. "Continuar com o Google" fica abaixo do botão principal.
+- **Log de segurança** (JSON): login, falha, limite atingido, senha vazada recusada, falha na consulta de senha vazada, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
 - **CSP e cabeçalhos de segurança ficam na Etapa 8.** A CSP com *nonce* obrigaria todas as páginas a serem geradas a cada visita e é incompatível com o Partial Prerendering (`cacheComponents`). O plano é uma CSP sem nonce, rígida no resto (`connect-src`, `frame-ancestors`, `form-action`, `base-uri`, `object-src`), testada antes em `Report-Only`. O SRI do Next fica para quando sair do experimental.
 ---
  
