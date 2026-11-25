@@ -73,7 +73,7 @@ export const authCopy = {
   invalidEmail: "Digite um e-mail válido, como nome@email.com.",
   newPasswordRequired: "Crie uma senha.",
   continueWithGoogle: "Continuar com o Google",
-  orWithEmail: "ou com e-mail",
+  or: "ou",
   googleFailed:
     "Não foi possível entrar com o Google. Tente de novo ou use e-mail e senha.",
   confirmPasswordLabel: "Repita a senha",

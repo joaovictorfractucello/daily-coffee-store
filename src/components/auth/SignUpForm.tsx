@@ -86,8 +86,6 @@ export function SignUpForm() {
     >
       {errorText && <FormMessage>{errorText}</FormMessage>}
 
-      <GoogleSignInButton />
-
       <FormField
         label={authCopy.nameLabel}
         autoComplete="name"
@@ -136,6 +134,8 @@ export function SignUpForm() {
       >
         {isSubmitting ? copy.submitting : copy.submit}
       </button>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-ink-soft">
         {copy.hasAccount}{" "}
