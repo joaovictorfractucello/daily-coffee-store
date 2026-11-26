@@ -28,6 +28,10 @@ export const signUpLink = "/cadastro";
 
 export const accountLink = "/conta";
 
+export const accountDataLink = "/conta/dados";
+
+export const aboutLink = "/sobre";
+
 export const forgotPasswordLink = "/esqueci-senha";
 
 // Começa o login com o Google (rota da API, aberta como navegação comum, não por fetch).

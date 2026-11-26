@@ -18,6 +18,13 @@ export const oauthAccountRepository = {
     return account?.user ?? null;
   },
 
+  async hasProvider(userId: string, provider: string) {
+    const count = await prisma.oAuthAccount.count({
+      where: { userId, provider },
+    });
+    return count > 0;
+  },
+
   link(userId: string, { provider, providerUserId }: ProviderAccount) {
     return prisma.oAuthAccount.create({
       data: { userId, provider, providerUserId },

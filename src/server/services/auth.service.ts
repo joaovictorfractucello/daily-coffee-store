@@ -6,6 +6,7 @@ import {
   type RegisterInput,
   type ResetPasswordInput,
 } from "@/lib/auth-schemas";
+import type { User } from "@/generated/prisma/client";
 import type { EmailTokenType } from "@/generated/prisma/enums";
 import {
   BreachedPasswordError,
@@ -305,6 +306,15 @@ export const authService = {
     const session = await sessionService.create(user, now);
     logSecurityEvent("google_login", { userId: user.id, ip });
     return { user, ...session };
+  },
+
+  // Para a tela "Dados pessoais": como a pessoa consegue entrar. Só sim/não, nunca o hash.
+  async signInMethods(user: Pick<User, "id" | "passwordHash">) {
+    const hasGoogle = await oauthAccountRepository.hasProvider(
+      user.id,
+      GOOGLE_PROVIDER,
+    );
+    return { hasPassword: Boolean(user.passwordHash), hasGoogle };
   },
 
   async logout(token: string | undefined, { ip }: RequestOrigin) {

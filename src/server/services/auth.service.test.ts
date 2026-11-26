@@ -21,7 +21,10 @@ import { sessionService } from "./session.service";
 
 vi.mock("@/env", () => ({ env: { APP_URL: "https://loja.test" } }));
 vi.mock("@/server/repositories/user.repository", () => ({
-  userRepository: { findByEmail: vi.fn(), create: vi.fn() },
+  userRepository: {
+    findByEmail: vi.fn(),
+    create: vi.fn(),
+  },
 }));
 vi.mock("@/server/repositories/email-token.repository", () => ({
   emailTokenRepository: {
@@ -34,6 +37,7 @@ vi.mock("@/server/repositories/email-token.repository", () => ({
 vi.mock("@/server/repositories/oauth-account.repository", () => ({
   oauthAccountRepository: {
     findUser: vi.fn(),
+    hasProvider: vi.fn(),
     link: vi.fn(),
     claimUnverifiedUser: vi.fn(),
     createUser: vi.fn(),
@@ -584,5 +588,29 @@ describe("authService.loginWithGoogle", () => {
       now,
     );
     expect(oauthAccountRepository.findUser).not.toHaveBeenCalled();
+  });
+});
+
+describe("authService.signInMethods", () => {
+  it("reports a password and a linked Google account", async () => {
+    vi.mocked(oauthAccountRepository.hasProvider).mockResolvedValue(true);
+
+    const methods = await authService.signInMethods(makeUser());
+
+    expect(methods).toEqual({ hasPassword: true, hasGoogle: true });
+    expect(oauthAccountRepository.hasProvider).toHaveBeenCalledWith(
+      "user-1",
+      "google",
+    );
+  });
+
+  it("reports no password for an account taken over by Google", async () => {
+    vi.mocked(oauthAccountRepository.hasProvider).mockResolvedValue(true);
+
+    const methods = await authService.signInMethods(
+      makeUser({ passwordHash: null }),
+    );
+
+    expect(methods).toEqual({ hasPassword: false, hasGoogle: true });
   });
 });
