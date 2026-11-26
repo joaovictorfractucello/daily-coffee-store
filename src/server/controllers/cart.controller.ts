@@ -1,17 +1,9 @@
 import "server-only";
-import { ValidationError } from "@/server/errors/validation.error";
 import { presentCartQuote } from "@/server/presenters/cart.presenter";
 import { cartService } from "@/server/services/cart.service";
 import { cartQuoteSchema } from "@/server/validators/cart.validator";
 import { parseInput } from "@/server/validators/parse-input";
-
-async function readJsonBody(request: Request): Promise<unknown> {
-  try {
-    return await request.json();
-  } catch {
-    throw new ValidationError();
-  }
-}
+import { readJsonBody } from "./read-json-body";
 
 export const cartController = {
   async quote(request: Request): Promise<Response> {

@@ -74,6 +74,13 @@ Nova categoria = alteração no enum + migration (aceitável: o cardápio muda p
 | `expiresAt` | |
 | `usedAt` | preenchido ao usar (uso único) |
  
+**RateLimit** (limite de tentativas, [ADR 011](adr/011-rate-limit-no-postgres.md))
+| Campo | Observação |
+|---|---|
+| `key` | único; regra + hash do identificador (IP, e-mail), nunca o valor em texto |
+| `count` | tentativas na janela atual |
+| `resetAt` | fim da janela; depois dele a contagem recomeça |
+
 ### Catálogo e entrega
  
 **Product**
@@ -171,6 +178,7 @@ User ─┬─< Session
                  ├─< OrderStatusHistory
                  └─< Payment
 WebhookEvent (independente)
+RateLimit (independente)
 ```
 `─<` = um para muitos.
  

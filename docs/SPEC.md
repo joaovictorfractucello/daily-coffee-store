@@ -63,6 +63,9 @@ O admin **não** marca pedidos como pagos e **não** cancela pedidos já pagos n
 - Outros provedores de login além do Google
 - **Cupom de desconto** (planejar com calma depois das 8 etapas). Pontos a decidir: tabela `Coupon` (código, tipo percentual ou valor fixo, validade, limite de usos, ativo); desconto calculado só no servidor (`cartService.quote` e checkout), copiado no pedido como snapshot; se vale sobre a taxa de entrega; valor mínimo do pedido; uso único por cliente. Riscos: código adivinhável e uso repetido (limite de tentativas na rota) e total negativo ou abaixo do mínimo do Pix/cartão (teste obrigatório)
 - Botão rápido de carrinho nos cards de produto (adiciona 1 unidade sem abrir o produto). Exige mudar o card, que hoje é um link inteiro
+- **2FA para o cliente** (app autenticador, opcional). Obrigatório para cliente derrubaria a conversão. O 2FA do admin está na Etapa 7
+- **Trocar senha e e-mail logado**, pedindo a senha atual de novo (*step-up*) e encerrando as outras sessões
+- Lista de "dispositivos conectados" com opção de encerrar cada sessão
 ---
  
 ## 3. Stack
@@ -155,7 +158,7 @@ A home é uma **vitrine curta**, não uma landing: hero, atalhos de categoria e 
 - **Página do produto:** caminho, foto, nome, preço, quantidade, "Adicionar ao carrinho", "Comprar agora", descrição e **produtos relacionados** (outros produtos ativos da mesma categoria, em fileira que rola; regra em `productService.listRelated`).
 - **Carrinho (Etapa 3):** "Adicionar ao carrinho" soma a quantidade escolhida ao carrinho e mostra "Adicionado ao carrinho" por 2 segundos; a cesta do cabeçalho mostra o total de unidades. "Comprar agora" adiciona e leva a `/carrinho` (vai direto ao checkout quando ele existir, na Etapa 6).
 - **WhatsApp:** saiu da página do produto. Continua no hero promocional e no rodapé.
-- **Barra de baixo no celular:** Início, Cardápio, Pedidos e Perfil (os dois últimos "em breve"). O ícone do Cardápio é um livro aberto.
+- **Barra de baixo no celular:** Início, Cardápio, Pedidos ("em breve") e Perfil (leva a `/conta`; sem sessão, ao login, que volta para lá). O ícone do Cardápio é um livro aberto.
 
 ### Estrutura de pastas
 ```
@@ -197,10 +200,35 @@ Mesma pessoa = mesma conta, desde que:
 - o e-mail da conta local esteja **verificado**; e
 - o Google informe que o e-mail dele é **verificado**.
 Sem essas duas condições, **não vincula** (evita tomada de conta).
+
+**Exceção, decidida na Etapa 4 (pré-sequestro de conta):** se a conta local **não** está verificada e o Google diz que o e-mail **é** verificado, o Google provou quem é o dono do e-mail. A conta é vinculada e marcada como verificada, e **a senha e as sessões existentes são apagadas**. Sem isso, alguém poderia cadastrar o e-mail de outra pessoa com uma senha própria, esperar a vítima entrar com o Google e usar a senha para entrar na conta já confirmada (*account pre-hijacking*).
  
 Modelo:
 - `User`: a pessoa. Senha **opcional** (quem só usa Google não tem senha).
 - `OAuthAccount`: formas de login externas ligadas ao usuário (provedor + id no provedor).
+
+### Ameaças e defesas (Etapa 4)
+A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em `docs/etapas/04-autenticacao.md`.
+
+| Ameaça | Defesa |
+|---|---|
+| Vazamento do banco | Senha com **argon2id** (parâmetros da OWASP). Tokens de sessão e de e-mail salvos só como SHA-256 |
+| Força bruta e *credential stuffing* | Limite por IP + e-mail **e** por IP, sem bloquear a conta ([ADR 011](adr/011-rate-limit-no-postgres.md)). Recusa de senha que já vazou (Have I Been Pwned, por *k-anonymity*) |
+| Descobrir quem tem conta (enumeração) | Mensagens genéricas. Cadastro com e-mail já usado responde igual e avisa por e-mail. Hash de uma senha falsa quando o e-mail não existe, para o tempo de resposta ser igual |
+| Roubo ou fixação de sessão | Cookie `__Host-session` (`httpOnly`, `secure`, `sameSite=lax`). Sessão nova a cada login. Redefinir a senha encerra todas |
+| CSRF | `sameSite=lax` + `proxy.ts` recusando escrita em `/api` com `Origin` de outro site |
+| Link de e-mail reaproveitado | Token de 32 bytes, com hash, uso único e expiração (24h na verificação, 30 min na redefinição). Confirmação por botão, porque robôs de e-mail abrem os links sozinhos |
+| Redirecionamento para site falso | `?next=` aceito só como caminho interno |
+| XSS | React escapa o texto; ESLint proíbe `dangerouslySetInnerHTML` |
+
+### Regras
+- **Senha:** de 8 a 128 caracteres, **sem** regra de maiúscula, número e símbolo (NIST 800-63B): essas regras levam a senhas previsíveis como `Senha@123`. Comprimento e a lista de senhas vazadas protegem mais. Se o Have I Been Pwned estiver fora do ar, o cadastro segue e o caso vai para o log.
+- **E-mail:** sem espaços e em minúsculas antes de salvar e buscar.
+- **Sem e-mail confirmado, sem login.** O aviso aparece só depois da senha certa, com botão para reenviar o link.
+- **Sessão:** cliente 30 dias, renovada quando faltam menos de 15; `ADMIN` e `DEMO_ADMIN` 8 horas, sem renovação.
+- **Limites de tentativas:** login 5 a cada 15 min por IP + e-mail e 30 por IP; cadastro 5 por hora por IP; recuperação e reenvio 3 por hora por e-mail e 10 por IP; confirmação de link 10 a cada 15 min por IP; `/api/cart/quote` 60 por minuto por IP. Estourou: `429` com `Retry-After`.
+- **Log de segurança** (JSON): login, falha, limite atingido, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
+- **CSP e cabeçalhos de segurança ficam na Etapa 8.** A CSP com *nonce* obrigaria todas as páginas a serem geradas a cada visita e é incompatível com o Partial Prerendering (`cacheComponents`). O plano é uma CSP sem nonce, rígida no resto (`connect-src`, `frame-ancestors`, `form-action`, `base-uri`, `object-src`), testada antes em `Report-Only`. O SRI do Next fica para quando sair do experimental.
 ---
  
 ## 6. Entrega e retirada
@@ -378,8 +406,8 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
 4. **Autenticação**: cadastro, login, sessão, verificação de e-mail, recuperação de senha, Google
 5. **Entrega e retirada**: bairros, taxas, endereço com ViaCEP
 6. **Checkout e pagamento**: pedido, Asaas sandbox, webhook
-7. **Painel administrativo**: produtos, bairros, pedidos e status
-8. **Polimento**: e-mails de pedido, revisão de segurança, documentação final
+7. **Painel administrativo**: produtos, bairros, pedidos e status; 2FA por app autenticador (TOTP) obrigatório para `ADMIN`; acesso do `DEMO_ADMIN`
+8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), documentação final
 ---
  
 ## 14. Ajustes herdados da landing
