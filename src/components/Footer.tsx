@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { navigation, footer, labels } from "@/data/copy";
 import { formatTime, formatPhone } from "@/lib/format";
-import { instagramLink, whatsAppLink } from "@/lib/links";
+import { homeTopLink, instagramLink, whatsAppLink } from "@/lib/links";
 import { site } from "@/site.config";
 
 const titleClass = "text-sm font-bold";
@@ -22,7 +22,7 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr_1.4fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">
             <Link
-              href="/#inicio"
+              href={homeTopLink}
               aria-label={`${site.name}, ${labels.backToTop}`}
               className="inline-flex items-center gap-2"
             >

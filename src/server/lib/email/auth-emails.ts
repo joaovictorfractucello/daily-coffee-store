@@ -65,3 +65,19 @@ export function alreadyRegisteredEmail(to: string, name: string) {
     { label: "Entrar", url: appLink("/entrar") },
   );
 }
+
+export function passwordResetEmail(to: string, name: string, token: string) {
+  return buildEmail(
+    to,
+    `Crie uma nova senha no ${site.name}`,
+    [
+      `Olá, ${name}!`,
+      "Recebemos um pedido para criar uma nova senha. O link vale por 30 minutos e só pode ser usado uma vez. Ao trocar a senha, você sai de todos os aparelhos.",
+      "Se não foi você, ignore este e-mail: sua senha continua a mesma.",
+    ],
+    {
+      label: "Criar nova senha",
+      url: appLink(`/redefinir-senha?token=${encodeURIComponent(token)}`),
+    },
+  );
+}

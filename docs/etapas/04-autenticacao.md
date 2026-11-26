@@ -67,7 +67,7 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 - [x] ESLint `react/no-danger`
 
 ### `feature/auth-password-reset`
-- [ ] Esqueci e redefinir senha (service, rotas, telas, testes, Postman)
+- [x] Esqueci e redefinir senha (service, rotas, telas, testes, Postman)
 
 ### `feature/auth-google`
 - [ ] Arctic e regras de vínculo (com testes dos 4 casos)

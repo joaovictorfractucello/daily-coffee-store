@@ -58,7 +58,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         <div
           role="group"
           aria-label={heroCopy.dotsLabel}
-          className="flex min-h-6 justify-center md:absolute md:inset-x-0 md:bottom-5 md:z-10"
+          className="absolute inset-x-0 bottom-2 z-10 flex justify-center md:bottom-5"
         >
           {slides.map((slide, index) => (
             <button
@@ -74,7 +74,7 @@ export function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
             >
               <span
                 aria-hidden="true"
-                className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${index === active ? "w-5 bg-accent md:bg-light" : "w-2 bg-accent/30 md:bg-light/40"}`}
+                className={`block h-2 rounded-full transition-[width,background-color] duration-300 ${index === active ? "w-5 bg-light" : "w-2 bg-light/40"}`}
               />
             </button>
           ))}

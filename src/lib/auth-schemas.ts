@@ -40,7 +40,15 @@ export const loginSchema = z.object({
 
 export const emailOnlySchema = z.object({ email: emailField });
 
-export const tokenSchema = z.object({ token: z.string().regex(TOKEN_PATTERN) });
+const tokenField = z.string().regex(TOKEN_PATTERN);
+
+export const tokenSchema = z.object({ token: tokenField });
+
+export const resetPasswordSchema = z.object({
+  token: tokenField,
+  password: newPasswordField,
+});
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

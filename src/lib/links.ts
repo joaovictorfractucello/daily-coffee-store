@@ -18,6 +18,10 @@ export const comboWhatsAppLink = buildWhatsAppLink(
 
 export const homeLink = "/";
 
+// Topo da home (âncora do hero). Usado nos logos: só "/" faria o Next restaurar a rolagem antiga
+// da home, que pode ter parado no meio da página (nas categorias).
+export const homeTopLink = "/#inicio";
+
 export const menuLink = "/cardapio";
 
 export const cartLink = "/carrinho";
@@ -27,6 +31,8 @@ export const signInLink = "/entrar";
 export const signUpLink = "/cadastro";
 
 export const accountLink = "/conta";
+
+export const forgotPasswordLink = "/esqueci-senha";
 
 // Login que volta para a página de origem depois de entrar.
 export const signInLinkReturningTo = (path: string) =>

@@ -1,8 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
 import { StructuredData } from "@/components/StructuredData";
-import { BottomNav, BottomNavFallback } from "@/components/BottomNav";
-import { Footer } from "@/components/Footer";
 import { labels, seo } from "@/data/copy";
 import { existsInPublic } from "@/lib/files";
 import { heroPhotos } from "@/lib/images";
@@ -67,10 +64,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {labels.skipToContent}
         </a>
         {children}
-        <Footer />
-        <Suspense fallback={<BottomNavFallback />}>
-          <BottomNav />
-        </Suspense>
         <StructuredData />
         {/* Sem JavaScript, o conteúdo que seria revelado ao rolar aparece direto. */}
         <noscript>

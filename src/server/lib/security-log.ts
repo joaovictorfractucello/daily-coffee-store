@@ -10,6 +10,8 @@ export type SecurityEvent =
   | "login_failure"
   | "login_unverified"
   | "logout"
+  | "password_reset_requested"
+  | "password_reset_completed"
   | "rate_limited"
   | "cross_site_request_blocked";
 

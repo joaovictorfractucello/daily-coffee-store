@@ -3,6 +3,7 @@ import {
   emailOnlySchema,
   loginSchema,
   registerSchema,
+  resetPasswordSchema,
   tokenSchema,
 } from "@/lib/auth-schemas";
 import { getClientIp } from "@/server/lib/client-ip";
@@ -46,6 +47,18 @@ export const authController = {
     });
     await writeSessionCookie(token, expiresAt);
     return Response.json({ user: presentUser(user) });
+  },
+
+  async forgotPassword(request: Request): Promise<Response> {
+    const { email } = parseInput(emailOnlySchema, await readJsonBody(request));
+    await authService.requestPasswordReset(email, { ip: getClientIp(request) });
+    return accepted();
+  },
+
+  async resetPassword(request: Request): Promise<Response> {
+    const input = parseInput(resetPasswordSchema, await readJsonBody(request));
+    await authService.resetPassword(input, { ip: getClientIp(request) });
+    return Response.json({ ok: true });
   },
 
   async logout(request: Request): Promise<Response> {

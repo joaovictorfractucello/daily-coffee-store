@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthCard } from "@/components/auth/AuthCard";
+import { AuthShell } from "@/components/auth/AuthShell";
 import { VerifyEmailPanel } from "@/components/auth/VerifyEmailPanel";
 import { authCopy } from "@/data/copy";
 
@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 export default function VerifyEmailPage() {
   return (
-    <AuthCard title={authCopy.verifyEmail.title}>
+    <AuthShell title={authCopy.verifyEmail.title}>
       <Suspense>
         <VerifyEmailPanel />
       </Suspense>
-    </AuthCard>
+    </AuthShell>
   );
 }

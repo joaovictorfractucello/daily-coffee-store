@@ -1,27 +1,45 @@
 "use client";
 
 import { Eye, EyeSlash } from "@phosphor-icons/react/ssr";
-import { useId, useState, type InputHTMLAttributes } from "react";
+import {
+  useId,
+  useState,
+  type ComponentType,
+  type InputHTMLAttributes,
+} from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 import { authCopy } from "@/data/copy";
+
+type FieldIcon = ComponentType<{
+  size?: number;
+  className?: string;
+  "aria-hidden"?: "true";
+}>;
 
 type FormFieldProps = {
   label: string;
   registration: UseFormRegisterReturn;
+  // Ícone dentro do campo, à esquerda: ajuda a reconhecer o campo de relance.
+  icon: FieldIcon;
   error?: string;
+  // true quando a pessoa tentou enviar com o campo vazio: mostra o asterisco de obrigatório.
+  missing?: boolean;
   hint?: string;
 } & Pick<
   InputHTMLAttributes<HTMLInputElement>,
-  "type" | "autoComplete" | "inputMode"
+  "type" | "autoComplete" | "inputMode" | "placeholder"
 >;
 
+// Fundo e preenchimento automático do navegador ficam na classe auth-input (globals.css).
 const inputClass =
-  "h-12 w-full rounded-[8px] border border-line bg-background px-4 text-base text-ink transition-colors placeholder:text-ink-soft/70 hover:border-ink-soft focus-visible:border-ink focus-visible:outline-none aria-invalid:border-[#b3261e]";
+  "auth-input h-12 w-full rounded-[8px] border border-line pr-4 pl-11 text-base text-ink transition-[border-color,box-shadow] duration-150 placeholder:text-ink-soft/70 hover:border-ink-soft/60 focus-visible:border-accent focus-visible:shadow-[0_0_0_4px_rgb(143_92_51/0.15)] focus-visible:outline-none aria-invalid:border-[#b3261e] aria-invalid:focus-visible:shadow-[0_0_0_4px_rgb(179_38_30/0.12)]";
 
 export function FormField({
   label,
   registration,
+  icon: Icon,
   error,
+  missing = false,
   hint,
   type = "text",
   ...inputProps
@@ -37,11 +55,25 @@ export function FormField({
     <div>
       <label htmlFor={id} className="text-sm font-bold">
         {label}
+        {missing && (
+          <>
+            <span aria-hidden="true" className="ml-0.5 text-[#b3261e]">
+              *
+            </span>
+            <span className="sr-only"> ({authCopy.required})</span>
+          </>
+        )}
       </label>
       <div className="relative mt-1.5">
+        <Icon
+          aria-hidden="true"
+          size={20}
+          className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-ink-soft/70"
+        />
         <input
           id={id}
           type={isPassword && passwordVisible ? "text" : type}
+          aria-required="true"
           aria-invalid={error ? true : undefined}
           aria-describedby={describedBy || undefined}
           className={`${inputClass} ${isPassword ? "pr-12" : ""}`}
@@ -59,10 +91,11 @@ export function FormField({
             aria-pressed={passwordVisible}
             className="absolute inset-y-0 right-0 inline-flex w-12 cursor-pointer items-center justify-center text-ink-soft transition-colors hover:text-ink"
           >
+            {/* O ícone mostra o estado atual: olho riscado = senha escondida. */}
             {passwordVisible ? (
-              <EyeSlash aria-hidden="true" size={20} />
-            ) : (
               <Eye aria-hidden="true" size={20} />
+            ) : (
+              <EyeSlash aria-hidden="true" size={20} />
             )}
           </button>
         )}
@@ -79,4 +112,9 @@ export function FormField({
       )}
     </div>
   );
+}
+
+// O campo está vazio depois de uma tentativa de envio (tem erro e nada digitado).
+export function isMissing(error: unknown, value: string | undefined) {
+  return Boolean(error) && !value?.trim();
 }
