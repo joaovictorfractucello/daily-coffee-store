@@ -409,7 +409,7 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
 5. **Entrega e retirada**: bairros, taxas, endereço com ViaCEP
 6. **Checkout e pagamento**: pedido, Asaas sandbox, webhook
 7. **Painel administrativo**: produtos, bairros, pedidos e status; 2FA por app autenticador (TOTP) obrigatório para `ADMIN`; acesso do `DEMO_ADMIN`
-8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), documentação final
+8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), página de política de privacidade (`/privacidade`, LGPD) e publicação do app do Google, documentação final
 ---
  
 ## 14. Ajustes herdados da landing

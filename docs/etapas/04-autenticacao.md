@@ -55,6 +55,7 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 | Botão do Google abaixo do botão principal, separado por "ou", no login e no cadastro | E-mail e senha continuam sendo o caminho principal da tela |
 | "G" colorido do Google em SVG (`GoogleIcon`), exceção à regra de ícones só do Phosphor | As diretrizes de marca do Google pedem o logo oficial no botão de login; o Phosphor só tem a versão de uma cor |
 | Limite do `/api/cart/quote` no middleware `withRateLimit`, não no `cartService` | O checkout (Etapa 6) reaproveita o service e terá os próprios limites. O limite roda antes de ler o corpo |
+| App do Google em modo **Teste** (só usuários de teste entram) até a Etapa 8 | Publicar exige URL de política de privacidade, que o site ainda não tem. A página `/privacidade` e a publicação ficam no Polimento |
 | Trabalho em `feature/auth-*`, cada uma com PR para a `develop` | Etapa grande, com migration e segurança: o staging só recebe cada parte pronta |
 
 ---
@@ -77,8 +78,8 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 ### `feature/auth-google`
 - [x] Arctic e regras de vínculo (com testes dos 4 casos)
 - [x] Botão "Continuar com o Google" no login e no cadastro, com aviso quando o retorno falha
-- [ ] Cliente OAuth no Google Cloud e variáveis `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (local e Vercel)
-- [ ] Teste real: conta nova, vínculo com conta verificada e tomada de conta não verificada
+- [x] Cliente OAuth no Google Cloud (redirects de local, staging e produção) e variáveis `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (local e Vercel)
+- [ ] Teste real: conta nova (falta), vínculo com conta verificada (ok, local) e tomada de conta não verificada (ok, local: senha e sessão antiga apagadas, login com a senha antiga recusado)
 
 ### `feature/auth-hardening`
 - [x] Have I Been Pwned (cadastro e redefinição, com testes)
@@ -118,7 +119,7 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 - [ ] Cookie `__Host-session` com `HttpOnly`, `Secure`, `SameSite=Lax` (DevTools)
 - [ ] Redefinir a senha derruba as sessões abertas
 - [ ] Google: conta nova, vínculo com conta verificada e tomada de conta não verificada
-- [ ] Cadastro e redefinição com senha vazada (ex.: `password123`): aviso no campo de senha
+- [ ] Cadastro e redefinição com senha vazada (ex.: `password123`): aviso no campo de senha (cadastro ok, local)
 - [ ] Carrinho: a página continua abrindo normalmente (o limite de 60 por minuto não atrapalha o uso)
 - [ ] `/conta` sem sessão leva a `/entrar?next=/conta` e volta depois do login
 - [ ] Celular e desktop; teclado; sem erro no console
