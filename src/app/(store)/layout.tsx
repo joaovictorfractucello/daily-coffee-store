@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { SiteChrome } from "@/components/SiteChrome";
 
 export default function StoreLayout({
   children,
@@ -9,6 +10,7 @@ export default function StoreLayout({
     <>
       <Header />
       <main id="conteudo">{children}</main>
+      <SiteChrome />
     </>
   );
 }

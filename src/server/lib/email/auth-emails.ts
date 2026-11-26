@@ -65,3 +65,33 @@ export function alreadyRegisteredEmail(to: string, name: string) {
     { label: "Entrar", url: appLink("/entrar") },
   );
 }
+
+// Aviso depois da troca de senha logado: se não foi o dono, ele percebe e recupera a conta.
+export function passwordChangedEmail(to: string, name: string) {
+  return buildEmail(
+    to,
+    `Sua senha do ${site.name} foi alterada`,
+    [
+      `Olá, ${name}!`,
+      "A senha da sua conta acabou de ser alterada. Os outros aparelhos conectados saíram da conta.",
+      "Se não foi você, crie uma nova senha agora pelo link abaixo.",
+    ],
+    { label: "Criar nova senha", url: appLink("/esqueci-senha") },
+  );
+}
+
+export function passwordResetEmail(to: string, name: string, token: string) {
+  return buildEmail(
+    to,
+    `Crie uma nova senha no ${site.name}`,
+    [
+      `Olá, ${name}!`,
+      "Recebemos um pedido para criar uma nova senha. O link vale por 30 minutos e só pode ser usado uma vez. Ao trocar a senha, você sai de todos os aparelhos.",
+      "Se não foi você, ignore este e-mail: sua senha continua a mesma.",
+    ],
+    {
+      label: "Criar nova senha",
+      url: appLink(`/redefinir-senha?token=${encodeURIComponent(token)}`),
+    },
+  );
+}

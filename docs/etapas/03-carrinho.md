@@ -133,7 +133,7 @@ Corpo: `{ "items": [{ "productId": "…", "quantity": 2 }] }`. Qualquer outro ca
 
 - **Cartão do item:** a lixeira ficou só com o ícone, no canto superior direito. A quantidade ficou embaixo à esquerda e o total do item embaixo à direita, igual em todas as telas. A foto é quadrada (1:1).
 - **Resumo:** card com borda arredondada (`1.25rem`, o mesmo dos cards de categoria), alinhado ao primeiro item e fixo (`sticky`) a partir de `lg`.
-- **Início no menu de baixo:** ao voltar para o início depois de trocar de aba, a página abria nas categorias. Corrigido com um `scrollTo` depois da navegação (o Next restaura o scroll antigo).
+- **Início no menu de baixo:** ao voltar para o início depois de trocar de aba, a página abria nas categorias. Na época, corrigido com um `scrollTo` depois da navegação; a causa real foi achada e corrigida na Etapa 4 (ver o registro de lá).
 - **Fora do plano, só registrado:** cupom de desconto entrou no backlog do SPEC.
 
 ## Problemas encontrados e soluções
@@ -147,4 +147,4 @@ Corpo: `{ "items": [{ "productId": "…", "quantity": 2 }] }`. Qualquer outro ca
 
 - Preço, nome e foto vêm sempre do servidor: o carrinho do navegador guarda só `productId` e `quantity` (ADR 010).
 - Regra de negócio no service (`cartService.quote`) deixa o checkout da Etapa 6 reaproveitar o cálculo.
-- Pendências conhecidas: sem limite de requisições em `/api/cart/quote` (entra com o login, Etapa 4) e o preço pode mudar entre o carrinho e o pagamento (tratar na Etapa 6).
+- Pendências conhecidas: sem limite de requisições em `/api/cart/quote` (resolvido na Etapa 4: 60 por minuto por IP) e o preço pode mudar entre o carrinho e o pagamento (tratar na Etapa 6).

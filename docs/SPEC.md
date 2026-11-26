@@ -64,8 +64,10 @@ O admin **não** marca pedidos como pagos e **não** cancela pedidos já pagos n
 - **Cupom de desconto** (planejar com calma depois das 8 etapas). Pontos a decidir: tabela `Coupon` (código, tipo percentual ou valor fixo, validade, limite de usos, ativo); desconto calculado só no servidor (`cartService.quote` e checkout), copiado no pedido como snapshot; se vale sobre a taxa de entrega; valor mínimo do pedido; uso único por cliente. Riscos: código adivinhável e uso repetido (limite de tentativas na rota) e total negativo ou abaixo do mínimo do Pix/cartão (teste obrigatório)
 - Botão rápido de carrinho nos cards de produto (adiciona 1 unidade sem abrir o produto). Exige mudar o card, que hoje é um link inteiro
 - **2FA para o cliente** (app autenticador, opcional). Obrigatório para cliente derrubaria a conversão. O 2FA do admin está na Etapa 7
-- **Trocar senha e e-mail logado**, pedindo a senha atual de novo (*step-up*) e encerrando as outras sessões
+- **Trocar e-mail logado**, pedindo a senha atual de novo (*step-up*) e confirmando o e-mail novo. (A troca de senha logado entrou na Etapa 4.)
 - Lista de "dispositivos conectados" com opção de encerrar cada sessão
+- **Rastreio do pedido em tempo real** no mapa (referência: [Ai Food Delivery – Order & Profile](https://dribbble.com/shots/27602994-Ai-Food-Delivery-Mobile-App-Order-Profile-Page)). Fora do MVP: a linha de status do pedido (Etapa 6) cobre o essencial
+- **Ilustrações e ícones próprios** (gerados com IA) para estados vazios e detalhes do site: criar na hora em que cada tela precisar, não antes
 ---
  
 ## 3. Stack
@@ -219,6 +221,7 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
 | CSRF | `sameSite=lax` + `proxy.ts` recusando escrita em `/api` com `Origin` de outro site |
 | Link de e-mail reaproveitado | Token de 32 bytes, com hash, uso único e expiração (24h na verificação, 30 min na redefinição). Confirmação por botão, porque robôs de e-mail abrem os links sozinhos |
 | Redirecionamento para site falso | `?next=` aceito só como caminho interno |
+| Retorno do Google forjado ou interceptado | `state` + PKCE (Arctic) em cookies `__Host-` de 10 min, apagados no primeiro uso. Exige `email_verified`. O `id_token` vem direto do Google por HTTPS, em troca do código, por isso não tem a assinatura conferida (caso aceito pela documentação do Google). Qualquer falha volta para o login com aviso genérico; o motivo vai só para o log |
 | XSS | React escapa o texto; ESLint proíbe `dangerouslySetInnerHTML` |
 
 ### Regras
@@ -226,8 +229,10 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
 - **E-mail:** sem espaços e em minúsculas antes de salvar e buscar.
 - **Sem e-mail confirmado, sem login.** O aviso aparece só depois da senha certa, com botão para reenviar o link.
 - **Sessão:** cliente 30 dias, renovada quando faltam menos de 15; `ADMIN` e `DEMO_ADMIN` 8 horas, sem renovação.
+- **Troca de senha logado** (`/conta/senha`): pede a senha atual (quem pega um aparelho com a sessão aberta não troca a senha); mesmas regras da senha nova (tamanho e senha vazada); 5 tentativas a cada 15 min por conta; numa transação grava o hash novo, encerra as **outras** sessões (a de quem trocou continua) e invalida links de redefinição pendentes; manda um e-mail de aviso (melhor esforço: a falha do envio não desfaz a troca). Conta só do Google não tem senha atual: cria a senha pelo link de "esqueci a senha".
 - **Limites de tentativas:** login 5 a cada 15 min por IP + e-mail e 30 por IP; cadastro 5 por hora por IP; recuperação e reenvio 3 por hora por e-mail e 10 por IP; confirmação de link 10 a cada 15 min por IP; `/api/cart/quote` 60 por minuto por IP. Estourou: `429` com `Retry-After`.
-- **Log de segurança** (JSON): login, falha, limite atingido, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
+- **Telas de autenticação** (`/entrar`, `/cadastro`, `/verificar-email`, `/esqueci-senha`, `/redefinir-senha`): grupo de rotas `(auth)`, sem cabeçalho e rodapé, num layout único com card centralizado sobre a foto da cafeteria. "Continuar com o Google" fica abaixo do botão principal.
+- **Log de segurança** (JSON): login, falha, limite atingido, senha vazada recusada, falha na consulta de senha vazada, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
 - **CSP e cabeçalhos de segurança ficam na Etapa 8.** A CSP com *nonce* obrigaria todas as páginas a serem geradas a cada visita e é incompatível com o Partial Prerendering (`cacheComponents`). O plano é uma CSP sem nonce, rígida no resto (`connect-src`, `frame-ancestors`, `form-action`, `base-uri`, `object-src`), testada antes em `Report-Only`. O SRI do Next fica para quando sair do experimental.
 ---
  
@@ -407,7 +412,7 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
 5. **Entrega e retirada**: bairros, taxas, endereço com ViaCEP
 6. **Checkout e pagamento**: pedido, Asaas sandbox, webhook
 7. **Painel administrativo**: produtos, bairros, pedidos e status; 2FA por app autenticador (TOTP) obrigatório para `ADMIN`; acesso do `DEMO_ADMIN`
-8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), documentação final
+8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), página de política de privacidade (`/privacidade`, LGPD) e publicação do app do Google, documentação final
 ---
  
 ## 14. Ajustes herdados da landing

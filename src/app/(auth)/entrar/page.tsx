@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthCard, AuthFormSkeleton } from "@/components/auth/AuthCard";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { AuthFormSkeleton } from "@/components/auth/FormFeedback";
 import { SignInForm } from "@/components/auth/SignInForm";
 import { authCopy } from "@/data/copy";
 
@@ -11,11 +12,14 @@ export const metadata: Metadata = {
 
 export default function SignInPage() {
   return (
-    <AuthCard title={authCopy.signIn.title} subtitle={authCopy.signIn.subtitle}>
+    <AuthShell
+      title={authCopy.signIn.title}
+      subtitle={authCopy.signIn.subtitle}
+    >
       {/* O formulário lê o ?next= da URL (useSearchParams precisa de Suspense). */}
       <Suspense fallback={<AuthFormSkeleton fields={2} />}>
         <SignInForm />
       </Suspense>
-    </AuthCard>
+    </AuthShell>
   );
 }

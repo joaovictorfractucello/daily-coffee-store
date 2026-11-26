@@ -10,6 +10,16 @@ export type SecurityEvent =
   | "login_failure"
   | "login_unverified"
   | "logout"
+  | "password_reset_requested"
+  | "password_reset_completed"
+  | "password_changed"
+  | "password_change_failure"
+  | "google_login"
+  | "google_linked"
+  | "google_unverified_claimed"
+  | "google_login_failure"
+  | "password_breached"
+  | "password_breach_check_failed"
   | "rate_limited"
   | "cross_site_request_blocked";
 
@@ -18,6 +28,8 @@ type SecurityLogDetails = {
   email?: string;
   ip?: string;
   rule?: string;
+  // Código do erro numa falha (ex.: OAUTH_CALLBACK_FAILED). Nunca a mensagem crua de um terceiro.
+  reason?: string;
 };
 
 // Identifica sem expor: o mesmo e-mail ou IP sempre gera o mesmo código, então dá para seguir um
@@ -29,7 +41,7 @@ export function fingerprint(value: string): string {
 // Quem, o quê, quando e resultado. Nunca senha, token ou cookie.
 export function logSecurityEvent(
   event: SecurityEvent,
-  { userId, email, ip, rule }: SecurityLogDetails = {},
+  { userId, email, ip, rule, reason }: SecurityLogDetails = {},
 ) {
   console.info(
     JSON.stringify({
@@ -40,6 +52,7 @@ export function logSecurityEvent(
       email: email && fingerprint(email),
       ip: ip && fingerprint(ip),
       rule,
+      reason,
     }),
   );
 }

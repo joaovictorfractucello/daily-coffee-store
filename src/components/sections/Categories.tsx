@@ -18,19 +18,21 @@ const categoryPhotos: Record<ProductCategory, string> = {
 };
 
 const categoryPhotoSizes =
-  "(min-width: 1280px) 300px, (min-width: 1024px) 22vw, 23vw";
+  "(min-width: 1280px) 240px, (min-width: 1024px) 18vw, 23vw";
 
 // Atalhos para o cardápio, logo abaixo do hero: sempre os 4 lado a lado (no celular, fotos pequenas e rótulo que pode quebrar em 2 linhas).
 export function Categories() {
   return (
     <section
       aria-labelledby="categories-title"
-      className="px-4 pt-8 sm:px-6 md:pt-16 lg:px-10"
+      className="px-(--gutter) pt-8 md:pt-16"
     >
       <h2 id="categories-title" className="sr-only">
         {categoriesCopy.title}
       </h2>
-      <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-x-3 sm:gap-x-4 lg:gap-x-6">
+      {/* No desktop, cada card tem a largura de uma coluna dos produtos (5 colunas, gap de 1,5rem):
+          4 colunas + 3 gaps = 80% da largura menos 0,3rem. Centralizado. */}
+      <ul className="mx-auto grid max-w-7xl grid-cols-4 gap-x-3 sm:gap-x-4 lg:w-[calc(80%-0.3rem)] lg:max-w-[calc(64rem-0.3rem)] lg:gap-x-6">
         {categoryOrder.map((category, index) => (
           <li key={category}>
             <Reveal delay={index * 0.06}>

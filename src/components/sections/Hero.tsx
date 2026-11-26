@@ -1,21 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment, type CSSProperties } from "react";
-import {
-  coldBrewPromo,
-  heroPromo,
-  labels,
-  productPage,
-  tartPromo,
-} from "@/data/copy";
+import { coldBrewPromo, heroPromo, labels, tartPromo } from "@/data/copy";
 import {
   coldBrewHero,
   frappeHero,
   tartHero,
   type ImageAsset,
 } from "@/lib/images";
-import { buildWhatsAppLink, menuLink } from "@/lib/links";
-import { site } from "@/site.config";
+import { menuLink, productLink } from "@/lib/links";
 
 function order(position: number) {
   return { "--order": position } as CSSProperties;
@@ -73,10 +66,6 @@ function HeroTitle({ promo }: { promo: Promo }) {
 // 1cqw e 1cqh do banner, então ele é uma versão reduzida do desktop.
 export function Hero({ banner }: { banner: HeroBannerName }) {
   const { promo, images, artClass } = heroBanners[banner];
-  const promoWhatsAppLink = buildWhatsAppLink(
-    site.whatsapp.phone,
-    productPage.whatsAppMessage(promo.productName),
-  );
 
   const titleId = `hero-title-${banner}`;
 
@@ -90,7 +79,7 @@ export function Hero({ banner }: { banner: HeroBannerName }) {
             "--cta-text": "#2A1D16",
           } as CSSProperties
         }
-        className="on-dark relative isolate overflow-hidden bg-dark text-center text-light [--cx:68%] [--vh:1cqh] [--vw:1cqw] max-md:[container-type:size] max-md:mx-4 max-md:mt-14 max-md:aspect-[16/10] max-md:min-h-0 max-md:rounded-[1.5rem] max-md:[clip-path:inset(0_round_1.5rem)] md:min-h-svh md:[--cx:60%] md:[--vh:1svh] md:[--vw:1vw]"
+        className="on-dark relative isolate overflow-hidden bg-dark text-center text-light [--cx:68%] [--vh:1cqh] [--vw:1cqw] max-md:[container-type:size] max-md:mx-(--gutter) max-md:mt-14 max-md:aspect-[16/10] max-md:min-h-0 max-md:rounded-[1.5rem] max-md:[clip-path:inset(0_round_1.5rem)] md:min-h-svh md:[--cx:60%] md:[--vh:1svh] md:[--vw:1vw]"
       >
         <Image
           src={images.background.file}
@@ -142,16 +131,12 @@ export function Hero({ banner }: { banner: HeroBannerName }) {
             className="hero-enter hero-text mt-[calc(var(--vh)*5)] flex w-auto flex-col items-start gap-1.5 md:mt-8 md:gap-3 xl:flex-row"
             style={order(3)}
           >
-            <a
-              href={promoWhatsAppLink}
-              data-cta-whatsapp=""
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={productLink(promo.productSlug)}
               className="button button-hero-cta px-7 text-base max-md:min-h-10 max-md:px-3.5 max-md:py-1.5 max-md:text-[0.8125rem]"
             >
               {promo.button}
-              <span className="sr-only"> {labels.opensWhatsApp}</span>
-            </a>
+            </Link>
             <Link
               href={menuLink}
               className="button button-outline px-7 text-base max-xl:hidden"

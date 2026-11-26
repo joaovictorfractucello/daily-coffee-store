@@ -1,30 +1,32 @@
 "use client";
 
+import { Envelope, LockSimple } from "@phosphor-icons/react/ssr";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
-import { PASSWORD_MAX_LENGTH } from "@/lib/auth-schemas";
-import { signUpLink } from "@/lib/links";
+import {
+  forgotPasswordLink,
+  GOOGLE_ERROR_PARAM,
+  signUpLink,
+} from "@/lib/links";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import type { PublicUser } from "@/server/presenters/user.presenter";
 import { useSessionStore } from "@/stores/session-store";
-import { FormMessage, rateLimitMinutes } from "./AuthCard";
-import { FormField } from "./FormField";
+import { FormMessage, rateLimitMinutes } from "./FormFeedback";
+import { FormField, isMissing } from "./FormField";
+import { GoogleSignInButton } from "./GoogleSignInButton";
+import { currentPasswordFormField, emailFormField } from "./form-schemas";
 
 const copy = authCopy.signIn;
 
-// Aviso rápido na tela. A validação que vale é a do servidor.
 const signInFormSchema = z.object({
-  email: z.string().trim().pipe(z.email(authCopy.invalidEmail)),
-  password: z
-    .string()
-    .min(1, authCopy.passwordRequired)
-    .max(PASSWORD_MAX_LENGTH, authCopy.passwordTooLong(PASSWORD_MAX_LENGTH)),
+  email: emailFormField,
+  password: currentPasswordFormField,
 });
 
 type SignInFormValues = z.infer<typeof signInFormSchema>;
@@ -43,8 +45,13 @@ export function SignInForm() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<SignInFormValues>({ resolver: zodResolver(signInFormSchema) });
+  const values = useWatch({ control });
+  const next = searchParams.get("next");
+  // Volta do Google com falha: o motivo fica no log do servidor, aqui só o aviso genérico.
+  const googleFailed = searchParams.get("erro") === GOOGLE_ERROR_PARAM;
 
   async function submit(values: SignInFormValues) {
     setFeedback(null);
@@ -52,7 +59,7 @@ export function SignInForm() {
 
     if (result.ok) {
       signIn(result.data.user);
-      router.replace(safeRedirectPath(searchParams.get("next")));
+      router.replace(safeRedirectPath(next));
       router.refresh();
       return;
     }
@@ -90,6 +97,9 @@ export function SignInForm() {
       noValidate
       className="flex flex-col gap-5"
     >
+      {googleFailed && !feedback && (
+        <FormMessage>{authCopy.googleFailed}</FormMessage>
+      )}
       {feedback?.kind === "error" && <FormMessage>{feedback.text}</FormMessage>}
       {feedback?.kind === "resent" && (
         <FormMessage tone="info">{copy.resent}</FormMessage>
@@ -111,31 +121,45 @@ export function SignInForm() {
         label={authCopy.emailLabel}
         type="email"
         autoComplete="email"
+        icon={Envelope}
+        placeholder={authCopy.emailPlaceholder}
         inputMode="email"
         registration={register("email")}
         error={errors.email?.message}
+        missing={isMissing(errors.email, values.email)}
       />
       <FormField
         label={authCopy.passwordLabel}
         type="password"
         autoComplete="current-password"
+        icon={LockSimple}
+        placeholder={authCopy.passwordPlaceholder}
         registration={register("password")}
         error={errors.password?.message}
+        missing={isMissing(errors.password, values.password)}
       />
+      <Link
+        href={forgotPasswordLink}
+        className="-mt-2 self-end text-sm text-ink-soft transition-colors duration-150 hover:text-ink"
+      >
+        {copy.forgotPassword}
+      </Link>
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="button button-accent mt-1 w-full cursor-pointer disabled:cursor-wait disabled:opacity-70"
+        className="button button-accent mt-1 w-full cursor-pointer rounded-[999px] disabled:cursor-wait disabled:opacity-70"
       >
         {isSubmitting ? copy.submitting : copy.submit}
       </button>
+
+      <GoogleSignInButton next={next} />
 
       <p className="text-center text-sm text-ink-soft">
         {copy.noAccount}{" "}
         <Link
           href={signUpLink}
-          className="font-bold text-ink underline underline-offset-2"
+          className="font-bold text-ink transition-colors duration-150 hover:text-accent"
         >
           {copy.createAccount}
         </Link>

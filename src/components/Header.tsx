@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { AuthButtons } from "@/components/header/AuthButtons";
 import { DesktopNav } from "@/components/header/DesktopNav";
 import { HeaderCartLink } from "@/components/header/HeaderCartLink";
 import { HeaderSearch } from "@/components/header/HeaderSearch";
 import { labels } from "@/data/copy";
+import { HomeLink } from "@/components/HomeLink";
 import { site } from "@/site.config";
 
 const ICON_SIZE = 22;
@@ -49,10 +49,9 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
           className="absolute inset-0 border-b border-transparent bg-background opacity-0 transition-[opacity,border-color] duration-200 ease-snappy data-[visible=true]:border-line data-[visible=true]:opacity-100 max-md:opacity-100"
         />
 
-        <div className="relative px-(--header-pad) py-1 [--header-pad:1rem] sm:[--header-pad:1.5rem] lg:[--header-pad:2.5rem]">
+        <div className="relative px-(--gutter) py-1">
           <div className="mx-auto flex h-12 max-w-7xl items-center justify-between gap-6 md:h-14 lg:grid lg:grid-cols-[1fr_auto_1fr]">
-            <Link
-              href="/#inicio"
+            <HomeLink
               aria-label={`${site.name}, ${labels.backToTop}`}
               className="flex items-center gap-2"
             >
@@ -83,14 +82,14 @@ export function Header({ overHero = false }: { overHero?: boolean }) {
                   className={`object-contain transition-opacity duration-200 ${solid ? "opacity-100" : "opacity-0 max-md:opacity-100"}`}
                 />
               </span>
-            </Link>
+            </HomeLink>
 
             <DesktopNav />
 
             <div className="flex items-center justify-self-end">
               <HeaderSearch open={searchOpen} onOpenChange={setSearchOpen} />
               <HeaderCartLink iconSize={ICON_SIZE} />
-              <AuthButtons />
+              <AuthButtons iconSize={ICON_SIZE} />
             </div>
           </div>
         </div>

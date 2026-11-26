@@ -20,6 +20,8 @@ export const homeLink = "/";
 
 export const menuLink = "/cardapio";
 
+export const productLink = (slug: string) => `${menuLink}/${slug}`;
+
 export const cartLink = "/carrinho";
 
 export const signInLink = "/entrar";
@@ -27,6 +29,24 @@ export const signInLink = "/entrar";
 export const signUpLink = "/cadastro";
 
 export const accountLink = "/conta";
+
+export const accountDataLink = "/conta/dados";
+
+export const accountPasswordLink = "/conta/senha";
+
+export const aboutLink = "/sobre";
+
+export const forgotPasswordLink = "/esqueci-senha";
+
+// Começa o login com o Google (rota da API, aberta como navegação comum, não por fetch).
+export const googleSignInLink = (next?: string | null) =>
+  next
+    ? `/api/auth/google?next=${encodeURIComponent(next)}`
+    : "/api/auth/google";
+
+// Para onde o retorno do Google manda quando algo falha: o login mostra o aviso.
+export const GOOGLE_ERROR_PARAM = "google";
+export const googleSignInFailedPath = `${signInLink}?erro=${GOOGLE_ERROR_PARAM}`;
 
 // Login que volta para a página de origem depois de entrar.
 export const signInLinkReturningTo = (path: string) =>

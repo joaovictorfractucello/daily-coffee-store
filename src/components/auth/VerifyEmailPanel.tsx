@@ -6,7 +6,7 @@ import { useState } from "react";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
 import { signInLink } from "@/lib/links";
-import { FormMessage, rateLimitMinutes } from "./AuthCard";
+import { FormMessage, rateLimitMinutes } from "./FormFeedback";
 
 const copy = authCopy.verifyEmail;
 
@@ -45,7 +45,10 @@ export function VerifyEmailPanel() {
         ) : (
           <FormMessage>{copy.invalid}</FormMessage>
         )}
-        <Link href={signInLink} className="button button-accent w-full">
+        <Link
+          href={signInLink}
+          className="button button-accent w-full rounded-[999px]"
+        >
           {copy.goToSignIn}
         </Link>
       </div>
@@ -60,7 +63,7 @@ export function VerifyEmailPanel() {
         type="button"
         onClick={confirm}
         disabled={status === "submitting"}
-        className="button button-accent w-full cursor-pointer disabled:cursor-wait disabled:opacity-70"
+        className="button button-accent w-full cursor-pointer rounded-[999px] disabled:cursor-wait disabled:opacity-70"
       >
         {status === "submitting" ? copy.submitting : copy.submit}
       </button>

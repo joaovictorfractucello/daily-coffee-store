@@ -40,7 +40,22 @@ export const loginSchema = z.object({
 
 export const emailOnlySchema = z.object({ email: emailField });
 
-export const tokenSchema = z.object({ token: z.string().regex(TOKEN_PATTERN) });
+const tokenField = z.string().regex(TOKEN_PATTERN);
+
+export const tokenSchema = z.object({ token: tokenField });
+
+export const resetPasswordSchema = z.object({
+  token: tokenField,
+  password: newPasswordField,
+});
+
+// Troca logado: a senha atual só precisa existir (a regra de tamanho vale para a nova).
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+  newPassword: newPasswordField,
+});
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

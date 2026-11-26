@@ -983,6 +983,84 @@
           }
         },
         {
+          "name": "POST /auth/change-password (senha atual errada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 (ou 401 sem login, 429 depois de muitas tentativas)\", () => pm.expect(pm.response.code).to.be.oneOf([400, 401, 429]));",
+                  "if (pm.response.code === 400) pm.test(\"erro no campo da senha atual\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_CURRENT_PASSWORD\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Precisa estar logado (rode o login antes). Confere a senha atual; 5 tentativas a cada 15 min por conta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"senha-errada\",\n  \"newPassword\": \"uma senha nova bem longa\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/change-password (senha nova curta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 (ou 401 sem login)\", () => pm.expect(pm.response.code).to.be.oneOf([400, 401]));",
+                  "if (pm.response.code === 400) pm.test(\"entrada inválida\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Senha nova com menos de 8 caracteres é recusada antes de conferir a atual.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{authPassword}}\",\n  \"newPassword\": \"curta\"\n}"
+            }
+          }
+        },
+        {
           "name": "POST /auth/login (outro site)",
           "event": [
             {
@@ -1022,6 +1100,159 @@
             "body": {
               "mode": "raw",
               "raw": "{}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/forgot-password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 202\", () => pm.response.to.have.status(202));",
+                  "pm.test(\"resposta sem detalhes da conta\", () => pm.expect(pm.response.json()).to.eql({ ok: true }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{authEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Manda o link de nova senha (vale 30 min). Copie o token do link para a variável resetToken."
+          }
+        },
+        {
+          "name": "POST /auth/forgot-password (e-mail inexistente)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"mesma resposta: 202\", () => pm.response.to.have.status(202));",
+                  "pm.test(\"resposta sem detalhes da conta\", () => pm.expect(pm.response.json()).to.eql({ ok: true }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ninguem-{{$timestamp}}@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Mesma resposta de um e-mail que existe: não revela quem tem conta."
+          }
+        },
+        {
+          "name": "POST /auth/reset-password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"200 na primeira vez ou 400 se o link já foi usado\", () => pm.expect(pm.response.code).to.be.oneOf([200, 400]));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"{{authPassword}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Grava a senha nova, encerra todas as sessões e não loga sozinho. O link é de uso único."
+          }
+        },
+        {
+          "name": "POST /auth/reset-password (senha curta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\",\n  \"password\": \"1234567\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
             }
           }
         },

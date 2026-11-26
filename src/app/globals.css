@@ -29,6 +29,20 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/*
+  Margem lateral do site (gutter): um valor só, usado por páginas, cabeçalho, rodapé e carrosséis
+  (px-(--gutter), -mx-(--gutter)). Celular e tablet 24px, desktop 40px.
+*/
+:root {
+  --gutter: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 2.5rem;
+  }
+}
+
 /* --font-display e --font-text são criadas pelo next/font em app/fonts.ts. */
 @theme inline {
   --font-sans: var(--font-text), sans-serif;
@@ -481,4 +495,60 @@
   .header-search[data-open="true"] .header-search-field {
     transition: opacity 200ms ease;
   }
+}
+
+/* Telas de login e cadastro: a foto "assenta" uma vez ao abrir (o único movimento automático). */
+@keyframes auth-photo-settle {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.auth-photo {
+  animation: auth-photo-settle 1.4s var(--ease-snappy) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-photo {
+    animation: none;
+  }
+}
+
+/* Campos das telas de login e cadastro (mesma cor do fundo da página). O fundo fica numa variável para o preenchimento automático
+   do navegador (que pinta o campo de azul ou amarelo) usar a mesma cor. */
+.auth-input {
+  --auth-input-bg: var(--color-background);
+  background-color: var(--auth-input-bg);
+}
+
+/* O navegador não deixa trocar o fundo do autofill: uma sombra interna cobre o campo inteiro com a
+   nossa cor. Seletores separados porque um seletor desconhecido invalida a regra inteira. */
+.auth-input:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-ink);
+  caret-color: var(--color-ink);
+  box-shadow: 0 0 0 1000px var(--auth-input-bg) inset;
+}
+.auth-input:-webkit-autofill:focus-visible {
+  box-shadow:
+    0 0 0 1000px var(--auth-input-bg) inset,
+    0 0 0 4px rgb(143 92 51 / 0.15);
+}
+.auth-input:autofill {
+  -webkit-text-fill-color: var(--color-ink);
+  box-shadow: 0 0 0 1000px var(--auth-input-bg) inset;
+}
+
+/* Senha escondida: bolinhas na fonte do sistema, iguais às da prévia do preenchimento automático do
+   Chrome (que o site não consegue estilizar). Assim o campo não "pula" quando a pessoa clica.
+   O placeholder e a senha visível (type=text) continuam na fonte do site. */
+.auth-input[type="password"] {
+  font-family: Arial, system-ui, sans-serif;
+  letter-spacing: 0.06em;
+}
+.auth-input[type="password"]::placeholder {
+  font-family: var(--font-text), sans-serif;
+  letter-spacing: normal;
 }

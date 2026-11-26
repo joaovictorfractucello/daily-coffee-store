@@ -1,32 +1,38 @@
 "use client";
 
+import { Envelope, LockSimple, User } from "@phosphor-icons/react/ssr";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
-import {
-  NAME_MAX_LENGTH,
-  PASSWORD_MAX_LENGTH,
-  PASSWORD_MIN_LENGTH,
-} from "@/lib/auth-schemas";
 import { signInLink } from "@/lib/links";
-import { FormMessage, rateLimitMinutes } from "./AuthCard";
-import { FormField } from "./FormField";
+import { FormMessage, rateLimitMinutes } from "./FormFeedback";
+import { FormField, isMissing } from "./FormField";
+import { GoogleSignInButton } from "./GoogleSignInButton";
+import {
+  emailFormField,
+  nameFormField,
+  newPasswordFormField,
+} from "./form-schemas";
 
 const copy = authCopy.signUp;
 
-// Aviso rápido na tela, com as mesmas constantes do servidor. A validação que vale é a do servidor.
-const signUpFormSchema = z.object({
-  name: z.string().trim().min(2, authCopy.nameTooShort).max(NAME_MAX_LENGTH),
-  email: z.string().trim().pipe(z.email(authCopy.invalidEmail)),
-  password: z
-    .string()
-    .min(PASSWORD_MIN_LENGTH, authCopy.passwordTooShort(PASSWORD_MIN_LENGTH))
-    .max(PASSWORD_MAX_LENGTH, authCopy.passwordTooLong(PASSWORD_MAX_LENGTH)),
-});
+// "Repetir a senha" é só da tela: o servidor recebe apenas a senha. O erro de diferença aparece no
+// campo de repetir, que é onde a pessoa vai corrigir.
+const signUpFormSchema = z
+  .object({
+    name: nameFormField,
+    email: emailFormField,
+    password: newPasswordFormField,
+    confirmPassword: z.string().min(1, authCopy.confirmPasswordRequired),
+  })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    message: authCopy.passwordsDontMatch,
+    path: ["confirmPassword"],
+  });
 
 type SignUpFormValues = z.infer<typeof signUpFormSchema>;
 
@@ -36,13 +42,19 @@ export function SignUpForm() {
   const {
     register,
     handleSubmit,
+    control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({ resolver: zodResolver(signUpFormSchema) });
+  const values = useWatch({ control });
 
-  async function submit(values: SignUpFormValues) {
+  async function submit({ name, email, password }: SignUpFormValues) {
     setErrorText(null);
-    const result = await postAuth("register", values);
-    if (result.ok) return setSentTo(values.email);
+    const result = await postAuth("register", { name, email, password });
+    if (result.ok) return setSentTo(email);
+    if (result.code === "PASSWORD_BREACHED") {
+      return setError("password", { message: authCopy.passwordBreached });
+    }
     setErrorText(
       result.status === 429
         ? authCopy.rateLimited(rateLimitMinutes(result.retryAfterSeconds))
@@ -56,7 +68,10 @@ export function SignUpForm() {
       <div role="status" className="flex flex-col gap-4">
         <h2 className="text-lg font-bold">{copy.sentTitle}</h2>
         <p className="text-ink-soft">{copy.sentText(sentTo)}</p>
-        <Link href={signInLink} className="button button-outline-ink w-full">
+        <Link
+          href={signInLink}
+          className="button button-outline-ink w-full rounded-[999px]"
+        >
           {copy.signIn}
         </Link>
       </div>
@@ -74,39 +89,59 @@ export function SignUpForm() {
       <FormField
         label={authCopy.nameLabel}
         autoComplete="name"
+        icon={User}
+        placeholder={authCopy.namePlaceholder}
         registration={register("name")}
         error={errors.name?.message}
+        missing={isMissing(errors.name, values.name)}
       />
       <FormField
         label={authCopy.emailLabel}
         type="email"
         autoComplete="email"
+        icon={Envelope}
+        placeholder={authCopy.emailPlaceholder}
         inputMode="email"
         registration={register("email")}
         error={errors.email?.message}
+        missing={isMissing(errors.email, values.email)}
       />
       <FormField
         label={authCopy.passwordLabel}
         type="password"
         autoComplete="new-password"
-        hint={authCopy.passwordHint(PASSWORD_MIN_LENGTH)}
+        icon={LockSimple}
+        placeholder={authCopy.newPasswordPlaceholder}
         registration={register("password")}
         error={errors.password?.message}
+        missing={isMissing(errors.password, values.password)}
+      />
+      <FormField
+        label={authCopy.confirmPasswordLabel}
+        type="password"
+        autoComplete="new-password"
+        icon={LockSimple}
+        placeholder={authCopy.confirmPasswordPlaceholder}
+        registration={register("confirmPassword")}
+        error={errors.confirmPassword?.message}
+        missing={isMissing(errors.confirmPassword, values.confirmPassword)}
       />
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="button button-accent mt-1 w-full cursor-pointer disabled:cursor-wait disabled:opacity-70"
+        className="button button-accent mt-1 w-full cursor-pointer rounded-[999px] disabled:cursor-wait disabled:opacity-70"
       >
         {isSubmitting ? copy.submitting : copy.submit}
       </button>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-ink-soft">
         {copy.hasAccount}{" "}
         <Link
           href={signInLink}
-          className="font-bold text-ink underline underline-offset-2"
+          className="font-bold text-ink transition-colors duration-150 hover:text-accent"
         >
           {copy.signIn}
         </Link>

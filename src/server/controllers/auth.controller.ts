@@ -1,16 +1,26 @@
 import "server-only";
+import { NextResponse } from "next/server";
 import {
+  changePasswordSchema,
   emailOnlySchema,
   loginSchema,
   registerSchema,
+  resetPasswordSchema,
   tokenSchema,
 } from "@/lib/auth-schemas";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import { getClientIp } from "@/server/lib/client-ip";
+import { googleOAuth } from "@/server/lib/oauth/google-oauth";
+import {
+  takeOAuthCookies,
+  writeOAuthCookies,
+} from "@/server/lib/oauth-cookies";
 import {
   clearSessionCookie,
   readSessionToken,
   writeSessionCookie,
 } from "@/server/lib/session-cookie";
+import { UnauthenticatedError } from "@/server/errors/auth.errors";
 import { presentUser } from "@/server/presenters/user.presenter";
 import { authService } from "@/server/services/auth.service";
 import type { ValidSession } from "@/server/services/session.service";
@@ -48,12 +58,69 @@ export const authController = {
     return Response.json({ user: presentUser(user) });
   },
 
+  async forgotPassword(request: Request): Promise<Response> {
+    const { email } = parseInput(emailOnlySchema, await readJsonBody(request));
+    await authService.requestPasswordReset(email, { ip: getClientIp(request) });
+    return accepted();
+  },
+
+  async resetPassword(request: Request): Promise<Response> {
+    const input = parseInput(resetPasswordSchema, await readJsonBody(request));
+    await authService.resetPassword(input, { ip: getClientIp(request) });
+    return Response.json({ ok: true });
+  },
+
+  // Vai para o Google. O `next` filtrado vai num cookie e volta no retorno (não confiamos na URL).
+  async googleStart(request: Request): Promise<Response> {
+    const next = safeRedirectPath(
+      new URL(request.url).searchParams.get("next"),
+    );
+    const { url, state, codeVerifier } = googleOAuth.createAuthorization();
+    await writeOAuthCookies({ state, codeVerifier, next });
+    return NextResponse.redirect(url);
+  },
+
+  async googleCallback(request: Request): Promise<Response> {
+    const params = new URL(request.url).searchParams;
+    const stored = await takeOAuthCookies();
+    const profile = await googleOAuth.fetchProfile({
+      code: params.get("code"),
+      state: params.get("state"),
+      storedState: stored.state,
+      codeVerifier: stored.codeVerifier,
+    });
+    const { token, expiresAt } = await authService.loginWithGoogle(profile, {
+      ip: getClientIp(request),
+    });
+    await writeSessionCookie(token, expiresAt);
+    return NextResponse.redirect(
+      new URL(safeRedirectPath(stored.next), request.url),
+    );
+  },
+
   async logout(request: Request): Promise<Response> {
     await authService.logout(await readSessionToken(), {
       ip: getClientIp(request),
     });
     await clearSessionCookie();
     return new Response(null, { status: 204 });
+  },
+
+  // A sessão já foi validada pelo withAuth. O token do cookie identifica qual sessão continua aberta.
+  async changePassword(
+    request: Request,
+    _context: unknown,
+    { user }: ValidSession,
+  ): Promise<Response> {
+    const input = parseInput(changePasswordSchema, await readJsonBody(request));
+    const sessionToken = await readSessionToken();
+    if (!sessionToken) throw new UnauthenticatedError();
+    await authService.changePassword(
+      input,
+      { user, sessionToken },
+      { ip: getClientIp(request) },
+    );
+    return Response.json({ ok: true });
   },
 
   async me(
