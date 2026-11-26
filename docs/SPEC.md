@@ -34,7 +34,7 @@ Apesar de fictício, **deve ser pensado como um produto real**: regras de negóc
 - Histórico de pedidos
 ### Administrador
 - CRUD de produtos
-- Cadastro de bairros atendidos e suas taxas de entrega
+- Cadastro de cidades atendidas e suas taxas de entrega
 - Lista de pedidos e mudança de status
 ### Regras do carrinho
 - Fica no **navegador (localStorage)**. Carrinho de visitante não ocupa servidor nem banco. Guarda só `productId` e `quantity`; nome, foto e preço vêm do servidor. Migrar para o servidor (conta logada, com merge no login) só quando houver multi-dispositivo ou aviso de carrinho abandonado: veja o [ADR 010](adr/010-carrinho-no-navegador.md).
@@ -238,10 +238,14 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
  
 ## 6. Entrega e retirada
  
-- O cliente escolhe **entrega** ou **retirada no balcão**.
-- Na entrega, o CEP preenche o endereço via **ViaCEP**.
-- A **taxa de entrega é por bairro**, cadastrada pelo admin.
-- Bairro não cadastrado: a loja informa que não entrega no local.
+- O cliente escolhe **entrega** ou **retirada no balcão** no checkout (Etapa 6).
+- **Área de entrega:** cidade de São Paulo e as 7 cidades do ABC. A loja fica na Vila Mariana.
+- A **taxa de entrega é por cidade** ([ADR 012](adr/012-taxa-de-entrega-por-cidade.md)), cadastrada pelo admin (pelo seed até a Etapa 7).
+- O CEP preenche o endereço via **ViaCEP**, consultado **só pelo servidor**. A cidade e a UF que valem são as do ViaCEP, nunca as enviadas pela tela.
+- **Fora da área:** o endereço não é salvo e a tela oferece a retirada no balcão.
+- **Endereços salvos** ficam na conta (`/conta/enderecos`): até 10 por pessoa, um padrão. Cada um tem um apelido, como nos apps de entrega: Casa, Trabalho ou Outro (com nome livre opcional). "Outro" sem nome mostra a rua como título.
+- **Resumo do carrinho:** com o CEP calculado e dentro da área, a taxa entra como linha e aparece o **total estimado**. O valor que vale é o do checkout, calculado no servidor.
+- **No carrinho**, "Calcular entrega" mostra a taxa pelo CEP, sem login. É só estimativa: o total do carrinho continua sendo o subtotal, e a escolha acontece no checkout.
 Motivo: produtos de cafeteria (bebidas, salgados) não são enviados por transportadora. A entrega é local, como em uma cafeteria real.
  
 ---
@@ -409,9 +413,9 @@ Cada etapa é planejada em detalhe antes de começar, em `docs/etapas/` (ver se�
 2. **Catálogo**: modelo de produtos no banco, API e páginas; home adaptada para loja
 3. **Carrinho**
 4. **Autenticação**: cadastro, login, sessão, verificação de e-mail, recuperação de senha, Google
-5. **Entrega e retirada**: bairros, taxas, endereço com ViaCEP
+5. **Entrega e retirada**: cidades atendidas e taxas, endereços salvos com ViaCEP, cálculo de entrega no carrinho
 6. **Checkout e pagamento**: pedido, Asaas sandbox, webhook
-7. **Painel administrativo**: produtos, bairros, pedidos e status; 2FA por app autenticador (TOTP) obrigatório para `ADMIN`; acesso do `DEMO_ADMIN`
+7. **Painel administrativo**: produtos, cidades atendidas, pedidos e status; 2FA por app autenticador (TOTP) obrigatório para `ADMIN`; acesso do `DEMO_ADMIN`
 8. **Polimento**: e-mails de pedido, revisão de segurança (CSP e cabeçalhos: HSTS, `nosniff`, `frame-ancestors`, `Permissions-Policy`), página de política de privacidade (`/privacidade`, LGPD) e publicação do app do Google, documentação final
 ---
  
