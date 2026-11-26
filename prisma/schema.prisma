@@ -32,6 +32,7 @@ model User {
   sessions      Session[]
   oauthAccounts OAuthAccount[]
   emailTokens   EmailToken[]
+  addresses     Address[]
 }
 
 // O id é o SHA-256 do token que vai no cookie: o banco nunca guarda o token em si.
@@ -82,6 +83,13 @@ model RateLimit {
   @@index([resetAt])
 }
 
+// Apelido do endereço, como nos apps de entrega: define o ícone e o título na lista.
+enum AddressLabel {
+  HOME
+  WORK
+  OTHER
+}
+
 enum ProductCategory {
   CAFES
   BEBIDAS_GELADAS
@@ -103,4 +111,44 @@ model Product {
   updatedAt    DateTime        @updatedAt
 
   @@index([isActive, category])
+}
+
+// Cidades atendidas e taxa de entrega (ADR 012). Desativar em vez de apagar: endereços apontam para elas.
+model DeliveryCity {
+  id                 String   @id @default(cuid())
+  name               String
+  state              String
+  deliveryFeeInCents Int
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  addresses Address[]
+
+  @@unique([name, state])
+}
+
+// Endereços salvos do cliente. Bairro, cidade e UF como vieram do ViaCEP; a cidade atendida define a taxa.
+model Address {
+  id               String       @id @default(cuid())
+  userId           String
+  cep              String
+  street           String
+  number           String
+  complement       String?
+  neighborhoodName String
+  city             String
+  state            String
+  deliveryCityId   String
+  label            AddressLabel @default(OTHER)
+  // Nome livre, só quando label = OTHER (ex.: "Casa da mãe").
+  customLabel      String?
+  isDefault        Boolean      @default(false)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveryCity DeliveryCity @relation(fields: [deliveryCityId], references: [id])
+
+  @@index([userId])
 }
