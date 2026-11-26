@@ -1,15 +1,18 @@
 "use client";
 
-import { ShoppingCart } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import {
+  emptyStateScreenClass,
+  StateIllustration,
+} from "@/components/StateIllustration";
 import { cartPage } from "@/data/copy";
 import { countCartUnits, sumCartLines } from "@/lib/cart";
-import { formatPrice } from "@/lib/format";
 import { menuLink } from "@/lib/links";
 import type { PublicProduct } from "@/server/presenters/product.presenter";
 import { useCartHydrated, useCartStore } from "@/stores/cart-store";
 import { CartLine } from "./CartLine";
+import { CartSummary } from "./CartSummary";
 import { CartSkeleton } from "./CartSkeleton";
 import { fetchCartQuote } from "./fetch-cart-quote";
 
@@ -63,8 +66,12 @@ export function CartView() {
 
   if (failedKey === productsKey) {
     return (
-      <div role="alert" className="py-10 text-center">
-        <p className="font-bold">{cartPage.error}</p>
+      <div
+        role="alert"
+        className="flex flex-col items-center py-10 text-center"
+      >
+        <StateIllustration name="error" />
+        <p className="mt-4 font-bold text-danger-ink">{cartPage.error}</p>
         <button
           type="button"
           onClick={() => setAttempt((count) => count + 1)}
@@ -91,7 +98,7 @@ export function CartView() {
   );
 
   return (
-    <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-14">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_23rem] lg:items-start lg:gap-10">
       <div>
         {showUnavailableNotice && <UnavailableNotice />}
         <ul>
@@ -107,34 +114,10 @@ export function CartView() {
         </ul>
       </div>
 
-      <aside
-        aria-labelledby="cart-summary-title"
-        className="rounded-[1.25rem] border border-line p-5 lg:sticky lg:top-28"
-      >
-        <h2
-          id="cart-summary-title"
-          className="heading-soft text-[1.125rem] md:text-[1.375rem]"
-        >
-          {cartPage.summaryTitle}
-        </h2>
-        <dl className="mt-4 flex items-baseline justify-between gap-4">
-          <dt className="text-[0.9375rem] text-ink-soft">
-            {cartPage.subtotal} ({cartPage.itemCount(countCartUnits(items))})
-          </dt>
-          <dd className="text-lg font-bold tabular-nums">
-            {formatPrice(subtotalInCents)}
-          </dd>
-        </dl>
-        <p className="mt-2 text-sm text-ink-soft">{cartPage.deliveryNote}</p>
-        <button
-          type="button"
-          aria-disabled="true"
-          title={cartPage.comingSoon}
-          className="button button-accent mt-5 w-full cursor-pointer"
-        >
-          {cartPage.checkout}
-        </button>
-      </aside>
+      <CartSummary
+        subtotalInCents={subtotalInCents}
+        itemCount={countCartUnits(items)}
+      />
     </div>
   );
 }
@@ -156,9 +139,11 @@ function EmptyCart({
   showUnavailableNotice: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center py-12 text-center">
+    <div
+      className={`flex flex-col items-center py-12 text-center ${emptyStateScreenClass.short}`}
+    >
       {showUnavailableNotice && <UnavailableNotice />}
-      <ShoppingCart aria-hidden="true" size={48} className="text-ink-soft" />
+      <StateIllustration name="cartEmpty" />
       <p className="mt-4 text-lg font-bold">{cartPage.emptyTitle}</p>
       <p className="mt-1 text-ink-soft">{cartPage.emptyText}</p>
       <Link href={menuLink} className="button button-accent mt-6">
