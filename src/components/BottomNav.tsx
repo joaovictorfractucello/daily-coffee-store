@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef, type ComponentType } from "react";
 import { usePathname } from "next/navigation";
 import { bottomNavCopy } from "@/data/copy";
-import { menuLink } from "@/lib/links";
+import { accountLink, menuLink, signInLink, signUpLink } from "@/lib/links";
 
 const itemClass =
   "flex min-h-14 flex-col items-center justify-center gap-0.5 text-[0.6875rem] font-semibold transition-[color,scale] duration-200 active:scale-95";
@@ -51,6 +51,9 @@ export function BottomNav() {
   const pathname = usePathname();
   const onMenu = pathname.startsWith(menuLink);
   const onHome = pathname === "/";
+  const onAccount = [accountLink, signInLink, signUpLink].some((link) =>
+    pathname.startsWith(link),
+  );
   const wantsHomeAtTop = useRef(false);
 
   // O Next mantém a posição de rolagem da página que ficou guardada e o Início abria no meio (nas
@@ -107,7 +110,19 @@ export function BottomNav() {
           <ComingSoonItem label={bottomNavCopy.orders} icon={Receipt} />
         </li>
         <li className="contents">
-          <ComingSoonItem label={bottomNavCopy.profile} icon={User} />
+          {/* Sem sessão, a /conta leva ao login e volta para cá depois. */}
+          <Link
+            href={accountLink}
+            aria-current={onAccount ? "page" : undefined}
+            className={`${itemClass} ${onAccount ? "text-accent" : "text-ink-soft"}`}
+          >
+            <User
+              aria-hidden="true"
+              size={24}
+              weight={onAccount ? "fill" : "regular"}
+            />
+            {bottomNavCopy.profile}
+          </Link>
         </li>
       </ul>
     </nav>
