@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/products/ProductCard";
+import { StateIllustration } from "@/components/StateIllustration";
 import { searchResults } from "@/data/copy";
 import { menuLink } from "@/lib/links";
 import { presentProduct } from "@/server/presenters/product.presenter";
@@ -13,6 +14,29 @@ export async function MenuSearchResults({ term }: { term: string }) {
     presentProduct,
   );
 
+  if (products.length === 0) {
+    return (
+      <section
+        aria-labelledby="search-results-title"
+        className="flex flex-col items-center py-6 text-center"
+      >
+        <StateIllustration name="searchEmpty" />
+        <h2
+          id="search-results-title"
+          className="mt-4 heading-soft text-[1.125rem] md:text-[1.375rem]"
+        >
+          {searchResults.title(term)}
+        </h2>
+        <p role="status" className="mt-2 text-ink-soft">
+          {searchResults.empty(term)}
+        </p>
+        <Link href={menuLink} className="button button-accent mt-6">
+          {searchResults.seeFullMenu}
+        </Link>
+      </section>
+    );
+  }
+
   return (
     <section aria-labelledby="search-results-title">
       <h2
@@ -22,9 +46,7 @@ export async function MenuSearchResults({ term }: { term: string }) {
         {searchResults.title(term)}
       </h2>
       <p role="status" className="mt-2 text-ink-soft">
-        {products.length > 0
-          ? searchResults.count(products.length)
-          : searchResults.empty(term)}
+        {searchResults.count(products.length)}
       </p>
       <Link
         href={menuLink}

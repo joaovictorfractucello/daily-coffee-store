@@ -357,6 +357,21 @@ export const menuPage = {
     "Cafés, bebidas geladas, salgados e doces feitos para comer com calma.",
 };
 
+export const errorPage = {
+  title: "Ops, algo deu errado",
+  text: "Não conseguimos carregar esta página. Tente de novo em instantes.",
+  retry: "Tentar de novo",
+  backHome: "Voltar ao início",
+};
+
+export const notFoundPage = {
+  metaTitle: "Página não encontrada",
+  title: "Essa página se perdeu",
+  text: "O link pode estar errado ou a página mudou de lugar.",
+  seeMenu: "Ver cardápio",
+  backHome: "Voltar ao início",
+};
+
 export const searchResults = {
   title: (term: string) => `Resultados para “${term}”`,
   count: (total: number) =>
@@ -378,6 +393,70 @@ export const productPage = {
   seeCategory: (categoryName: string) => `Ver ${categoryName}`,
 };
 
+export const deliveryCopy = {
+  cepLabel: "CEP",
+  cepPlaceholder: "00000-000",
+  cepInvalid: "Digite um CEP com 8 números.",
+  cepNotFound: "Não encontramos esse CEP.",
+  cepUnavailable: "Não foi possível consultar o CEP agora. Tente de novo.",
+  looking: "Consultando o CEP...",
+  available: (city: string, fee: string) => `Entregamos em ${city}: ${fee}`,
+  unavailable: (city: string) =>
+    `Ainda não entregamos em ${city}. Você pode retirar no balcão.`,
+  calculateTitle: "Calcular entrega",
+  calculate: "Calcular",
+  calculating: "Calculando...",
+  deliveryTo: (cep: string) => `Entrega em ${cep}`,
+  openCalculator: "Calcular entrega",
+  change: "trocar",
+  changeLabel: "Trocar o CEP da entrega",
+  estimatedTotal: "Total estimado",
+  pickupNote: "Retirada no balcão: sem taxa.",
+};
+
+export const addressesCopy = {
+  metaTitle: "Endereços",
+  title: "Endereços",
+  intro: "Onde você recebe seus pedidos. Entregamos em São Paulo e no ABC.",
+  add: "Adicionar endereço",
+  emptyTitle: "Nenhum endereço salvo",
+  emptyText: "Cadastre onde você quer receber seu café.",
+  default: "Padrão",
+  deliveryFee: (fee: string) => `Entrega: ${fee}`,
+  labels: { HOME: "Casa", WORK: "Trabalho", OTHER: "Outro" },
+  labelLegend: "Salvar como",
+  customLabelLabel: "Nome do endereço",
+  customLabelPlaceholder: "Casa da mãe, academia (opcional)",
+  actions: (title: string) => `Ações do endereço ${title}`,
+  edit: "Editar",
+  makeDefault: "Tornar padrão",
+  remove: "Apagar",
+  confirmRemove: "Apagar este endereço?",
+  confirmYes: "Sim, apagar",
+  confirmNo: "Cancelar",
+  limitReached: "Você chegou ao limite de 10 endereços.",
+  backToAddresses: "Voltar para os endereços",
+  newTitle: "Novo endereço",
+  editTitle: "Editar endereço",
+  streetLabel: "Rua",
+  streetPlaceholder: "Nome da rua",
+  numberLabel: "Número",
+  numberPlaceholder: "123",
+  complementLabel: "Complemento",
+  complementPlaceholder: "Apto, bloco (opcional)",
+  neighborhoodLabel: "Bairro",
+  neighborhoodPlaceholder: "Seu bairro",
+  cityLabel: "Cidade",
+  required: (label: string) => `Preencha ${label.toLowerCase()}.`,
+  tooLong: (max: number) => `Use no máximo ${max} caracteres.`,
+  save: "Salvar endereço",
+  saving: "Salvando...",
+  outOfArea: "Ainda não entregamos nessa cidade. Você pode retirar no balcão.",
+  genericError: "Não foi possível salvar agora. Tente de novo em instantes.",
+  rateLimited: (minutes: number) =>
+    `Muitas tentativas. Tente de novo em ${minutes} ${minutes === 1 ? "minuto" : "minutos"}.`,
+};
+
 export const cartPage = {
   title: "Carrinho",
   metaTitle: "Carrinho | Daily Coffee",
@@ -388,10 +467,14 @@ export const cartPage = {
   unitPrice: (price: string) => `${price} cada`,
   remove: (productName: string) => `Remover ${productName} do carrinho`,
   quantityOf: (productName: string) => `Quantidade de ${productName}`,
-  summaryTitle: "Resumo",
+  summaryTitle: "Resumo do pedido",
   subtotal: "Subtotal",
-  deliveryNote: "Taxa de entrega calculada no checkout.",
+  delivery: "Entrega",
+  deliveryUnavailable: "Indisponível",
+  total: "Total",
+  deliveryNote: "Entrega ou retirada você escolhe ao finalizar.",
   checkout: "Finalizar pedido",
+  continueShopping: "Continuar comprando",
   comingSoon: "Em breve",
   unavailable:
     "Alguns produtos não estão mais disponíveis e saíram do carrinho.",

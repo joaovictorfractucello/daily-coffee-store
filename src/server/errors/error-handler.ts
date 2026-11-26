@@ -9,7 +9,11 @@ const statusByKind: Record<ErrorKind, number> = {
   VALIDATION: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
+  // Entrada válida, mas a regra de negócio recusa (ex.: endereço fora da área de entrega).
+  UNPROCESSABLE: 422,
   RATE_LIMITED: 429,
+  // Serviço externo fora do ar (ex.: ViaCEP).
+  UNAVAILABLE: 503,
 };
 
 function respondWithAppError(error: AppError): Response {

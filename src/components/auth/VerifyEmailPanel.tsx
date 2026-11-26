@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { StateIllustration } from "@/components/StateIllustration";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
 import { signInLink } from "@/lib/links";
@@ -36,9 +37,13 @@ export function VerifyEmailPanel() {
 
   if (status === "verified" || status === "invalid") {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col items-center gap-4">
+        <StateIllustration
+          name={status === "verified" ? "allSet" : "linkExpired"}
+          size={128}
+        />
         {status === "verified" ? (
-          <div role="status">
+          <div role="status" className="text-center">
             <h2 className="text-lg font-bold">{copy.successTitle}</h2>
             <p className="mt-1 text-ink-soft">{copy.successText}</p>
           </div>

@@ -6,7 +6,9 @@ export type ErrorKind =
   | "VALIDATION"
   | "UNAUTHORIZED"
   | "FORBIDDEN"
-  | "RATE_LIMITED";
+  | "UNPROCESSABLE"
+  | "RATE_LIMITED"
+  | "UNAVAILABLE";
 
 type AppErrorParams = {
   message: string;

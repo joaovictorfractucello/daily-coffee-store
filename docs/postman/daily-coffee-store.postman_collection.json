@@ -1286,6 +1286,502 @@
           }
         }
       ]
+    },
+    {
+      "name": "Entrega e endereços",
+      "description": "Cotação da entrega pelo CEP (pública) e endereços salvos (precisa de login). Os endereços usam o cookie de sessão: rode POST /auth/login antes, porque a pasta Autenticação termina com logout. A variável addressId é preenchida pelo POST /addresses.",
+      "item": [
+        {
+          "name": "GET /delivery/quote (São Paulo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"entrega em São Paulo por R$ 6,00\", () => { const { delivery } = pm.response.json(); pm.expect(delivery.available).to.be.true; pm.expect(delivery.feeInCents).to.eql(600); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delivery/quote?cep=01303-000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delivery",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "cep",
+                  "value": "01303-000"
+                }
+              ]
+            },
+            "description": "Consulta o ViaCEP pelo servidor e devolve o endereço, a cidade e a taxa. Limite: 30 por minuto por IP."
+          }
+        },
+        {
+          "name": "GET /delivery/quote (Santo André)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"CEP formatado e taxa de R$ 10,00\", () => { const body = pm.response.json(); pm.expect(body.address.cep).to.eql(\"09010-000\"); pm.expect(body.delivery.feeInCents).to.eql(1000); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delivery/quote?cep=09010000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delivery",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "cep",
+                  "value": "09010000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /delivery/quote (fora da área)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Campinas sem entrega\", () => { const { delivery } = pm.response.json(); pm.expect(delivery.available).to.be.false; pm.expect(delivery.feeInCents).to.be.null; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delivery/quote?cep=13010-000",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delivery",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "cep",
+                  "value": "13010-000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /delivery/quote (CEP inexistente, 404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"código CEP_NOT_FOUND\", () => pm.expect(pm.response.json().error.code).to.eql(\"CEP_NOT_FOUND\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delivery/quote?cep=99999-999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delivery",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "cep",
+                  "value": "99999-999"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /delivery/quote (CEP inválido, 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delivery/quote?cep=123",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delivery",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "cep",
+                  "value": "123"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /addresses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 201\", () => pm.response.to.have.status(201));",
+                  "const addressKeys = [\"id\",\"cep\",\"street\",\"number\",\"complement\",\"neighborhood\",\"city\",\"state\",\"isDefault\",\"deliveryFeeInCents\"];",
+                  "pm.test(\"só campos públicos\", () => pm.expect(pm.response.json().address).to.have.keys(addressKeys));",
+                  "pm.test(\"cidade vem do ViaCEP, não do corpo\", () => pm.expect(pm.response.json().address.city).to.eql(\"Santo André\"));",
+                  "pm.test(\"Casa não guarda nome livre\", () => { const a = pm.response.json().address; pm.expect(a.label).to.eql(\"HOME\"); pm.expect(a.customLabel).to.be.null; });",
+                  "pm.collectionVariables.set(\"addressId\", pm.response.json().address.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"09010-000\",\n  \"street\": \"Rua Coronel Oliveira Lima\",\n  \"number\": \"100\",\n  \"neighborhood\": \"Centro\",\n  \"label\": \"HOME\",\n  \"customLabel\": \"ignorado em Casa\",\n  \"city\": \"Campinas\",\n  \"isDefault\": false\n}"
+            },
+            "description": "Campos extras (city, isDefault, userId) são ignorados. label: HOME, WORK ou OTHER; customLabel só vale com OTHER. O primeiro endereço vira o padrão. Até 10 por pessoa (409 ADDRESS_LIMIT)."
+          }
+        },
+        {
+          "name": "POST /addresses (fora da área, 422)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 422\", () => pm.response.to.have.status(422));",
+                  "pm.test(\"código DELIVERY_UNAVAILABLE\", () => pm.expect(pm.response.json().error.code).to.eql(\"DELIVERY_UNAVAILABLE\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"13010-000\",\n  \"street\": \"Avenida Doutor Moraes Salles\",\n  \"number\": \"1\",\n  \"neighborhood\": \"Centro\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /addresses (campo vazio, 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"09450-000\",\n  \"street\": \"\",\n  \"number\": \"1\",\n  \"neighborhood\": \"\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /addresses (apelido inválido, 400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"09010-000\",\n  \"street\": \"Rua X\",\n  \"number\": \"1\",\n  \"neighborhood\": \"Centro\",\n  \"label\": \"ESCOLA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "GET /addresses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"lista com um padrão no máximo\", () => { const { addresses } = pm.response.json(); pm.expect(addresses).to.be.an(\"array\"); pm.expect(addresses.filter((a) => a.isDefault).length).to.be.at.most(1); });",
+                  "pm.test(\"sem cache compartilhado\", () => pm.expect(pm.response.headers.get(\"Cache-Control\")).to.include(\"no-store\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/addresses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses"
+              ]
+            },
+            "description": "Sem sessão: 401."
+          }
+        },
+        {
+          "name": "PATCH /addresses/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"número atualizado\", () => pm.expect(pm.response.json().address.number).to.eql(\"200\"));",
+                  "pm.test(\"apelido livre em Outro\", () => pm.expect(pm.response.json().address.customLabel).to.eql(\"Escritório\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/addresses/{{addressId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses",
+                "{{addressId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cep\": \"09010-000\",\n  \"street\": \"Rua Coronel Oliveira Lima\",\n  \"number\": \"200\",\n  \"complement\": \"Sala 2\",\n  \"neighborhood\": \"Centro\",\n  \"label\": \"OTHER\",\n  \"customLabel\": \"Escritório\"\n}"
+            },
+            "description": "O servidor consulta o CEP de novo. Endereço de outra pessoa: 404 (não revela que existe)."
+          }
+        },
+        {
+          "name": "POST /addresses/:id/default",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"virou o padrão\", () => pm.expect(pm.response.json().address.isDefault).to.be.true);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/addresses/{{addressId}}/default",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses",
+                "{{addressId}}",
+                "default"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE /addresses/:id inexistente (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"código ADDRESS_NOT_FOUND\", () => pm.expect(pm.response.json().error.code).to.eql(\"ADDRESS_NOT_FOUND\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/addresses/cm0000000000000000000000a",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses",
+                "cm0000000000000000000000a"
+              ]
+            }
+          }
+        },
+        {
+          "name": "DELETE /addresses/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"responde 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/addresses/{{addressId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "addresses",
+                "{{addressId}}"
+              ]
+            },
+            "description": "Se era o padrão, o endereço mais recente vira o padrão."
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "addressId",
+      "value": ""
     }
   ]
 }

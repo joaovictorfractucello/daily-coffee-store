@@ -22,6 +22,7 @@
 | `Role` | `CUSTOMER`, `ADMIN`, `DEMO_ADMIN` |
 | `EmailTokenType` | `EMAIL_VERIFICATION`, `PASSWORD_RESET` |
 | `ProductCategory` | `CAFES`, `BEBIDAS_GELADAS`, `SALGADOS`, `DOCES` |
+| `AddressLabel` | `HOME`, `WORK`, `OTHER` |
 | `FulfillmentType` | `DELIVERY`, `PICKUP` |
 | `OrderStatus` | `AWAITING_PAYMENT`, `PAID`, `PREPARING`, `OUT_FOR_DELIVERY`, `READY_FOR_PICKUP`, `DELIVERED`, `CANCELLED` |
 | `PaymentMethod` | `PIX`, `CREDIT_CARD` |
@@ -97,22 +98,26 @@ Nova categoria = alteração no enum + migration (aceitável: o cardápio muda p
 | `isFeatured` | aparece nos destaques ("Mais pedidos") da home; padrão `false` |
 | `createdAt`, `updatedAt` | |
  
-**Neighborhood** (bairros atendidos)
+**DeliveryCity** (cidades atendidas, [ADR 012](adr/012-taxa-de-entrega-por-cidade.md))
 | Campo | Observação |
 |---|---|
 | `id` | |
-| `name` | único |
+| `name`, `state` | único: `name` + `state` (ex.: "Santo André", "SP") |
 | `deliveryFeeInCents` | |
-| `isActive` | |
+| `isActive` | desativar em vez de apagar |
  
 **Address** (endereços salvos do cliente)
 | Campo | Observação |
 |---|---|
 | `id`, `userId` | |
 | `cep`, `street`, `number`, `complement` | |
-| `neighborhoodName`, `city`, `state` | como vieram do ViaCEP |
-| `neighborhoodId` | bairro atendido correspondente (define a taxa) |
-| `isDefault` | |
+| `neighborhoodName`, `city`, `state` | como vieram do ViaCEP (o bairro pode ser corrigido pela pessoa) |
+| `deliveryCityId` | cidade atendida correspondente (define a taxa) |
+| `label` | `AddressLabel`, padrão `OTHER` (Casa, Trabalho ou Outro) |
+| `customLabel` | opcional, até 30 caracteres; só com `OTHER` (ex.: "Casa da mãe") |
+| `isDefault` | um por pessoa |
+| `createdAt`, `updatedAt` | |
+| | até 10 por pessoa |
  
 ### Pedidos e pagamento
  
@@ -173,7 +178,7 @@ Nova categoria = alteração no enum + migration (aceitável: o cardápio muda p
 User ─┬─< Session
       ├─< OAuthAccount
       ├─< EmailToken
-      ├─< Address >── Neighborhood
+      ├─< Address >── DeliveryCity
       └─< Order ─┬─< OrderItem >── Product
                  ├─< OrderStatusHistory
                  └─< Payment

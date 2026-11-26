@@ -34,6 +34,12 @@ export const accountDataLink = "/conta/dados";
 
 export const accountPasswordLink = "/conta/senha";
 
+export const accountAddressesLink = "/conta/enderecos";
+
+export const newAddressLink = `${accountAddressesLink}/novo`;
+
+export const editAddressLink = (id: string) => `${accountAddressesLink}/${id}`;
+
 export const aboutLink = "/sobre";
 
 export const forgotPasswordLink = "/esqueci-senha";

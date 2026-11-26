@@ -8,17 +8,17 @@ import {
 import type { Icon } from "@phosphor-icons/react";
 import Link from "next/link";
 import { authCopy } from "@/data/copy";
-import { aboutLink, accountDataLink } from "@/lib/links";
+import { aboutLink, accountAddressesLink, accountDataLink } from "@/lib/links";
 import { accountCardClass, accountListClass } from "./list-styles";
 
 const copy = authCopy.account;
 
-export type AccountSection = "home" | "data";
+export type AccountSection = "home" | "data" | "addresses";
 
 type MenuItem = {
   label: string;
   icon: Icon;
-  // Sem link: ainda não existe (pedidos na Etapa 6, endereços na Etapa 5).
+  // Sem link: ainda não existe (pedidos na Etapa 6).
   href?: string;
   section?: AccountSection;
 };
@@ -31,7 +31,12 @@ const items: MenuItem[] = [
     section: "data",
   },
   { label: copy.orders, icon: Receipt },
-  { label: copy.addresses, icon: MapPin },
+  {
+    label: copy.addresses,
+    icon: MapPin,
+    href: accountAddressesLink,
+    section: "addresses",
+  },
   { label: copy.about, icon: Storefront, href: aboutLink },
 ];
 

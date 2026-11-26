@@ -25,3 +25,4 @@ Status possíveis: *Aceita*, *Substituída por ADR-xxx*, *Descartada*. Um ADR n�
 | [009](009-branches-do-neon-por-ambiente.md) | Branches do Neon por ambiente | Implementada |
 | [010](010-carrinho-no-navegador.md) | Carrinho no navegador, checkout recalculado no servidor | Implementada |
 | [011](011-rate-limit-no-postgres.md) | Limite de tentativas guardado no Postgres | Etapa 4 |
+| [012](012-taxa-de-entrega-por-cidade.md) | Taxa de entrega por cidade | Etapa 5 |

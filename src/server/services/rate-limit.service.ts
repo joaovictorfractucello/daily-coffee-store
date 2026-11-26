@@ -19,6 +19,10 @@ export const rateLimitRules = {
   passwordChangePerUser: { limit: 5, windowMs: 15 * MINUTE_MS },
   // Rota pública que consulta o banco a cada chamada. A tela do carrinho chama uma vez por visita.
   quotePerIp: { limit: 60, windowMs: MINUTE_MS },
+  // Rota pública: cada consulta de CEP vai ao ViaCEP.
+  cepLookupPerIp: { limit: 30, windowMs: MINUTE_MS },
+  // Salvar endereço também consulta o ViaCEP: por conta, para uma sessão não virar proxy de CEP.
+  addressWritePerUser: { limit: 30, windowMs: 15 * MINUTE_MS },
 } as const;
 
 export type RateLimitRule = keyof typeof rateLimitRules;

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { StateIllustration } from "@/components/StateIllustration";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
 import { signInLink } from "@/lib/links";
@@ -65,7 +66,11 @@ export function SignUpForm() {
   // Mesma tela para e-mail novo e já cadastrado: não revela quem tem conta (SPEC §5).
   if (sentTo) {
     return (
-      <div role="status" className="flex flex-col gap-4">
+      <div
+        role="status"
+        className="flex flex-col items-center gap-4 text-center"
+      >
+        <StateIllustration name="emailSent" size={128} />
         <h2 className="text-lg font-bold">{copy.sentTitle}</h2>
         <p className="text-ink-soft">{copy.sentText(sentTo)}</p>
         <Link

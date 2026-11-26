@@ -32,7 +32,7 @@ type FormFieldProps = {
 
 // Fundo e preenchimento automático do navegador ficam na classe auth-input (globals.css).
 const inputClass =
-  "auth-input h-12 w-full rounded-[8px] border border-line pr-4 pl-11 text-base text-ink transition-[border-color,box-shadow] duration-150 placeholder:text-ink-soft/70 hover:border-ink-soft/60 focus-visible:border-accent focus-visible:shadow-[0_0_0_4px_rgb(143_92_51/0.15)] focus-visible:outline-none aria-invalid:border-[#b3261e] aria-invalid:focus-visible:shadow-[0_0_0_4px_rgb(179_38_30/0.12)]";
+  "auth-input h-12 w-full rounded-[8px] border border-line pr-4 pl-11 text-base text-ink transition-[border-color,box-shadow] duration-150 placeholder:text-ink-soft/70 hover:border-ink-soft/60 focus-visible:border-accent focus-visible:shadow-[0_0_0_4px_rgb(143_92_51/0.15)] focus-visible:outline-none aria-invalid:border-danger aria-invalid:focus-visible:shadow-[0_0_0_4px_rgb(179_38_30/0.12)]";
 
 export function FormField({
   label,
@@ -57,7 +57,7 @@ export function FormField({
         {label}
         {missing && (
           <>
-            <span aria-hidden="true" className="ml-0.5 text-[#b3261e]">
+            <span aria-hidden="true" className="ml-0.5 text-danger">
               *
             </span>
             <span className="sr-only"> ({authCopy.required})</span>
@@ -106,7 +106,7 @@ export function FormField({
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-sm text-[#b3261e]">
+        <p id={`${id}-error`} className="mt-1.5 text-sm text-danger">
           {error}
         </p>
       )}
