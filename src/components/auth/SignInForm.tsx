@@ -117,8 +117,6 @@ export function SignInForm() {
         </FormMessage>
       )}
 
-      <GoogleSignInButton next={next} />
-
       <FormField
         label={authCopy.emailLabel}
         type="email"
@@ -154,6 +152,8 @@ export function SignInForm() {
       >
         {isSubmitting ? copy.submitting : copy.submit}
       </button>
+
+      <GoogleSignInButton next={next} />
 
       <p className="text-center text-sm text-ink-soft">
         {copy.noAccount}{" "}

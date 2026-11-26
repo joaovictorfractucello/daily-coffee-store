@@ -147,4 +147,4 @@ Corpo: `{ "items": [{ "productId": "…", "quantity": 2 }] }`. Qualquer outro ca
 
 - Preço, nome e foto vêm sempre do servidor: o carrinho do navegador guarda só `productId` e `quantity` (ADR 010).
 - Regra de negócio no service (`cartService.quote`) deixa o checkout da Etapa 6 reaproveitar o cálculo.
-- Pendências conhecidas: sem limite de requisições em `/api/cart/quote` (entra com o login, Etapa 4) e o preço pode mudar entre o carrinho e o pagamento (tratar na Etapa 6).
+- Pendências conhecidas: sem limite de requisições em `/api/cart/quote` (resolvido na Etapa 4: 60 por minuto por IP) e o preço pode mudar entre o carrinho e o pagamento (tratar na Etapa 6).

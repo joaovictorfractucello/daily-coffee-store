@@ -8,6 +8,7 @@ import {
 } from "@/lib/auth-schemas";
 import type { EmailTokenType } from "@/generated/prisma/enums";
 import {
+  BreachedPasswordError,
   EmailNotVerifiedError,
   GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
@@ -21,6 +22,7 @@ import {
 import { getEmailService } from "@/server/lib/email/email-service";
 import type { GoogleProfile } from "@/server/lib/oauth/google-oauth";
 import { hashPassword, verifyPassword } from "@/server/lib/password";
+import { checkPasswordBreach } from "@/server/lib/pwned-passwords";
 import { logSecurityEvent } from "@/server/lib/security-log";
 import { generateToken, hashToken } from "@/server/lib/tokens";
 import { emailTokenRepository } from "@/server/repositories/email-token.repository";
@@ -37,6 +39,19 @@ const GOOGLE_PROVIDER = "google";
 
 // Quem fez a requisição. O service recebe só o IP, sem saber de onde ele veio (HTTP fica no controller).
 type RequestOrigin = { ip: string };
+
+// Recusa senha que já apareceu em vazamento. Se o serviço de consulta estiver fora do ar, deixa
+// passar e registra: um terceiro não pode travar o cadastro (SPEC §5).
+async function assertPasswordNotBreached(password: string, ip: string) {
+  const result = await checkPasswordBreach(password);
+  if (result === "breached") {
+    logSecurityEvent("password_breached", { ip });
+    throw new BreachedPasswordError();
+  }
+  if (result === "unavailable") {
+    logSecurityEvent("password_breach_check_failed", { ip });
+  }
+}
 
 // Cria o link de uso único (invalida o anterior do mesmo tipo) e devolve o token para o e-mail.
 async function createEmailToken(
@@ -133,6 +148,9 @@ export const authService = {
     await rateLimitService.consume("registerPerIp", ip, now);
     // Também por endereço: impede usar o cadastro para lotar a caixa de entrada de alguém.
     await rateLimitService.consume("emailPerAddress", email, now);
+
+    // Antes de olhar o e-mail: a recusa depende só da senha, então não revela quem tem conta.
+    await assertPasswordNotBreached(password, ip);
 
     // O hash é calculado nos dois casos para o tempo de resposta não revelar se o e-mail existe.
     const passwordHash = await hashPassword(password);
@@ -256,6 +274,9 @@ export const authService = {
       now,
     );
     if (!emailToken) throw new InvalidTokenError();
+
+    // Depois de validar o link e antes de gastá-lo: senha recusada deixa o link valer para outra tentativa.
+    await assertPasswordNotBreached(password, ip);
 
     const passwordHash = await hashPassword(password);
     const consumed = await emailTokenRepository.consumeAndResetPassword(

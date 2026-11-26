@@ -43,6 +43,7 @@ export function SignUpForm() {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<SignUpFormValues>({ resolver: zodResolver(signUpFormSchema) });
   const values = useWatch({ control });
@@ -51,6 +52,9 @@ export function SignUpForm() {
     setErrorText(null);
     const result = await postAuth("register", { name, email, password });
     if (result.ok) return setSentTo(email);
+    if (result.code === "PASSWORD_BREACHED") {
+      return setError("password", { message: authCopy.passwordBreached });
+    }
     setErrorText(
       result.status === 429
         ? authCopy.rateLimited(rateLimitMinutes(result.retryAfterSeconds))
@@ -81,8 +85,6 @@ export function SignUpForm() {
       className="flex flex-col gap-5"
     >
       {errorText && <FormMessage>{errorText}</FormMessage>}
-
-      <GoogleSignInButton />
 
       <FormField
         label={authCopy.nameLabel}
@@ -132,6 +134,8 @@ export function SignUpForm() {
       >
         {isSubmitting ? copy.submitting : copy.submit}
       </button>
+
+      <GoogleSignInButton />
 
       <p className="text-center text-sm text-ink-soft">
         {copy.hasAccount}{" "}

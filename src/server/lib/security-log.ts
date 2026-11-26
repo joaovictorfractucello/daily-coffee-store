@@ -16,6 +16,8 @@ export type SecurityEvent =
   | "google_linked"
   | "google_unverified_claimed"
   | "google_login_failure"
+  | "password_breached"
+  | "password_breach_check_failed"
   | "rate_limited"
   | "cross_site_request_blocked";
 
