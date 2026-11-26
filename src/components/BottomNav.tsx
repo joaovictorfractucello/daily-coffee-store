@@ -2,7 +2,8 @@
 
 import { BookOpen, House, Receipt, User } from "@phosphor-icons/react/ssr";
 import Link from "next/link";
-import { useEffect, useRef, type ComponentType } from "react";
+import { HomeLink } from "@/components/HomeLink";
+import type { ComponentType } from "react";
 import { usePathname } from "next/navigation";
 import { bottomNavCopy } from "@/data/copy";
 import { accountLink, menuLink, signInLink, signUpLink } from "@/lib/links";
@@ -54,19 +55,6 @@ export function BottomNav() {
   const onAccount = [accountLink, signInLink, signUpLink].some((link) =>
     pathname.startsWith(link),
   );
-  const wantsHomeAtTop = useRef(false);
-
-  // O Next mantém a posição de rolagem da página que ficou guardada e o Início abria no meio (nas
-  // categorias). Depois que a home aparece, forçamos o topo. O frame de espera deixa o Next terminar
-  // de restaurar a posição antes.
-  useEffect(() => {
-    if (!onHome || !wantsHomeAtTop.current) return;
-    wantsHomeAtTop.current = false;
-    const frame = requestAnimationFrame(() =>
-      window.scrollTo({ top: 0, behavior: "instant" }),
-    );
-    return () => cancelAnimationFrame(frame);
-  }, [onHome]);
 
   return (
     <nav
@@ -75,12 +63,7 @@ export function BottomNav() {
     >
       <ul className="grid grid-cols-4">
         <li className="contents">
-          <Link
-            href="/"
-            onClick={() => {
-              wantsHomeAtTop.current = true;
-              window.scrollTo({ top: 0, behavior: "instant" });
-            }}
+          <HomeLink
             aria-current={onHome ? "page" : undefined}
             className={`${itemClass} ${onHome ? "text-accent" : "text-ink-soft"}`}
           >
@@ -90,7 +73,7 @@ export function BottomNav() {
               weight={onHome ? "fill" : "regular"}
             />
             {bottomNavCopy.home}
-          </Link>
+          </HomeLink>
         </li>
         <li className="contents">
           <Link

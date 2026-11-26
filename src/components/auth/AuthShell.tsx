@@ -1,8 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { authCopy } from "@/data/copy";
-import { homeTopLink } from "@/lib/links";
+import { HomeLink } from "@/components/HomeLink";
 import { site } from "@/site.config";
 
 const ambiencePhoto = "/images/quem-somos/ambiente.webp";
@@ -55,8 +54,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
 
 function BrandLink() {
   return (
-    <Link
-      href={homeTopLink}
+    <HomeLink
       aria-label={`${site.name}, ${authCopy.backToStore.toLowerCase()}`}
       className="inline-flex items-center gap-2"
     >
@@ -78,6 +76,6 @@ function BrandLink() {
           className="object-contain"
         />
       </span>
-    </Link>
+    </HomeLink>
   );
 }

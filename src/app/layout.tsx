@@ -52,8 +52,12 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // data-scroll-behavior: o globals.css deixa a rolagem suave (âncoras da página). Sem este atributo, o
+    // Next 16 não desliga a suavidade na troca de página, e a rolagem que ele faz ao abrir uma página
+    // vira animações que se atropelam: a home abria no meio, nas categorias.
     <html
       lang="pt-BR"
+      data-scroll-behavior="smooth"
       className={`${headingFont.variable} ${textFont.variable}`}
     >
       <body>
