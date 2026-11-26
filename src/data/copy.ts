@@ -253,7 +253,7 @@ export const heroPromo = {
   ghostWord: "Frappé",
   text: "Gelado, cremoso e cheio de pedaços de biscoito, coberto com chantilly e calda de chocolate.",
   button: "Pedir o Frappé",
-  productName: "Frappé de Oreo",
+  productSlug: "frappe-de-oreo",
 };
 
 // TESTE do segundo banner promocional: torta de limão (mesma composição do frappé).
@@ -262,7 +262,7 @@ export const tartPromo = {
   ghostWord: "Limão",
   text: "Massa amanteigada, creme cítrico de limão e merengue maçaricado na hora.",
   button: "Pedir a Torta",
-  productName: "Torta de limão",
+  productSlug: "torta-de-limao",
 };
 
 // TESTE do terceiro banner promocional: cold brew.
@@ -271,7 +271,7 @@ export const coldBrewPromo = {
   ghostWord: "Brew",
   text: "Extraído a frio por 16 horas. Menos ácido, mais doce.",
   button: "Pedir o Cold Brew",
-  productName: "Cold brew",
+  productSlug: "cold-brew",
 };
 
 export const heroCopy = {
@@ -376,7 +376,6 @@ export const productPage = {
   descriptionTitle: "Descrição",
   relatedTitle: "Produtos relacionados",
   seeCategory: (categoryName: string) => `Ver ${categoryName}`,
-  whatsAppMessage: (productName: string) => `Oi! Quero pedir: ${productName}.`,
 };
 
 export const cartPage = {

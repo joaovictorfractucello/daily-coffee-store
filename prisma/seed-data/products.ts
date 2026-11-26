@@ -64,6 +64,15 @@ export const seedProducts: Prisma.ProductCreateInput[] = [
     isFeatured: true,
   },
   {
+    name: "Frappé de Oreo",
+    slug: "frappe-de-oreo",
+    description:
+      "Gelado, cremoso e cheio de pedaços de biscoito, com chantilly e calda de chocolate.",
+    priceInCents: 2000,
+    imageUrl: photoOf("frappe-de-oreo"),
+    category: "BEBIDAS_GELADAS",
+  },
+  {
     name: "Pão na chapa",
     slug: "pao-na-chapa",
     description: "Pão francês tostado na chapa com bastante manteiga.",

@@ -20,6 +20,8 @@ export const homeLink = "/";
 
 export const menuLink = "/cardapio";
 
+export const productLink = (slug: string) => `${menuLink}/${slug}`;
+
 export const cartLink = "/carrinho";
 
 export const signInLink = "/entrar";
