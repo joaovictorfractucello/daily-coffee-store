@@ -30,6 +30,8 @@ export const accountLink = "/conta";
 
 export const accountDataLink = "/conta/dados";
 
+export const accountPasswordLink = "/conta/senha";
+
 export const aboutLink = "/sobre";
 
 export const forgotPasswordLink = "/esqueci-senha";

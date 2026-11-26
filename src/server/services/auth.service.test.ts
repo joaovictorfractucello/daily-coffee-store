@@ -5,13 +5,16 @@ import {
   EmailNotVerifiedError,
   GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
+  InvalidCurrentPasswordError,
   InvalidTokenError,
+  PasswordNotSetError,
   RateLimitedError,
 } from "@/server/errors/auth.errors";
 import { getEmailService } from "@/server/lib/email/email-service";
 import { hashPassword, verifyPassword } from "@/server/lib/password";
 import { checkPasswordBreach } from "@/server/lib/pwned-passwords";
 import { logSecurityEvent } from "@/server/lib/security-log";
+import { hashToken } from "@/server/lib/tokens";
 import { emailTokenRepository } from "@/server/repositories/email-token.repository";
 import { oauthAccountRepository } from "@/server/repositories/oauth-account.repository";
 import { userRepository } from "@/server/repositories/user.repository";
@@ -24,6 +27,7 @@ vi.mock("@/server/repositories/user.repository", () => ({
   userRepository: {
     findByEmail: vi.fn(),
     create: vi.fn(),
+    changePassword: vi.fn(),
   },
 }));
 vi.mock("@/server/repositories/email-token.repository", () => ({
@@ -612,5 +616,134 @@ describe("authService.signInMethods", () => {
     );
 
     expect(methods).toEqual({ hasPassword: false, hasGoogle: true });
+  });
+});
+
+describe("authService.changePassword", () => {
+  const input = {
+    currentPassword: "senha atual",
+    newPassword: "nova senha longa",
+  };
+  const sessionToken = "token-da-sessao";
+
+  it("checks the current password, stores the new hash, keeps this session and warns by email", async () => {
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    const user = makeUser();
+
+    await authService.changePassword(
+      input,
+      { user, sessionToken },
+      origin,
+      now,
+    );
+
+    expect(verifyPassword).toHaveBeenCalledWith("hash-da-senha", "senha atual");
+    expect(checkPasswordBreach).toHaveBeenCalledWith("nova senha longa");
+    expect(userRepository.changePassword).toHaveBeenCalledWith(
+      "user-1",
+      "hash-novo",
+      hashToken(sessionToken),
+    );
+    expect(logSecurityEvent).toHaveBeenCalledWith("password_changed", {
+      userId: "user-1",
+      ip: origin.ip,
+    });
+    expect(sentEmails()[0].subject).toContain("foi alterada");
+  });
+
+  it("keeps the new password when the warning email fails", async () => {
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    vi.mocked(getEmailService().send).mockRejectedValueOnce(new Error("smtp"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    await expect(
+      authService.changePassword(
+        input,
+        { user: makeUser(), sessionToken },
+        origin,
+        now,
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(userRepository.changePassword).toHaveBeenCalled();
+    expect(consoleError).toHaveBeenCalledWith(
+      "password_changed_email_failed",
+      "Error",
+    );
+    consoleError.mockRestore();
+  });
+
+  it("refuses a wrong current password and changes nothing", async () => {
+    vi.mocked(verifyPassword).mockResolvedValue(false);
+
+    await expect(
+      authService.changePassword(
+        input,
+        { user: makeUser(), sessionToken },
+        origin,
+        now,
+      ),
+    ).rejects.toBeInstanceOf(InvalidCurrentPasswordError);
+
+    expect(userRepository.changePassword).not.toHaveBeenCalled();
+    expect(logSecurityEvent).toHaveBeenCalledWith("password_change_failure", {
+      userId: "user-1",
+      ip: origin.ip,
+    });
+    expect(sentEmails()).toHaveLength(0);
+  });
+
+  it("does not accept a change for an account without a password (Google only)", async () => {
+    await expect(
+      authService.changePassword(
+        input,
+        { user: makeUser({ passwordHash: null }), sessionToken },
+        origin,
+        now,
+      ),
+    ).rejects.toBeInstanceOf(PasswordNotSetError);
+
+    expect(verifyPassword).not.toHaveBeenCalled();
+    expect(userRepository.changePassword).not.toHaveBeenCalled();
+  });
+
+  it("refuses a breached new password", async () => {
+    vi.mocked(verifyPassword).mockResolvedValue(true);
+    vi.mocked(checkPasswordBreach).mockResolvedValue("breached");
+
+    await expect(
+      authService.changePassword(
+        input,
+        { user: makeUser(), sessionToken },
+        origin,
+        now,
+      ),
+    ).rejects.toBeInstanceOf(BreachedPasswordError);
+
+    expect(userRepository.changePassword).not.toHaveBeenCalled();
+  });
+
+  it("limits attempts per account before checking the password", async () => {
+    vi.mocked(rateLimitService.consume).mockRejectedValueOnce(
+      new RateLimitedError(60),
+    );
+
+    await expect(
+      authService.changePassword(
+        input,
+        { user: makeUser(), sessionToken },
+        origin,
+        now,
+      ),
+    ).rejects.toBeInstanceOf(RateLimitedError);
+
+    expect(rateLimitService.consume).toHaveBeenCalledWith(
+      "passwordChangePerUser",
+      "user-1",
+      now,
+    );
+    expect(verifyPassword).not.toHaveBeenCalled();
   });
 });

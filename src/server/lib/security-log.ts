@@ -12,6 +12,8 @@ export type SecurityEvent =
   | "logout"
   | "password_reset_requested"
   | "password_reset_completed"
+  | "password_changed"
+  | "password_change_failure"
   | "google_login"
   | "google_linked"
   | "google_unverified_claimed"

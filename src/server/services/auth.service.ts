@@ -2,6 +2,7 @@ import "server-only";
 import {
   NAME_MAX_LENGTH,
   normalizeEmail,
+  type ChangePasswordInput,
   type LoginInput,
   type RegisterInput,
   type ResetPasswordInput,
@@ -13,10 +14,13 @@ import {
   EmailNotVerifiedError,
   GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
+  InvalidCurrentPasswordError,
   InvalidTokenError,
+  PasswordNotSetError,
 } from "@/server/errors/auth.errors";
 import {
   alreadyRegisteredEmail,
+  passwordChangedEmail,
   passwordResetEmail,
   verificationEmail,
 } from "@/server/lib/email/auth-emails";
@@ -306,6 +310,40 @@ export const authService = {
     const session = await sessionService.create(user, now);
     logSecurityEvent("google_login", { userId: user.id, ip });
     return { user, ...session };
+  },
+
+  // Troca de senha logado (SPEC §5). Pede a senha atual: quem pegou um aparelho com a sessão aberta
+  // não consegue trocar a senha e tomar a conta. A sessão de quem trocou continua; as outras caem.
+  async changePassword(
+    { currentPassword, newPassword }: ChangePasswordInput,
+    { user, sessionToken }: { user: User; sessionToken: string },
+    { ip }: RequestOrigin,
+    now = new Date(),
+  ) {
+    await rateLimitService.consume("passwordChangePerUser", user.id, now);
+    if (!user.passwordHash) throw new PasswordNotSetError();
+
+    if (!(await verifyPassword(user.passwordHash, currentPassword))) {
+      logSecurityEvent("password_change_failure", { userId: user.id, ip });
+      throw new InvalidCurrentPasswordError();
+    }
+
+    await assertPasswordNotBreached(newPassword, ip);
+    const passwordHash = await hashPassword(newPassword);
+    await userRepository.changePassword(
+      user.id,
+      passwordHash,
+      hashToken(sessionToken),
+    );
+    logSecurityEvent("password_changed", { userId: user.id, ip });
+
+    // O aviso é melhor esforço: a senha já foi trocada, então uma falha do Gmail não vira erro para
+    // a pessoa. Vai para o log só o tipo do erro (a mensagem do provedor pode ter o e-mail).
+    try {
+      await getEmailService().send(passwordChangedEmail(user.email, user.name));
+    } catch (error) {
+      console.error("password_changed_email_failed", (error as Error).name);
+    }
   },
 
   // Para a tela "Dados pessoais": como a pessoa consegue entrar. Só sim/não, nunca o hash.

@@ -1,6 +1,7 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import {
+  changePasswordSchema,
   emailOnlySchema,
   loginSchema,
   registerSchema,
@@ -19,6 +20,7 @@ import {
   readSessionToken,
   writeSessionCookie,
 } from "@/server/lib/session-cookie";
+import { UnauthenticatedError } from "@/server/errors/auth.errors";
 import { presentUser } from "@/server/presenters/user.presenter";
 import { authService } from "@/server/services/auth.service";
 import type { ValidSession } from "@/server/services/session.service";
@@ -102,6 +104,23 @@ export const authController = {
     });
     await clearSessionCookie();
     return new Response(null, { status: 204 });
+  },
+
+  // A sessão já foi validada pelo withAuth. O token do cookie identifica qual sessão continua aberta.
+  async changePassword(
+    request: Request,
+    _context: unknown,
+    { user }: ValidSession,
+  ): Promise<Response> {
+    const input = parseInput(changePasswordSchema, await readJsonBody(request));
+    const sessionToken = await readSessionToken();
+    if (!sessionToken) throw new UnauthenticatedError();
+    await authService.changePassword(
+      input,
+      { user, sessionToken },
+      { ip: getClientIp(request) },
+    );
+    return Response.json({ ok: true });
   },
 
   async me(

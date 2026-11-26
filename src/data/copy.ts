@@ -196,9 +196,29 @@ export const authCopy = {
       notConnected: "Não conectado",
       defined: "Definida",
       notDefined: "Não definida",
-      newPassword: "Criar nova senha",
+      changePassword: "Alterar senha",
+      createPassword: "Criar senha",
       editSoon: "Em breve dá para editar seus dados por aqui.",
       signInMethodsHint: "Como você acessa a sua conta.",
+    },
+    password: {
+      metaTitle: "Alterar senha",
+      title: "Alterar senha",
+      intro:
+        "Por segurança, confirme a senha atual. Depois da troca, os outros aparelhos saem da conta.",
+      currentLabel: "Senha atual",
+      currentPlaceholder: "Digite a senha atual",
+      newLabel: "Nova senha",
+      forgotCurrent: "Esqueci a senha atual",
+      submit: "Salvar nova senha",
+      submitting: "Salvando...",
+      invalidCurrent: "A senha atual não confere.",
+      notSet:
+        "Sua conta entra só pelo Google. Para criar uma senha, use o link que enviamos por e-mail.",
+      doneTitle: "Senha alterada",
+      doneText:
+        "Pronto! Os outros aparelhos saíram da conta e enviamos um aviso para o seu e-mail.",
+      backToData: "Voltar para os dados",
     },
   },
 };

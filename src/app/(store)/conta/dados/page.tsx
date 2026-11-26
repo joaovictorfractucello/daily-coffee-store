@@ -19,6 +19,7 @@ import { authCopy } from "@/data/copy";
 import {
   accountDataLink,
   accountLink,
+  accountPasswordLink,
   forgotPasswordLink,
   signInLinkReturningTo,
 } from "@/lib/links";
@@ -76,11 +77,15 @@ async function PersonalData() {
             <SignInMethods {...methods} />
           </div>
           <Link
-            href={forgotPasswordLink}
+            href={
+              methods.hasPassword ? accountPasswordLink : forgotPasswordLink
+            }
             className="mt-4 inline-flex items-center gap-2 text-[0.9375rem] font-bold text-accent transition-opacity duration-150 hover:opacity-80"
           >
             <Key aria-hidden="true" size={18} />
-            {copy.data.newPassword}
+            {methods.hasPassword
+              ? copy.data.changePassword
+              : copy.data.createPassword}
           </Link>
         </section>
       </div>

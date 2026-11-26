@@ -983,6 +983,84 @@
           }
         },
         {
+          "name": "POST /auth/change-password (senha atual errada)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 (ou 401 sem login, 429 depois de muitas tentativas)\", () => pm.expect(pm.response.code).to.be.oneOf([400, 401, 429]));",
+                  "if (pm.response.code === 400) pm.test(\"erro no campo da senha atual\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_CURRENT_PASSWORD\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Precisa estar logado (rode o login antes). Confere a senha atual; 5 tentativas a cada 15 min por conta.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"senha-errada\",\n  \"newPassword\": \"uma senha nova bem longa\"\n}"
+            }
+          }
+        },
+        {
+          "name": "POST /auth/change-password (senha nova curta)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"400 (ou 401 sem login)\", () => pm.expect(pm.response.code).to.be.oneOf([400, 401]));",
+                  "if (pm.response.code === 400) pm.test(\"entrada inválida\", () => pm.expect(pm.response.json().error.code).to.equal(\"INVALID_INPUT\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/change-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "change-password"
+              ]
+            },
+            "description": "Senha nova com menos de 8 caracteres é recusada antes de conferir a atual.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{authPassword}}\",\n  \"newPassword\": \"curta\"\n}"
+            }
+          }
+        },
+        {
           "name": "POST /auth/login (outro site)",
           "event": [
             {

@@ -49,6 +49,13 @@ export const resetPasswordSchema = z.object({
   password: newPasswordField,
 });
 
+// Troca logado: a senha atual só precisa existir (a regra de tamanho vale para a nova).
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+  newPassword: newPasswordField,
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

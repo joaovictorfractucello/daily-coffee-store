@@ -42,6 +42,29 @@ export class BreachedPasswordError extends AppError {
   }
 }
 
+// Troca de senha logado: a senha atual não confere. Erro de campo (400), não de sessão: a pessoa
+// continua logada e corrige o campo.
+export class InvalidCurrentPasswordError extends AppError {
+  constructor() {
+    super({
+      message: "A senha atual não confere.",
+      code: "INVALID_CURRENT_PASSWORD",
+      kind: "VALIDATION",
+    });
+  }
+}
+
+// Conta sem senha (só Google): não há senha atual para conferir. Criar senha é pelo link do e-mail.
+export class PasswordNotSetError extends AppError {
+  constructor() {
+    super({
+      message: "Esta conta ainda não tem senha.",
+      code: "PASSWORD_NOT_SET",
+      kind: "CONFLICT",
+    });
+  }
+}
+
 export class UnauthenticatedError extends AppError {
   constructor() {
     super({
