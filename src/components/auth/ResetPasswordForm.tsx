@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { StateIllustration } from "@/components/StateIllustration";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
 import { forgotPasswordLink, signInLink } from "@/lib/links";
@@ -74,7 +75,8 @@ export function ResetPasswordForm() {
 
   if (status === "done") {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col items-center gap-4 text-center">
+        <StateIllustration name="allSet" size={128} />
         <div role="status">
           <h2 className="text-lg font-bold">{copy.successTitle}</h2>
           <p className="mt-1 text-ink-soft">{copy.successText}</p>
@@ -91,7 +93,8 @@ export function ResetPasswordForm() {
 
   if (status === "invalid") {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col items-center gap-4">
+        <StateIllustration name="linkExpired" size={128} />
         <FormMessage>{copy.invalid}</FormMessage>
         <Link
           href={forgotPasswordLink}

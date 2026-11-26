@@ -8,6 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { FormMessage, rateLimitMinutes } from "@/components/auth/FormFeedback";
 import { FormField, isMissing } from "@/components/auth/FormField";
+import { StateIllustration } from "@/components/StateIllustration";
 import {
   currentPasswordFormField,
   newPasswordFormField,
@@ -75,6 +76,7 @@ export function ChangePasswordForm() {
   if (done) {
     return (
       <div role="status" className="flex flex-col items-start gap-4">
+        <StateIllustration name="allSet" size={112} />
         <div>
           <h2 className="text-lg font-bold">{copy.doneTitle}</h2>
           <p className="mt-1 text-ink-soft">{copy.doneText}</p>
