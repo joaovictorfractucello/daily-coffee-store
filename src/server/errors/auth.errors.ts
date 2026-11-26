@@ -64,3 +64,37 @@ export class RateLimitedError extends AppError {
     this.retryAfterSeconds = retryAfterSeconds;
   }
 }
+
+// Retorno do Google que não dá para aceitar: `state` diferente do cookie, pessoa cancelou, código
+// inválido ou já usado. Uma mensagem só; o detalhe não ajuda quem está tentando forjar o retorno.
+export class OAuthCallbackError extends AppError {
+  constructor() {
+    super({
+      message: "Não foi possível entrar com o Google.",
+      code: "OAUTH_CALLBACK_FAILED",
+      kind: "UNAUTHORIZED",
+    });
+  }
+}
+
+// Sem e-mail verificado no Google não dá para saber se a pessoa é dona do endereço (SPEC §5).
+export class GoogleEmailNotVerifiedError extends AppError {
+  constructor() {
+    super({
+      message: "O e-mail da conta Google não está verificado.",
+      code: "GOOGLE_EMAIL_NOT_VERIFIED",
+      kind: "FORBIDDEN",
+    });
+  }
+}
+
+// GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET ausentes (só acontece fora da Vercel).
+export class GoogleUnavailableError extends AppError {
+  constructor() {
+    super({
+      message: "Login com Google indisponível.",
+      code: "GOOGLE_UNAVAILABLE",
+      kind: "NOT_FOUND",
+    });
+  }
+}

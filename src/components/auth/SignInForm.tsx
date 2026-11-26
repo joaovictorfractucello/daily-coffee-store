@@ -9,12 +9,17 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { authCopy } from "@/data/copy";
 import { postAuth } from "@/lib/auth-api";
-import { forgotPasswordLink, signUpLink } from "@/lib/links";
+import {
+  forgotPasswordLink,
+  GOOGLE_ERROR_PARAM,
+  signUpLink,
+} from "@/lib/links";
 import { safeRedirectPath } from "@/lib/safe-redirect";
 import type { PublicUser } from "@/server/presenters/user.presenter";
 import { useSessionStore } from "@/stores/session-store";
 import { FormMessage, rateLimitMinutes } from "./FormFeedback";
 import { FormField, isMissing } from "./FormField";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 import { currentPasswordFormField, emailFormField } from "./form-schemas";
 
 const copy = authCopy.signIn;
@@ -44,6 +49,9 @@ export function SignInForm() {
     formState: { errors, isSubmitting },
   } = useForm<SignInFormValues>({ resolver: zodResolver(signInFormSchema) });
   const values = useWatch({ control });
+  const next = searchParams.get("next");
+  // Volta do Google com falha: o motivo fica no log do servidor, aqui só o aviso genérico.
+  const googleFailed = searchParams.get("erro") === GOOGLE_ERROR_PARAM;
 
   async function submit(values: SignInFormValues) {
     setFeedback(null);
@@ -51,7 +59,7 @@ export function SignInForm() {
 
     if (result.ok) {
       signIn(result.data.user);
-      router.replace(safeRedirectPath(searchParams.get("next")));
+      router.replace(safeRedirectPath(next));
       router.refresh();
       return;
     }
@@ -89,6 +97,9 @@ export function SignInForm() {
       noValidate
       className="flex flex-col gap-5"
     >
+      {googleFailed && !feedback && (
+        <FormMessage>{authCopy.googleFailed}</FormMessage>
+      )}
       {feedback?.kind === "error" && <FormMessage>{feedback.text}</FormMessage>}
       {feedback?.kind === "resent" && (
         <FormMessage tone="info">{copy.resent}</FormMessage>
@@ -105,6 +116,8 @@ export function SignInForm() {
           </button>
         </FormMessage>
       )}
+
+      <GoogleSignInButton next={next} />
 
       <FormField
         label={authCopy.emailLabel}

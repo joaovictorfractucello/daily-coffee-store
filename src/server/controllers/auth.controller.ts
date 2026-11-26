@@ -1,4 +1,5 @@
 import "server-only";
+import { NextResponse } from "next/server";
 import {
   emailOnlySchema,
   loginSchema,
@@ -6,7 +7,13 @@ import {
   resetPasswordSchema,
   tokenSchema,
 } from "@/lib/auth-schemas";
+import { safeRedirectPath } from "@/lib/safe-redirect";
 import { getClientIp } from "@/server/lib/client-ip";
+import { googleOAuth } from "@/server/lib/oauth/google-oauth";
+import {
+  takeOAuthCookies,
+  writeOAuthCookies,
+} from "@/server/lib/oauth-cookies";
 import {
   clearSessionCookie,
   readSessionToken,
@@ -59,6 +66,34 @@ export const authController = {
     const input = parseInput(resetPasswordSchema, await readJsonBody(request));
     await authService.resetPassword(input, { ip: getClientIp(request) });
     return Response.json({ ok: true });
+  },
+
+  // Vai para o Google. O `next` filtrado vai num cookie e volta no retorno (não confiamos na URL).
+  async googleStart(request: Request): Promise<Response> {
+    const next = safeRedirectPath(
+      new URL(request.url).searchParams.get("next"),
+    );
+    const { url, state, codeVerifier } = googleOAuth.createAuthorization();
+    await writeOAuthCookies({ state, codeVerifier, next });
+    return NextResponse.redirect(url);
+  },
+
+  async googleCallback(request: Request): Promise<Response> {
+    const params = new URL(request.url).searchParams;
+    const stored = await takeOAuthCookies();
+    const profile = await googleOAuth.fetchProfile({
+      code: params.get("code"),
+      state: params.get("state"),
+      storedState: stored.state,
+      codeVerifier: stored.codeVerifier,
+    });
+    const { token, expiresAt } = await authService.loginWithGoogle(profile, {
+      ip: getClientIp(request),
+    });
+    await writeSessionCookie(token, expiresAt);
+    return NextResponse.redirect(
+      new URL(safeRedirectPath(stored.next), request.url),
+    );
   },
 
   async logout(request: Request): Promise<Response> {

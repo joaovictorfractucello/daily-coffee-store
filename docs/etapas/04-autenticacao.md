@@ -70,7 +70,10 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 - [x] Esqueci e redefinir senha (service, rotas, telas, testes, Postman)
 
 ### `feature/auth-google`
-- [ ] Arctic e regras de vínculo (com testes dos 4 casos)
+- [x] Arctic e regras de vínculo (com testes dos 4 casos)
+- [x] Botão "Continuar com o Google" no login e no cadastro, com aviso quando o retorno falha
+- [ ] Cliente OAuth no Google Cloud e variáveis `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (local e Vercel)
+- [ ] Teste real: conta nova, vínculo com conta verificada e tomada de conta não verificada
 
 ### `feature/auth-hardening`
 - [ ] Have I Been Pwned

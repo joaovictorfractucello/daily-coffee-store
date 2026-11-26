@@ -31,15 +31,21 @@ const envSchema = z
       .default("http://localhost:3000"),
     GMAIL_USER: optionalText,
     GMAIL_APP_PASSWORD: optionalText,
+    // Cliente OAuth do Google Cloud. O redirect cadastrado lá é `${APP_URL}/api/auth/google/callback`.
+    GOOGLE_CLIENT_ID: optionalText,
+    GOOGLE_CLIENT_SECRET: optionalText,
   })
-  // Na Vercel (staging e produção) os e-mails precisam sair de verdade: sem as credenciais, o
-  // build falha em vez de publicar um cadastro que nunca envia o link de confirmação.
+  // Na Vercel (staging e produção) os e-mails precisam sair de verdade e o Google precisa funcionar:
+  // sem as credenciais, o build falha em vez de publicar um cadastro que nunca envia o link de
+  // confirmação ou um botão do Google quebrado.
   .superRefine((values, context) => {
     if (!values.VERCEL_ENV) return;
     for (const key of [
       "APP_URL",
       "GMAIL_USER",
       "GMAIL_APP_PASSWORD",
+      "GOOGLE_CLIENT_ID",
+      "GOOGLE_CLIENT_SECRET",
     ] as const) {
       if (!process.env[key]?.trim()) {
         context.addIssue({

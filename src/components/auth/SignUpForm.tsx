@@ -11,6 +11,7 @@ import { postAuth } from "@/lib/auth-api";
 import { signInLink } from "@/lib/links";
 import { FormMessage, rateLimitMinutes } from "./FormFeedback";
 import { FormField, isMissing } from "./FormField";
+import { GoogleSignInButton } from "./GoogleSignInButton";
 import {
   emailFormField,
   nameFormField,
@@ -80,6 +81,8 @@ export function SignUpForm() {
       className="flex flex-col gap-5"
     >
       {errorText && <FormMessage>{errorText}</FormMessage>}
+
+      <GoogleSignInButton />
 
       <FormField
         label={authCopy.nameLabel}

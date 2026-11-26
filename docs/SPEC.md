@@ -219,6 +219,7 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
 | CSRF | `sameSite=lax` + `proxy.ts` recusando escrita em `/api` com `Origin` de outro site |
 | Link de e-mail reaproveitado | Token de 32 bytes, com hash, uso único e expiração (24h na verificação, 30 min na redefinição). Confirmação por botão, porque robôs de e-mail abrem os links sozinhos |
 | Redirecionamento para site falso | `?next=` aceito só como caminho interno |
+| Retorno do Google forjado ou interceptado | `state` + PKCE (Arctic) em cookies `__Host-` de 10 min, apagados no primeiro uso. Exige `email_verified`. O `id_token` vem direto do Google por HTTPS, em troca do código, por isso não tem a assinatura conferida (caso aceito pela documentação do Google). Qualquer falha volta para o login com aviso genérico; o motivo vai só para o log |
 | XSS | React escapa o texto; ESLint proíbe `dangerouslySetInnerHTML` |
 
 ### Regras

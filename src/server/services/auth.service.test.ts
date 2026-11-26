@@ -2,13 +2,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EmailToken, User } from "@/generated/prisma/client";
 import {
   EmailNotVerifiedError,
+  GoogleEmailNotVerifiedError,
   InvalidCredentialsError,
   InvalidTokenError,
   RateLimitedError,
 } from "@/server/errors/auth.errors";
 import { getEmailService } from "@/server/lib/email/email-service";
 import { hashPassword, verifyPassword } from "@/server/lib/password";
+import { logSecurityEvent } from "@/server/lib/security-log";
 import { emailTokenRepository } from "@/server/repositories/email-token.repository";
+import { oauthAccountRepository } from "@/server/repositories/oauth-account.repository";
 import { userRepository } from "@/server/repositories/user.repository";
 import { authService } from "./auth.service";
 import { rateLimitService } from "./rate-limit.service";
@@ -24,6 +27,14 @@ vi.mock("@/server/repositories/email-token.repository", () => ({
     findValid: vi.fn(),
     consumeAndVerifyEmail: vi.fn(),
     consumeAndResetPassword: vi.fn(),
+  },
+}));
+vi.mock("@/server/repositories/oauth-account.repository", () => ({
+  oauthAccountRepository: {
+    findUser: vi.fn(),
+    link: vi.fn(),
+    claimUnverifiedUser: vi.fn(),
+    createUser: vi.fn(),
   },
 }));
 vi.mock("@/server/lib/password", () => ({
@@ -393,5 +404,127 @@ describe("authService.logout", () => {
 
     expect(sessionService.invalidate).toHaveBeenCalledTimes(1);
     expect(sessionService.invalidate).toHaveBeenCalledWith("token");
+  });
+});
+
+describe("authService.loginWithGoogle", () => {
+  const profile = {
+    providerUserId: "google-123",
+    email: "Ana@Example.com",
+    emailVerified: true,
+    name: "Ana Souza",
+  };
+  const account = { provider: "google", providerUserId: "google-123" };
+  const session = { token: "token-da-sessao", expiresAt: now };
+
+  beforeEach(() => {
+    vi.mocked(oauthAccountRepository.findUser).mockResolvedValue(null);
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(null);
+    vi.mocked(sessionService.create).mockResolvedValue(session);
+  });
+
+  it("signs in the user already linked to this Google account", async () => {
+    const linkedUser = makeUser();
+    vi.mocked(oauthAccountRepository.findUser).mockResolvedValue(linkedUser);
+
+    const result = await authService.loginWithGoogle(profile, origin, now);
+
+    expect(result).toEqual({ user: linkedUser, ...session });
+    expect(oauthAccountRepository.findUser).toHaveBeenCalledWith(account);
+    expect(oauthAccountRepository.link).not.toHaveBeenCalled();
+    expect(sessionService.create).toHaveBeenCalledWith(linkedUser, now);
+  });
+
+  it("refuses a Google email that is not verified", async () => {
+    await expect(
+      authService.loginWithGoogle(
+        { ...profile, emailVerified: false },
+        origin,
+        now,
+      ),
+    ).rejects.toBeInstanceOf(GoogleEmailNotVerifiedError);
+
+    expect(userRepository.findByEmail).not.toHaveBeenCalled();
+    expect(oauthAccountRepository.createUser).not.toHaveBeenCalled();
+    expect(sessionService.create).not.toHaveBeenCalled();
+  });
+
+  it("links Google to an existing verified account, keeping its password", async () => {
+    const verifiedUser = makeUser();
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(verifiedUser);
+
+    const result = await authService.loginWithGoogle(profile, origin, now);
+
+    expect(userRepository.findByEmail).toHaveBeenCalledWith("ana@example.com");
+    expect(oauthAccountRepository.link).toHaveBeenCalledWith("user-1", account);
+    expect(oauthAccountRepository.claimUnverifiedUser).not.toHaveBeenCalled();
+    expect(result.user).toBe(verifiedUser);
+  });
+
+  it("takes over an unverified local account, dropping its password and sessions", async () => {
+    vi.mocked(userRepository.findByEmail).mockResolvedValue(
+      makeUser({ emailVerifiedAt: null, passwordHash: "senha-do-atacante" }),
+    );
+    const claimedUser = makeUser({ emailVerifiedAt: now, passwordHash: null });
+    vi.mocked(oauthAccountRepository.claimUnverifiedUser).mockResolvedValue(
+      claimedUser,
+    );
+
+    const result = await authService.loginWithGoogle(profile, origin, now);
+
+    expect(oauthAccountRepository.claimUnverifiedUser).toHaveBeenCalledWith(
+      "user-1",
+      account,
+      now,
+    );
+    expect(oauthAccountRepository.link).not.toHaveBeenCalled();
+    expect(logSecurityEvent).toHaveBeenCalledWith("google_unverified_claimed", {
+      userId: "user-1",
+      ip: origin.ip,
+    });
+    expect(sessionService.create).toHaveBeenCalledWith(claimedUser, now);
+    expect(result.user).toBe(claimedUser);
+  });
+
+  it("creates a verified account without password for a new email", async () => {
+    const newUser = makeUser({ passwordHash: null, emailVerifiedAt: now });
+    vi.mocked(oauthAccountRepository.createUser).mockResolvedValue(newUser);
+
+    const result = await authService.loginWithGoogle(profile, origin, now);
+
+    expect(oauthAccountRepository.createUser).toHaveBeenCalledWith({
+      ...account,
+      name: "Ana Souza",
+      email: "ana@example.com",
+      now,
+    });
+    expect(result).toEqual({ user: newUser, ...session });
+  });
+
+  it("names the new account after the email when Google sends no name", async () => {
+    vi.mocked(oauthAccountRepository.createUser).mockResolvedValue(makeUser());
+
+    await authService.loginWithGoogle({ ...profile, name: "   " }, origin, now);
+
+    expect(oauthAccountRepository.createUser).toHaveBeenCalledWith(
+      expect.objectContaining({ name: "ana" }),
+    );
+  });
+
+  it("stops before touching accounts when the IP is over the limit", async () => {
+    vi.mocked(rateLimitService.consume).mockRejectedValueOnce(
+      new RateLimitedError(60),
+    );
+
+    await expect(
+      authService.loginWithGoogle(profile, origin, now),
+    ).rejects.toBeInstanceOf(RateLimitedError);
+
+    expect(rateLimitService.consume).toHaveBeenCalledWith(
+      "loginPerIp",
+      origin.ip,
+      now,
+    );
+    expect(oauthAccountRepository.findUser).not.toHaveBeenCalled();
   });
 });
