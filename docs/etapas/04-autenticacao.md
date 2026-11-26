@@ -27,7 +27,7 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 
 - 2FA: TOTP do admin na Etapa 7; do cliente no backlog
 - CSP e cabeçalhos de segurança: Etapa 8 (motivo no SPEC §5)
-- Trocar senha e e-mail logado, lista de dispositivos: backlog
+- Trocar e-mail logado, lista de dispositivos: backlog (a troca de senha logado entrou nesta etapa, ver Parte 2)
 - Telefone e `asaasCustomerId` no usuário: Etapa 6
 - Acesso do `DEMO_ADMIN` e seed de admin: Etapa 7 (agora só o valor no enum)
 - "Finalizar pedido" continua inerte até a Etapa 6
@@ -104,6 +104,7 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 | GET | `/api/auth/me` | Logado | `200 { user }` · `401` |
 | POST | `/api/auth/forgot-password` | Público | `202` sempre |
 | POST | `/api/auth/reset-password` | Público | `200` · `400 INVALID_TOKEN` · `400 PASSWORD_BREACHED` |
+| POST | `/api/auth/change-password` | Logado | `200` · `400 INVALID_CURRENT_PASSWORD` · `400 PASSWORD_BREACHED` · `409 PASSWORD_NOT_SET` · `401` |
 | GET | `/api/auth/google`, `/api/auth/google/callback` | Público | Redirecionamentos |
 
 Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-After`).
@@ -140,6 +141,10 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 
 ## O que mudou em relação ao plano
 
+- **Área da conta redesenhada:** `/conta` e `/conta/dados` (nova). Celular: "Olá" com as iniciais, banner do primeiro pedido e lista em cards. Desktop: menu lateral simples com o título "Minha conta" e, no topo do conteúdo, iniciais, nome, e-mail e "Cliente desde". Dados pessoais em campos só de leitura (viram editáveis quando a edição chegar).
+- **Troca de senha logado** (`/conta/senha`, `POST /api/auth/change-password`): saiu do backlog a pedido, porque mandar quem está logado para o "esqueci a senha" era ruim. Regras no SPEC §5.
+- **Margem lateral única** (`--gutter` no `globals.css`): 24px no celular e no tablet, 40px no desktop.
+
 - **Telas de autenticação:** ficaram num grupo de rotas `(auth)`, sem cabeçalho e rodapé, com um layout único (`AuthShell`): card centralizado sobre a foto da cafeteria, título e subtítulo centralizados ("Entrar", "Criar uma conta").
 - **Redefinir senha:** a tela pede para repetir a senha nova. A conferência é só na tela; o servidor recebe uma senha.
 - **Google:** o botão fica abaixo do botão principal, separado por "ou", com o "G" colorido oficial em SVG (exceção à regra de ícones do Phosphor, nas Decisões).
@@ -151,6 +156,7 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 - **Origem inválida no Google Cloud:** o campo "Origens JavaScript autorizadas" aceita só a origem (`http://localhost:3000`). O caminho do callback vai em "URIs de redirecionamento autorizados".
 - **Segredo do Google num print:** o client secret apareceu numa captura de tela. Foi trocado no Google Cloud na hora. Regra: esconder segredos antes de mandar print.
 - **Nome da conta nova vindo do e-mail:** quando o Google não manda nome, o nome usava o e-mail cru (com maiúsculas). Corrigido usando o e-mail já normalizado, com teste.
+- **Home abrindo no meio (nas categorias) ao voltar de outra aba:** bug antigo, com remendos desde a Etapa 3 (`scrollTo` na barra de baixo e logos apontando para `/#inicio`). Causa real: ao abrir uma página, o Next chama `scrollIntoView` nas seções dela, e com `scroll-behavior: smooth` no `<html>` essas rolagens viravam animações que se atropelavam e paravam no meio. No Next 16 ele só desliga a rolagem suave na troca de página se o `<html>` tiver `data-scroll-behavior="smooth"` (o aviso aparecia no terminal). Corrigido com o atributo; os remendos saíram. Já estando na home, logo e "Início" (`HomeLink`) só sobem até o topo, sem navegar. Testado nas abas (cardápio, produto, carrinho, sobre, perfil/login), no logo do cabeçalho, do rodapé e do login, celular e desktop.
 - **Servidor de desenvolvimento antigo:** um `next dev` aberto desde cedo respondeu com código velho e deixou passar uma senha vazada no teste manual. Reiniciado, a recusa funcionou. Lição: conferir no log se o evento esperado aparece antes de concluir que o código falhou ou passou.
 
 ## Aprendizados

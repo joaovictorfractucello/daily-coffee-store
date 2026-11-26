@@ -64,8 +64,10 @@ O admin **não** marca pedidos como pagos e **não** cancela pedidos já pagos n
 - **Cupom de desconto** (planejar com calma depois das 8 etapas). Pontos a decidir: tabela `Coupon` (código, tipo percentual ou valor fixo, validade, limite de usos, ativo); desconto calculado só no servidor (`cartService.quote` e checkout), copiado no pedido como snapshot; se vale sobre a taxa de entrega; valor mínimo do pedido; uso único por cliente. Riscos: código adivinhável e uso repetido (limite de tentativas na rota) e total negativo ou abaixo do mínimo do Pix/cartão (teste obrigatório)
 - Botão rápido de carrinho nos cards de produto (adiciona 1 unidade sem abrir o produto). Exige mudar o card, que hoje é um link inteiro
 - **2FA para o cliente** (app autenticador, opcional). Obrigatório para cliente derrubaria a conversão. O 2FA do admin está na Etapa 7
-- **Trocar senha e e-mail logado**, pedindo a senha atual de novo (*step-up*) e encerrando as outras sessões
+- **Trocar e-mail logado**, pedindo a senha atual de novo (*step-up*) e confirmando o e-mail novo. (A troca de senha logado entrou na Etapa 4.)
 - Lista de "dispositivos conectados" com opção de encerrar cada sessão
+- **Rastreio do pedido em tempo real** no mapa (referência: [Ai Food Delivery – Order & Profile](https://dribbble.com/shots/27602994-Ai-Food-Delivery-Mobile-App-Order-Profile-Page)). Fora do MVP: a linha de status do pedido (Etapa 6) cobre o essencial
+- **Ilustrações e ícones próprios** (gerados com IA) para estados vazios e detalhes do site: criar na hora em que cada tela precisar, não antes
 ---
  
 ## 3. Stack
@@ -227,6 +229,7 @@ A autenticação foi desenhada a partir dos ataques, não das telas. Detalhes em
 - **E-mail:** sem espaços e em minúsculas antes de salvar e buscar.
 - **Sem e-mail confirmado, sem login.** O aviso aparece só depois da senha certa, com botão para reenviar o link.
 - **Sessão:** cliente 30 dias, renovada quando faltam menos de 15; `ADMIN` e `DEMO_ADMIN` 8 horas, sem renovação.
+- **Troca de senha logado** (`/conta/senha`): pede a senha atual (quem pega um aparelho com a sessão aberta não troca a senha); mesmas regras da senha nova (tamanho e senha vazada); 5 tentativas a cada 15 min por conta; numa transação grava o hash novo, encerra as **outras** sessões (a de quem trocou continua) e invalida links de redefinição pendentes; manda um e-mail de aviso (melhor esforço: a falha do envio não desfaz a troca). Conta só do Google não tem senha atual: cria a senha pelo link de "esqueci a senha".
 - **Limites de tentativas:** login 5 a cada 15 min por IP + e-mail e 30 por IP; cadastro 5 por hora por IP; recuperação e reenvio 3 por hora por e-mail e 10 por IP; confirmação de link 10 a cada 15 min por IP; `/api/cart/quote` 60 por minuto por IP. Estourou: `429` com `Retry-After`.
 - **Telas de autenticação** (`/entrar`, `/cadastro`, `/verificar-email`, `/esqueci-senha`, `/redefinir-senha`): grupo de rotas `(auth)`, sem cabeçalho e rodapé, num layout único com card centralizado sobre a foto da cafeteria. "Continuar com o Google" fica abaixo do botão principal.
 - **Log de segurança** (JSON): login, falha, limite atingido, senha vazada recusada, falha na consulta de senha vazada, cadastro, verificação, redefinição, Google e logout. Com id do usuário ou hash do e-mail e do IP; nunca senha, token ou cookie.
