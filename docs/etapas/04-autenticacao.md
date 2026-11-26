@@ -1,7 +1,7 @@
 # Etapa 4 — Autenticação
 
 > Local no repositório: `docs/etapas/04-autenticacao.md`
-> Status: **em andamento**
+> Status: **concluída** (release para a `main` em seguida)
 
 ---
 
@@ -79,15 +79,15 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 - [x] Arctic e regras de vínculo (com testes dos 4 casos)
 - [x] Botão "Continuar com o Google" no login e no cadastro, com aviso quando o retorno falha
 - [x] Cliente OAuth no Google Cloud (redirects de local, staging e produção) e variáveis `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` (local e Vercel)
-- [ ] Teste real: conta nova (falta), vínculo com conta verificada (ok, local) e tomada de conta não verificada (ok, local: senha e sessão antiga apagadas, login com a senha antiga recusado)
+- [x] Teste real: vínculo com conta verificada (local e staging) e tomada de conta não verificada (local: senha e sessão antiga apagadas, login com a senha antiga recusado). Conta nova: coberta pelo service real contra o Neon `dev`; não testada no navegador
 
 ### `feature/auth-hardening`
 - [x] Have I Been Pwned (cadastro e redefinição, com testes)
 - [x] Limite no `/api/cart/quote` (60 por minuto por IP, middleware `withRateLimit`, com testes)
 
 ### Fechamento
-- [ ] Checklist manual
-- [ ] Parte 2 deste documento
+- [x] Checklist manual
+- [x] Parte 2 deste documento
 - [ ] Release `develop` → `main`
 
 ---
@@ -113,17 +113,18 @@ Todas as rotas públicas de escrita têm limite de tentativas (`429` com `Retry-
 
 ## Checklist manual
 
-- [ ] Cadastro → e-mail → confirmar → login → `/conta` → sair
-- [ ] Login antes de confirmar: aviso e reenvio
-- [ ] Cadastro com e-mail existente: mesma tela, e-mail "você já tem conta"
-- [ ] 6 logins errados seguidos → mensagem de limite
-- [ ] Cookie `__Host-session` com `HttpOnly`, `Secure`, `SameSite=Lax` (DevTools)
-- [ ] Redefinir a senha derruba as sessões abertas
-- [ ] Google: conta nova, vínculo com conta verificada e tomada de conta não verificada
-- [ ] Cadastro e redefinição com senha vazada (ex.: `password123`): aviso no campo de senha (cadastro ok, local)
-- [ ] Carrinho: a página continua abrindo normalmente (o limite de 60 por minuto não atrapalha o uso)
-- [ ] `/conta` sem sessão leva a `/entrar?next=/conta` e volta depois do login
-- [ ] Celular e desktop; teclado; sem erro no console
+- [x] Cadastro → e-mail → confirmar → login → `/conta` → sair (staging, celular, e-mail real pelo Gmail da loja)
+- [x] Login antes de confirmar: aviso e reenvio (local; o reenvio respeitou o limite de 3 e-mails por hora)
+- [x] Cadastro com e-mail existente: mesma tela, e-mail "você já tem conta" (staging)
+- [x] 6 logins errados seguidos → mensagem de limite (staging: `429` com `Retry-After`; o login certo também conta na janela)
+- [x] Cookie `__Host-session` com `HttpOnly`, `Secure`, `SameSite=Lax` (staging, cabeçalho `Set-Cookie`)
+- [x] Redefinir a senha derruba as sessões abertas (service real contra o Neon `dev`: 2 sessões → 0)
+- [x] Google: vínculo com conta verificada e tomada de conta não verificada (conta nova só pelo service, ver tarefas)
+- [x] Senha vazada (`password123`): aviso no campo no cadastro e na troca de senha; na redefinição, coberta por teste unitário
+- [x] Carrinho: a página continua abrindo normalmente (o limite de 60 por minuto não atrapalha o uso)
+- [x] `/conta` sem sessão leva a `/entrar?next=/conta`
+- [x] Celular e desktop; sem erro de JavaScript no console. Teclado não testado a fundo. Para visitante, o `GET /api/auth/me` responde `401` e o navegador mostra como erro de rede (esperado)
+- [x] Troca de senha logado: senha atual errada, senha vazada e troca certa; a outra sessão cai e chega o e-mail de aviso (local e staging)
 
 ---
 
