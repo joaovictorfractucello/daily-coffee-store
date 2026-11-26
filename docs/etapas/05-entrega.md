@@ -97,13 +97,13 @@ Limites de tentativas (`429` com `Retry-After`): cotação, 30 por minuto por IP
 
 - Endereços e cálculo de entrega funcionando em local e no staging
 - Testes unitários das regras e Postman cobrindo as rotas
-- Seed das cidades rodado em produção depois da release
+- Cidades no banco de produção depois da release (seed automático no build da Vercel; conferir no log)
 
 ---
 
 # Parte 2 — Registro
 
-> Preenchida com o que já foi feito. Falta: commits, push para a `develop`, checklist no staging, release e seed das cidades em produção.
+> Preenchida com o que já foi feito. Falta: checklist no staging e release. As cidades entram em produção sozinhas: o build da Vercel roda `migrate deploy` e `db seed` (decisão da Etapa 2).
 
 ## O que mudou em relação ao plano
 
