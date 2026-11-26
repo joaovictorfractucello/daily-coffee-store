@@ -11,7 +11,7 @@ export function FormMessage({
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={`rounded-[8px] px-4 py-3 text-sm ${tone === "error" ? "bg-[#b3261e]/8 text-[#8c1d18]" : "bg-muted text-ink"}`}
+      className={`rounded-[8px] px-4 py-3 text-sm ${tone === "error" ? "bg-danger/8 text-danger-ink" : "bg-muted text-ink"}`}
     >
       {children}
     </p>

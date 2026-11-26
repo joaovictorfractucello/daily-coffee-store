@@ -14,6 +14,8 @@
   --color-dark: #2a1d16;
   --color-accent: #8f5c33;
   --color-light: #f6eee4;
+  --color-danger: #b3261e;
+  --color-danger-ink: #8c1d18;
 
   /* Raio zero em tudo: a linguagem do site é de retângulos nítidos. */
   --radius-xs: 0;
