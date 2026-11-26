@@ -90,7 +90,7 @@ export function Hero({ banner }: { banner: HeroBannerName }) {
             "--cta-text": "#2A1D16",
           } as CSSProperties
         }
-        className="on-dark relative isolate overflow-hidden bg-dark text-center text-light [--cx:68%] [--vh:1cqh] [--vw:1cqw] max-md:[container-type:size] max-md:mx-4 max-md:mt-14 max-md:aspect-[16/10] max-md:min-h-0 max-md:rounded-[1.5rem] max-md:[clip-path:inset(0_round_1.5rem)] md:min-h-svh md:[--cx:60%] md:[--vh:1svh] md:[--vw:1vw]"
+        className="on-dark relative isolate overflow-hidden bg-dark text-center text-light [--cx:68%] [--vh:1cqh] [--vw:1cqw] max-md:[container-type:size] max-md:mx-(--gutter) max-md:mt-14 max-md:aspect-[16/10] max-md:min-h-0 max-md:rounded-[1.5rem] max-md:[clip-path:inset(0_round_1.5rem)] md:min-h-svh md:[--cx:60%] md:[--vh:1svh] md:[--vw:1vw]"
       >
         <Image
           src={images.background.file}

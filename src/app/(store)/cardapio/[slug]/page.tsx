@@ -79,7 +79,7 @@ async function SlugContent({ params }: { params: Promise<{ slug: string }> }) {
 
 export default function SlugPage({ params }: PageProps<"/cardapio/[slug]">) {
   return (
-    <div className="px-4 pt-24 pb-12 sm:px-6 md:pt-28 md:pb-[4.5rem] lg:px-10">
+    <div className="px-(--gutter) pt-24 pb-12 md:pt-28 md:pb-[4.5rem]">
       <div className="mx-auto max-w-7xl">
         <Suspense fallback={<ProductDetailsSkeleton />}>
           <SlugContent params={params} />

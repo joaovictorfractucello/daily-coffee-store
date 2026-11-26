@@ -19,7 +19,7 @@ const isolatedPhotoSizes =
 
 // Cardápio completo: cada categoria é uma fileira que rola de lado no celular.
 const carouselListClass =
-  "-mx-4 mt-6 flex [scrollbar-width:none] gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 md:mx-0 md:grid md:grid-cols-3 md:gap-x-6 md:gap-y-10 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden";
+  "-mx-(--gutter) mt-6 flex [scrollbar-width:none] gap-4 overflow-x-auto px-(--gutter) pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-x-6 md:gap-y-10 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden";
 const carouselItemClass =
   "w-[62vw] max-w-[15rem] shrink-0 md:w-auto md:max-w-none";
 

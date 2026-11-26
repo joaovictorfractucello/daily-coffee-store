@@ -25,7 +25,7 @@ export function Categories() {
   return (
     <section
       aria-labelledby="categories-title"
-      className="px-4 pt-8 sm:px-6 md:pt-16 lg:px-10"
+      className="px-(--gutter) pt-8 md:pt-16"
     >
       <h2 id="categories-title" className="sr-only">
         {categoriesCopy.title}

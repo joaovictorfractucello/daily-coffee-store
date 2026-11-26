@@ -53,7 +53,7 @@ export function Favorites() {
       aria-labelledby="favorites-title"
       className="py-12 md:py-[4.5rem] lg:px-10"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-0">
+      <div className="mx-auto max-w-7xl px-(--gutter) lg:px-0">
         <Reveal className="flex items-baseline justify-between gap-6">
           <h2
             id="favorites-title"
@@ -76,7 +76,7 @@ export function Favorites() {
         role="region"
         aria-label={favoritesCopy.title}
         tabIndex={0}
-        className="mt-10 grid [scrollbar-width:none] grid-cols-2 gap-x-4 gap-y-8 px-4 pb-4 sm:px-6 md:flex md:gap-4 md:overflow-x-auto lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden"
+        className="mt-10 grid [scrollbar-width:none] grid-cols-2 gap-x-4 gap-y-8 px-(--gutter) pb-4 md:flex md:gap-4 md:overflow-x-auto lg:mx-auto lg:grid lg:max-w-7xl lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0 lg:overflow-visible lg:px-0 lg:pb-0 [&::-webkit-scrollbar]:hidden"
       >
         <Suspense fallback={<FeaturedProductsSkeleton />}>
           <FeaturedProducts />

@@ -29,6 +29,20 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/*
+  Margem lateral do site (gutter): um valor só, usado por páginas, cabeçalho, rodapé e carrosséis
+  (px-(--gutter), -mx-(--gutter)). Celular e tablet 24px, desktop 40px.
+*/
+:root {
+  --gutter: 1.5rem;
+}
+
+@media (min-width: 64rem) {
+  :root {
+    --gutter: 2.5rem;
+  }
+}
+
 /* --font-display e --font-text são criadas pelo next/font em app/fonts.ts. */
 @theme inline {
   --font-sans: var(--font-text), sans-serif;

@@ -17,7 +17,7 @@ export function Footer() {
 
   return (
     // No celular, o espaço extra embaixo evita que a barra fixa do WhatsApp cubra o rodapé.
-    <footer className="border-t border-line px-4 pb-20 sm:px-6 lg:px-10 lg:pb-0">
+    <footer className="border-t border-line px-(--gutter) pb-20 lg:pb-0">
       <div className="mx-auto max-w-7xl py-10 md:py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr_1.4fr] md:gap-x-10">
           <div className="col-span-2 md:col-span-1">

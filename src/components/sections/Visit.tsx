@@ -35,7 +35,7 @@ export function Visit() {
     <section
       id="visitar"
       aria-labelledby="visit-title"
-      className="scroll-mt-4 px-4 pb-12 sm:px-6 md:pb-[4.5rem] lg:px-10"
+      className="scroll-mt-4 px-(--gutter) pb-12 md:pb-[4.5rem]"
     >
       <div className="mx-auto max-w-7xl">
         <Reveal>

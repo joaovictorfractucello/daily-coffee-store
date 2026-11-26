@@ -37,7 +37,7 @@ export async function RelatedProducts({ product }: { product: PublicProduct }) {
           <ArrowRight aria-hidden="true" size={14} weight="bold" />
         </Link>
       </div>
-      <ul className="-mx-4 mt-6 flex [scrollbar-width:none] gap-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden">
+      <ul className="-mx-(--gutter) mt-6 flex [scrollbar-width:none] gap-4 overflow-x-auto px-(--gutter) pb-2 lg:mx-0 lg:px-0 [&::-webkit-scrollbar]:hidden">
         {related.map((relatedProduct) => (
           <li
             key={relatedProduct.id}
