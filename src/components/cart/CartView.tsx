@@ -111,14 +111,17 @@ export function CartView() {
         aria-labelledby="cart-summary-title"
         className="rounded-[1.25rem] border border-line p-5 lg:sticky lg:top-28"
       >
-        <h2 id="cart-summary-title" className="font-bold">
+        <h2
+          id="cart-summary-title"
+          className="heading-soft text-[1.125rem] md:text-[1.375rem]"
+        >
           {cartPage.summaryTitle}
         </h2>
         <dl className="mt-4 flex items-baseline justify-between gap-4">
-          <dt className="text-ink-soft">
+          <dt className="text-[0.9375rem] text-ink-soft">
             {cartPage.subtotal} ({cartPage.itemCount(countCartUnits(items))})
           </dt>
-          <dd className="text-xl font-bold tabular-nums">
+          <dd className="text-lg font-bold tabular-nums">
             {formatPrice(subtotalInCents)}
           </dd>
         </dl>

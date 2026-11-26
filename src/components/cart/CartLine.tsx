@@ -42,7 +42,7 @@ export function CartLine({
 
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="leading-snug font-bold">
+          <h2 className="text-[0.9375rem] leading-snug font-bold sm:text-base">
             <Link href={productLink} className="hover:underline">
               {product.name}
             </Link>
@@ -51,12 +51,12 @@ export function CartLine({
             type="button"
             onClick={onRemove}
             aria-label={cartPage.remove(product.name)}
-            className="-mt-2 -mr-2 inline-flex size-11 shrink-0 cursor-pointer items-center justify-center text-ink-soft transition-colors hover:text-ink"
+            className="-mt-2.5 -mr-2.5 inline-flex size-10 shrink-0 cursor-pointer items-center justify-center text-ink-soft transition-colors hover:text-ink"
           >
-            <Trash aria-hidden="true" size={22} />
+            <Trash aria-hidden="true" size={19} />
           </button>
         </div>
-        <p className="text-sm text-ink-soft tabular-nums">
+        <p className="mt-0.5 text-sm text-ink-soft tabular-nums">
           {cartPage.unitPrice(formatPrice(product.priceInCents))}
         </p>
 
@@ -65,8 +65,9 @@ export function CartLine({
             value={quantity}
             onChange={onQuantityChange}
             label={cartPage.quantityOf(product.name)}
+            size="sm"
           />
-          <p className="font-bold tabular-nums">
+          <p className="text-[0.9375rem] font-bold tabular-nums sm:text-base">
             {formatPrice(product.priceInCents * quantity)}
           </p>
         </div>
