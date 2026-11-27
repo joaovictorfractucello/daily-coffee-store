@@ -55,7 +55,7 @@ A etapa foi desenhada a partir das **ameaças**: cada defesa existe por causa de
 | Botão do Google abaixo do botão principal, separado por "ou", no login e no cadastro | E-mail e senha continuam sendo o caminho principal da tela |
 | "G" colorido do Google em SVG (`GoogleIcon`), exceção à regra de ícones só do Phosphor | As diretrizes de marca do Google pedem o logo oficial no botão de login; o Phosphor só tem a versão de uma cor |
 | Limite do `/api/cart/quote` no middleware `withRateLimit`, não no `cartService` | O checkout (Etapa 6) reaproveita o service e terá os próprios limites. O limite roda antes de ler o corpo |
-| App do Google em modo **Teste** (só usuários de teste entram) até a Etapa 8 | Publicar exige URL de política de privacidade, que o site ainda não tem. A página `/privacidade` e a publicação ficam no Polimento |
+| App do Google em modo **Teste** até a Etapa 8 | Publicar exige URL de política de privacidade, que o site ainda não tem. A página `/privacidade` e a publicação ficam no Polimento. **Correção (27/11/2026):** o modo Teste **não** fecha o login. Uma conta fora da lista de usuários de teste se cadastrou pelo Google na produção, e o console seguiu mostrando "0 outros". Provável motivo: só pedimos escopos não sensíveis (`openid`, `email`, `profile`). O cadastro está aberto a qualquer pessoa, pelo Google e por e-mail, o que é aceito para a loja. Publicar o app passa a servir só para a tela de consentimento mostrar nome, logo e política de privacidade |
 | Trabalho em `feature/auth-*`, cada uma com PR para a `develop` | Etapa grande, com migration e segurança: o staging só recebe cada parte pronta |
 
 ---
